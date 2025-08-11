@@ -145,6 +145,12 @@ void mas_string_insert_at(masString** StringRef, int Offset, const masChar* Text
 
 }
 
+int mas_string_size(masString* String)
+{
+    if(!String)
+        return 0;
+    return String->Size;
+}
 
 
 
@@ -165,6 +171,7 @@ int main(int argc, const char** argv)
     mas_string_insert_last(&IntroMsg, L" immortals who loves to be on the verge of destruction.");
     mas_string_insert_first(&IntroMsg, L"Welcome to the masEngine, we are ");
     mas_string_insert_replace(&IntroMsg, L"Glad you", L"glad you've");
-    mas_string_remove(Intro, )
+    mas_string_remove(Intro, "immortals");
+
     return 0;
 }
