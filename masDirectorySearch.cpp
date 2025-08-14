@@ -34,6 +34,7 @@ struct masFoundFiles
     int32_t  Size;
     int32_t  AllocIdx;
     int32_t  GetIdx;
+    int32_t  FileCount;
 };
 
 struct masSubFolders
@@ -75,7 +76,7 @@ static bool mas_interanl_skip_search(const char* FileName)
     return false;
 }
 
-static void mas_internal_add_sub_folder_path(masSubFolders* SubFolders, const char* SearchingPath, const char* FolderName)
+static void mas_internal_sub_folder_add_path(masSubFolders* SubFolders, const char* SearchingPath, const char* FolderName)
 {
     int32_t  SearchPathSize = strlen(SearchingPath) - 1;
     int32_t  FolderNameSize = strlen(FolderName);
@@ -95,7 +96,7 @@ static void mas_internal_add_sub_folder_path(masSubFolders* SubFolders, const ch
         printf("[ FAILED ]: MAS_DIRECTORY_SEARCH -> interanl sub folder path list is full to add\n\t\t%s\\%s\n", SearchingPath, FolderName);
 }
 
-static bool mas_internal_get_sub_folder_path(masSubFolders* SubFolders, char* OutSearchingPath)
+static bool mas_internal_sub_folder_get_path(masSubFolders* SubFolders, char* OutSearchingPath)
 {
     int32_t  GetIdx            = SubFolders->GetIdx;
     char    *SubFolderPath     = SubFolders->PathList[GetIdx];
@@ -125,9 +126,10 @@ static void mas_internal_found_file_add(masFoundFiles* FoundFiles, const char* F
     int32_t PathSize      = (FilePathSize + (NameSize - 1) + (ExtensionSize - 1)) + 1; //
 
     int32_t RequiredSize = sizeof(masFile) + PathSize + NameSize + ExtensionSize; 
-    if(RequiredSize >= (MAS_FILES_BUFFER_SIZE - FoundFiles->AllocIdx))
+    if(RequiredSize >= (FoundFiles->Size - FoundFiles->AllocIdx))
     {
         printf("[ FAILED ]: MAS_DIRECTORY_SEARCH -> adding found file, internal buffer is full for ( %s\\%s.%s)\n", FilePath, FileName, FileExtension);
+        printf("               MAX_FILE_COUNT_REACHED: %d\n", FoundFiles->FileCount);
         return;
     }
 
@@ -146,6 +148,8 @@ static void mas_internal_found_file_add(masFoundFiles* FoundFiles, const char* F
 
     memcpy(File->Name,      FileName,      NameSize);
     memcpy(File->Extension, FileExtension, ExtensionSize);
+
+    FoundFiles->FileCount++;
 }
 
 static bool mas_internal_has_extension(const char* FileName)
@@ -259,7 +263,7 @@ masFoundFiles* mas_directory_search_run(masDirectorySearch* DirectorySearch, con
         if(!mas_interanl_skip_search(FindData.cFileName))
         {
             if(FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                mas_internal_add_sub_folder_path(DirectorySearch->SubFolders, SearchingPath, FindData.cFileName);
+                mas_internal_sub_folder_add_path(DirectorySearch->SubFolders, SearchingPath, FindData.cFileName);
             else
                 mas_internal_process_found_file(&DirectorySearch->FoundFiles, SearchingPath, FindData.cFileName, Targets, TargetCount);
         }
@@ -268,7 +272,7 @@ masFoundFiles* mas_directory_search_run(masDirectorySearch* DirectorySearch, con
         {
             FindClose(FileHandle);
  
-            if(!mas_internal_get_sub_folder_path(DirectorySearch->SubFolders, SearchingPath))
+            if(!mas_internal_sub_folder_get_path(DirectorySearch->SubFolders, SearchingPath))
                 break;
 
             //FileHandle = FindFirstFileExA(SearchingPath, FindExInfoBasic, &FindData, FindExSearchMaxSearchOp, NULL, FIND_FIRST_EX_LARGE_FETCH);
