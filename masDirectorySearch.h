@@ -4,7 +4,7 @@
 /**************************************
 * 
 ***************************************/
-struct masDirectorySearch;
+struct masDirectorySearch ;
 struct masFile;
 
 
@@ -23,27 +23,3 @@ masFile*            mas_directory_search_find_next(masDirectorySearch* Directory
 const char* mas_file_name(masFile* File);
 const char* mas_file_path(masFile* File);
 const char* mas_file_extension(masFile* File);
-
-
-/**************************************
-* API TEST
-***************************************/
-int main()
-{
-    const char* AssetPath = "";
-
-    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create(AssetPath, true);
-
-    const char *SearchTarget[]    = { "BackgroundAmbient", ".png", "IntroVideo", ".tga", ".jpeg", ".jpg" };
-    int32_t     SearchTargetCount = (sizeof(SearchTarget)/sizeof(SearchTarget[0]));
-    masFile    *File              = mas_directory_search_find(AssetSearchDirectory, SearchTarget, SearchTargetCount);
-    for(; !File; File = mas_directory_search_find_next(AssetSearchDirectory))
-    {
-        printf("FILE_PATH:      %s\n",   mas_file_name(File));
-        printf("FILE_NAME:      %s\n",   mas_file_path(File));
-        printf("FILE_EXTENSION: %s\n",   mas_file_extension(File));
-        printf("FILE_SIZE:      %llu\n", mas_file_size(File));
-    }
-
-    mas_directory_search_destroy(&AssetSearch);
-}

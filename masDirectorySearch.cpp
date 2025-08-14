@@ -2,7 +2,10 @@
 #include <Windows.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
+//#include "masDirectorySearch.h"
 
 /***********************************************************************************************************
 *
@@ -38,13 +41,12 @@ struct masSubFolders
     char    PathList[MAS_SUB_FOLDER_COUNT][MAS_PATH_SIZE];
     int32_t AddIdx;
     int32_t GetIdx;
-}
+};
 
 struct masDirectorySearch
 {
     masSubFolders *SubFolders;
     masFoundFiles  FoundFiles;
-    bool           EnableRecursiveSearch;
     char           Path[MAS_PATH_SIZE];
 };
 
@@ -58,7 +60,7 @@ static bool mas_interanl_skip_search(const char* FileName)
     static int         IgnoreFileCount = MAS_ARRAY_SIZE(IgnoreFiles);
 
     for(int32_t i = 0; i < IgnoreFileCount; ++i)
-        if(strcmp(IgnoreFiles[i], FindData.CFileName) == 0)
+        if(strcmp(IgnoreFiles[i], FileName) == 0)
             return true;
     
     return false;
@@ -93,7 +95,7 @@ static bool mas_internal_get_sub_folder_path(masSubFolders* SubFolders, char* Ou
     {
         memset(OutSearchingPath, 0, MAS_PATH_SIZE);
         memcpy(OutSearchingPath, SubFolderPath, SubFolderPathSize);
-        memset(SubFolderPathSize, 0, SubFolderPathSize);
+        memset(SubFolderPath, 0, SubFolderPathSize);
 
         SubFolders->GetIdx++;
         if(SubFolders->GetIdx >= MAS_SUB_FOLDER_COUNT)
@@ -106,21 +108,21 @@ static bool mas_internal_get_sub_folder_path(masSubFolders* SubFolders, char* Ou
 }
 
 
-static void mas_interanl_found_file_add(masFoundFiles* FoundFiles, const char* FilePath, const char* FileName, const char* FileExtension)
+static void mas_internal_found_file_add(masFoundFiles* FoundFiles, const char* FilePath, const char* FileName, const char* FileExtension)
 {
     int32_t PathSize      = strlen(FilePath)      + 1; // null terminator
     int32_t NameSize      = strlen(FileName)      + 1; // null terminator
     int32_t ExtensionSize = strlen(FileExtension) + 1; // null terminator
 
-    int32_t RequriedSize = sizeof(masFile) + PathSize + NameSize + ExtensionSize; 
-    if(RequiredSize >= (MAS_FILES_BUFFER_SIZE - FoundFiles->AllocSize))
+    int32_t RequiredSize = sizeof(masFile) + PathSize + NameSize + ExtensionSize; 
+    if(RequiredSize >= (MAS_FILES_BUFFER_SIZE - FoundFiles->AllocIdx))
     {
-        printf("[ FAILED ]: MAS_DIRECTORY_SEARCH -> adding found file, internal buffer is full for ( %s\\%s.%s)\n",, FilePath, Filename, FileExtension);
+        printf("[ FAILED ]: MAS_DIRECTORY_SEARCH -> adding found file, internal buffer is full for ( %s\\%s.%s)\n", FilePath, FileName, FileExtension);
         return;
     }
 
-    masFile* File = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->AllocSize);
-    FoundFiles->Allocsize += RequiredSize;
+    masFile* File = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->AllocIdx);
+    FoundFiles->AllocIdx += RequiredSize;
 
     File->Path           = MAS_PTR_OFFSET(char, File,       sizeof(masFile));
     File->Name           = MAS_PTR_OFFSET(char, File->Path, PathSize);
@@ -136,7 +138,7 @@ static bool mas_internal_has_extension(const char* FileName)
 {
     int32_t FileNameSize = strlen(FileName);
     for(int32_t i = FileNameSize - 1; i >= 0; --i)
-        if(FileName[i] == ".")
+        if(FileName[i] == '.')
             return true;
     return false;
 }
@@ -152,7 +154,7 @@ static void mas_internal_process_found_file(masFoundFiles* FoundFiles, const cha
     int32_t FileNameSize    = strlen(FileName);
     int32_t ExtensionOffset = 0;
     for(; ExtensionOffset < FileNameSize; ++ExtensionOffset)
-        if(FileName[ExtensionOffset] == ".")
+        if(FileName[ExtensionOffset] == '.')
             break;
     int32_t ExtensionSize = FileNameSize - ExtensionOffset;
     int32_t NameSize      = ExtensionOffset;
@@ -162,10 +164,10 @@ static void mas_internal_process_found_file(masFoundFiles* FoundFiles, const cha
     for(int32_t i = 0; i < TargetCount; ++i)
     {
         const char* Target = Targets[i];
-        if(Target[0] == ".")
+        if(Target[0] == '.')
         {
             if(strcmp(Extension, Target) == 0)
-                mas_interanl_found_file_add(FoundFiles, SearchingPath, Name, Extension);
+                mas_internal_found_file_add(FoundFiles, SearchingPath, Name, Extension);
         }
         else if(!mas_internal_has_extension(Target))
         {
@@ -196,11 +198,11 @@ masDirectorySearch* mas_directory_search_create(const char* Path)
         return NULL;
     memset(DirectorySearch, 0, AllocSize);
 
-    memcpy(DirectorySearch->Path, 0, PathLen);
-    DirectorySearch->SubFolders             = MAS_PTR_OFFSET(masSubFolders, DirectorySearch,             sizeof(masDirectorySearch));
-    DirectorySearch->FoundFiles.Files       = MAS_PTR_OFFSET(masFoundFiles, DirectorySearch->SubFolders, sizeof(masSubFolders));
-    DirectorySearch->SearchBuffer->Size     = MAS_SEARCH_BUFFER_SIZE;
-    DirectorySearch->SearchBuffer->AllocIdx = 0;
+    memcpy(DirectorySearch->Path, Path, PathLen);
+    DirectorySearch->SubFolders          = MAS_PTR_OFFSET(masSubFolders, DirectorySearch,             sizeof(masDirectorySearch));
+    DirectorySearch->FoundFiles.Files    = MAS_PTR_OFFSET(uint8_t,       DirectorySearch->SubFolders, sizeof(masSubFolders));
+    DirectorySearch->FoundFiles.Size     = MAS_FILES_BUFFER_SIZE;
+    DirectorySearch->FoundFiles.AllocIdx = 0;
 
     return DirectorySearch;
 }
@@ -219,7 +221,7 @@ masFile* mas_directory_search_find(masDirectorySearch* DirectorySearch, const ch
         return NULL;
 
     int32_t SearchingPathSize = strlen(DirectorySearch->Path);
-    if(SearchignPathSize <= 0)
+    if(SearchingPathSize <= 0)
         return NULL;
 
     WIN32_FIND_DATA FindData;
@@ -227,7 +229,7 @@ masFile* mas_directory_search_find(masDirectorySearch* DirectorySearch, const ch
 
     char SearchingPath[MAS_PATH_SIZE];
     memset(SearchingPath, 0, MAS_PATH_SIZE);
-    memcpy(SearchingPath, DirectorySearching->Path, SearchingPathSize);
+    memcpy(SearchingPath, DirectorySearch->Path, SearchingPathSize);
 
     HANDLE      FileHandle    = FindFirstFileExA(SearchingPath, FindExInfoBasic, &FindData, FindExSearchMaxSearchOp, NULL, FIND_FIRST_EX_LARGE_FETCH);
     if(FileHandle == INVALID_HANDLE_VALUE)
@@ -239,9 +241,9 @@ masFile* mas_directory_search_find(masDirectorySearch* DirectorySearch, const ch
         if(!mas_interanl_skip_search(FindData.cFileName))
         {
             if(FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                mas_internal_add_sub_folder_path(SearchingPath, FindData.cFileName);
+                mas_internal_add_sub_folder_path(DirectorySearch->SubFolders, SearchingPath, FindData.cFileName);
             else
-                mas_internal_process_found_file(DirectorySearch->FoundFiles, SearchingPath, FindData.cFileName, Targets, TargetCount);
+                mas_internal_process_found_file(&DirectorySearch->FoundFiles, SearchingPath, FindData.cFileName, Targets, TargetCount);
         }
 
         if(!FindNextFileA(FileHandle, &FindData))
@@ -257,7 +259,14 @@ masFile* mas_directory_search_find(masDirectorySearch* DirectorySearch, const ch
         }
     }
 
-    return mas_directory_search_find_next(DirectorySearch);
+
+    masFoundFiles* FoundFiles = &DirectorySearch->FoundFiles;
+    if(FoundFiles->GetIdx >= FoundFiles->AllocIdx)
+        return NULL;
+    masFile *File       = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->GetIdx);
+    FoundFiles->GetIdx += File->NextFileOffset;
+
+    return File;
 }
 
 masFile* mas_directory_search_find_next(masDirectorySearch* DirectorySearch)
@@ -265,11 +274,62 @@ masFile* mas_directory_search_find_next(masDirectorySearch* DirectorySearch)
     if(!DirectorySearch)
         return NULL;
 
-    masFoundFiles* FoundFiles = DirectorySearch->FoundFiles;
-    if(FoundFiles->GetIdx >= AllocIdx)
+    masFoundFiles* FoundFiles = &DirectorySearch->FoundFiles;
+    if(FoundFiles->GetIdx >= FoundFiles->AllocIdx)
         return NULL;
     masFile *File       = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->GetIdx);
     FoundFiles->GetIdx += File->NextFileOffset;
 
     return File;
+}
+
+
+/**************************************
+* 
+***************************************/
+const char* mas_file_name(masFile* File)      
+{ 
+    if(!File) 
+        return NULL; 
+    return File->Name; 
+}
+
+const char* mas_file_path(masFile* File)      
+{ 
+    if(!File) 
+        return NULL; 
+    return File->Path; 
+}
+
+const char* mas_file_extension(masFile* File) 
+{ 
+    if(!File) 
+        return NULL; 
+    return File->Extension; 
+}
+
+
+
+/**************************************
+* API TEST
+***************************************/
+int main(int argc, const char** argv)
+{
+    char Path[MAS_PATH_SIZE];
+    memset(Path, 0, MAS_PATH_SIZE);
+    GetCurrentDirectory(MAS_PATH_SIZE, Path);
+
+    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create(Path);
+
+    const char *SearchTarget[]    = { "BackgroundAmbient", ".png", "IntroVideo", ".tga", ".jpeg", ".jpg", ".obj", ".exe", ".c", ".h"};
+    int32_t     SearchTargetCount = (sizeof(SearchTarget)/sizeof(SearchTarget[0]));
+    masFile    *File              = mas_directory_search_find(AssetSearchDirectory, SearchTarget, SearchTargetCount);
+    for(; File; File = mas_directory_search_find_next(AssetSearchDirectory))
+    {
+        printf("FILE_PATH:      %s\n", mas_file_name(File));
+        printf("FILE_NAME:      %s\n", mas_file_path(File));
+        printf("FILE_EXTENSION: %s\n", mas_file_extension(File));
+    }
+
+    mas_directory_search_destroy(&AssetSearchDirectory);
 }
