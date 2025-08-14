@@ -19,11 +19,10 @@
 ************************************************************************************************************/
 struct masFile
 {
-    const char* Path;
-    const char* Name;
-    const char* Extension;
-    uint64_t    Size;
-    uint64_t    NextFileOffset;
+    char     *Path;
+    char     *Name;
+    char     *Extension;
+    uint64_t  NextFileOffset;
 };
 
 struct masFoundFiles
@@ -31,6 +30,7 @@ struct masFoundFiles
     uint8_t *Files;
     int32_t  Size;
     int32_t  AllocIdx;
+    int32_t  GetIdx;
 };
 
 struct masSubFolders
@@ -108,7 +108,28 @@ static bool mas_internal_get_sub_folder_path(masSubFolders* SubFolders, char* Ou
 
 static void mas_interanl_found_file_add(masFoundFiles* FoundFiles, const char* FilePath, const char* FileName, const char* FileExtension)
 {
+    int32_t PathSize      = strlen(FilePath)      + 1; // null terminator
+    int32_t NameSize      = strlen(FileName)      + 1; // null terminator
+    int32_t ExtensionSize = strlen(FileExtension) + 1; // null terminator
 
+    int32_t RequriedSize = sizeof(masFile) + PathSize + NameSize + ExtensionSize; 
+    if(RequiredSize >= (MAS_FILES_BUFFER_SIZE - FoundFiles->AllocSize))
+    {
+        printf("[ FAILED ]: MAS_DIRECTORY_SEARCH -> adding found file, internal buffer is full for ( %s\\%s.%s)\n",, FilePath, Filename, FileExtension);
+        return;
+    }
+
+    masFile* File = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->AllocSize);
+    FoundFiles->Allocsize += RequiredSize;
+
+    File->Path           = MAS_PTR_OFFSET(char, File,       sizeof(masFile));
+    File->Name           = MAS_PTR_OFFSET(char, File->Path, PathSize);
+    File->Extension      = MAS_PTR_OFFSET(char, File->Name, NameSize);
+    File->NextFileOffset = RequiredSize;
+
+    memcpy(File->Path,      FilePath,      PathSize);
+    memcpy(File->Name,      FileName,      NameSize);
+    memcpy(File->Extension, FileExtension, ExtensionSize);
 }
 
 static bool mas_internal_has_extension(const char* FileName)
@@ -236,10 +257,19 @@ masFile* mas_directory_search_find(masDirectorySearch* DirectorySearch, const ch
         }
     }
 
-    return masFile*;
+    return mas_directory_search_find_next(DirectorySearch);
 }
 
 masFile* mas_directory_search_find_next(masDirectorySearch* DirectorySearch)
 {
+    if(!DirectorySearch)
+        return NULL;
 
+    masFoundFiles* FoundFiles = DirectorySearch->FoundFiles;
+    if(FoundFiles->GetIdx >= AllocIdx)
+        return NULL;
+    masFile *File       = MAS_PTR_OFFSET(masFile, FoundFiles->Files, FoundFiles->GetIdx);
+    FoundFiles->GetIdx += File->NextFileOffset;
+
+    return File;
 }

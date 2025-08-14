@@ -23,7 +23,6 @@ masFile*            mas_directory_search_find_next(masDirectorySearch* Directory
 const char* mas_file_name(masFile* File);
 const char* mas_file_path(masFile* File);
 const char* mas_file_extension(masFile* File);
-uint64_t    mas_file_size(masFile* File);
 
 
 /**************************************
