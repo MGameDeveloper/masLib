@@ -5,7 +5,13 @@
 * 
 ***************************************/
 struct masDirectorySearch ;
-struct masFile;
+struct masFoundFiles;
+struct masFile
+{
+    const char* Path;
+    const char* Name;
+    const char* Extension;
+};
 
 
 /**************************************
@@ -13,13 +19,6 @@ struct masFile;
 ***************************************/
 masDirectorySearch* mas_directory_search_create(const char* Path);
 void                mas_directory_search_destroy(masDirectorySearch** DirectorySearch);
-masFile*            mas_directory_search_find(masDirectorySearch* DirectorySearch, const char** Targets, int32_t TargetCount);
-masFile*            mas_directory_search_find_next(masDirectorySearch* DirectorySearch);
+masFoundFiles*      mas_directory_search_run(masDirectorySearch* DirectorySearch, const char** Targets, int32_t TargetCount);
+masFile*            mas_found_files_next(masFoundFiles* FoundFiles);
 
-
-/**************************************
-* 
-***************************************/
-const char* mas_file_name(masFile* File);
-const char* mas_file_path(masFile* File);
-const char* mas_file_extension(masFile* File);
