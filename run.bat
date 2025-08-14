@@ -1,0 +1,2 @@
+
+build\masDirectorySearch.exe

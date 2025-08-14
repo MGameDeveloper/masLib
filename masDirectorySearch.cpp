@@ -301,6 +301,12 @@ masFile* mas_found_files_next(masFoundFiles* FoundFiles)
     return File;
 }
 
+int32_t mas_found_files_count(masFoundFiles* FoundFiles)
+{
+    if(!FoundFiles)
+        return 0;
+    return FoundFiles->FileCount;
+}
 
 
 
@@ -316,9 +322,9 @@ int main(int argc, const char** argv)
     Path[PathSize++] = '\\';
     Path[PathSize++] = '*';
 
-    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create(Path);
+    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create("D:\\SDKs\\wx328\\*");
 
-    const char    *SearchTarget[]    = { "BackgroundAmbient", ".png", "IntroVideo", ".tga", ".jpeg", ".jpg", ".obj", ".exe", ".c", ".h", ".ilk", ".pdb", ".bat"};
+    const char    *SearchTarget[]    = { "BackgroundAmbient", ".png", "IntroVideo", ".tga", ".jpeg", ".jpg", ".obj", ".exe", ".c", ".h", ".ilk", ".pdb", ".bat", ".iso"};
     int32_t        SearchTargetCount = (sizeof(SearchTarget)/sizeof(SearchTarget[0]));
     masFoundFiles *FoundFiles        = mas_directory_search_run(AssetSearchDirectory, SearchTarget, SearchTargetCount);
 
@@ -329,6 +335,8 @@ int main(int argc, const char** argv)
         printf("\tNAME:      %s\n", File->Name);
         printf("\tEXTENSION: %s\n", File->Extension);
     }
+
+    printf("\n FOUND_FILES_COUNT: %d\n\n", mas_found_files_count(FoundFiles));
 
     mas_directory_search_destroy(&AssetSearchDirectory);
 }
