@@ -1,2 +1,2 @@
 
-devenv build\masdirectorysearch.sln
+devenv /DebugExe build\masDirectorySearch.exe
