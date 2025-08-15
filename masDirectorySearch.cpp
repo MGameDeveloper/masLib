@@ -11,8 +11,8 @@
 *
 ************************************************************************************************************/
 #define MAS_PATH_SIZE 256
-#define MAS_FILES_BUFFER_SIZE 4096
-#define MAS_SUB_FOLDER_COUNT  1024
+#define MAS_FILES_BUFFER_SIZE (1024 * 1024 * 10)
+#define MAS_SUB_FOLDER_COUNT  50000
 #define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
 #define MAS_ARRAY_SIZE(array)             (sizeof(array)/sizeof(array[0]))
 
@@ -295,6 +295,15 @@ masFoundFiles* mas_directory_search_run(masDirectorySearch* DirectorySearch, con
             }
             SearchingPath[--SearchingPathSize] = '\0';
         }
+
+        system("cls");
+        static int32_t i = 1;
+        if(i > 3)
+            i = 1;
+        printf("Searching");
+        for(int32_t j = 0; j < i; ++j)
+            printf(".");
+        i++;
     }
 
     return &DirectorySearch->FoundFiles;
@@ -332,9 +341,9 @@ int main(int argc, const char** argv)
     memset(Path, 0, MAS_PATH_SIZE);
     int32_t PathSize = GetCurrentDirectoryA(MAS_PATH_SIZE, Path);
 
-    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create(Path);
+    masDirectorySearch* AssetSearchDirectory = mas_directory_search_create("D:\\Open_Source_Project");
 
-    const char    *SearchTarget[]    = { "BackgroundAmbient", ".png", "IntroVideo", ".tga", ".jpeg", ".jpg", ".obj", ".exe", ".c", ".h", ".ilk", ".pdb", ".bat", ".iso"};
+    const char    *SearchTarget[]    = { ".cpp" };
     int32_t        SearchTargetCount = (sizeof(SearchTarget)/sizeof(SearchTarget[0]));
     masFoundFiles *FoundFiles        = mas_directory_search_run(AssetSearchDirectory, SearchTarget, SearchTargetCount);
 
