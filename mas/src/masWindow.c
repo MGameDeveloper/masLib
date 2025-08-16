@@ -30,6 +30,7 @@ typedef struct masWindow_
     int32_t  DrawAreaWidth;
     int32_t  DrawAreaHeight;
     bool     bClosed;
+    bool     bTrackMouse;
 } masWindow;
 
 static masWindow Window   = {0};
@@ -219,15 +220,18 @@ void mas_impl_window_mouse_get_pos(int32_t* x, int32_t* y)
 ****************************************************************************************************************************/
 LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam)
 {
+    masEvent Event = {0};
+
     switch(Msg)
     {
     case WM_CLOSE:
         DestroyWindow(Hwnd);
         PostQuitMessage(0);
+        Event = mas_impl_event_add(EventType_Window_Close);
         return 0;
 
     case WM_DEVICECHANGE: 
-        mas_impl_input_check_controllers_connection();
+        Event = mas_impl_event_add(EventType_Device_Changes);
         break;
 
     case WM_SIZE: 
@@ -239,20 +243,34 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
         int32_t ScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
         int32_t ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
+        int32_t EventWidth  = 0;
+        int32_t EventHeight = 0;
 		switch (wparam)
 		{
-		case SIZE_MAXIMIZED: mas_impl_window_set_size(ScreenWidth, ScreenHeight);
-		case SIZE_MINIMIZED: mas_impl_window_set_size(0, 0);
-		case SIZE_RESTORED:  mas_impl_window_set_size(Width, Height);
+		case SIZE_MAXIMIZED: 
+            EventWidth = ScreenWidth; 
+            EventHeight = ScreenHeight; 
+            break;
+
+		case SIZE_MINIMIZED: 
+            EventWidth = 0; 
+            EventHeight = 0; 
+            break;
+
+		case SIZE_RESTORED:  
+            EventWidth = Width; 
+            EventHeight = Height; 
+            break;
 		} 
 
-        // Event = mas_impl_event_add(EventType_Window_Resize);
-        // Event->WindowSize = { Width, Height };
+        Event = mas_impl_event_add(EventType_Window_Resize);
+        Event->Data.Size = { EventWidth, EventHeight };
     }
         return 0;
 
     case WM_MOVE:
-        mas_impl_window_set_pos(GET_X_LPARAM(Lparam), GET_Y_LPARAM(Lparam));
+        Event = mas_impl_event_add(EventType_Window_Move);
+        Event->Data.Size = { GET_X_LPARAM(Lparam), GET_Y_LPARAM(Lparam) };
         return 0;
 
     case WM_MOUSEMOVE:  return 0;

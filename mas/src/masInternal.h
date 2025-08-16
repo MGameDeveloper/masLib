@@ -42,6 +42,8 @@ double mas_impl_time_now();
 ****************************************************************************************************************************/
 typedef enum masEventType_
 {
+    EventType_None,
+
     EventType_Window_Close,
     EventType_Window_Maximize,
     EventType_Window_Minimize,
@@ -73,8 +75,7 @@ typedef struct masEvent_
 void            mas_impl_event_init();
 void            mas_impl_event_deinit();
 const masEvent* mas_impl_event_add(masEventType EventType);
-
-
+bool            mas_impl_event_get(masEvent* Event);
 
 
 /***************************************************************************************************************************
