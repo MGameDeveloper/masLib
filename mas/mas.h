@@ -11,49 +11,44 @@
 *    - String
 *    - Hash Table
 *    - Memory
+*    - Math
+*    - Log
 */
 
 
 /********************************************************************************************************
-*
+* INITIALIZATION
 *********************************************************************************************************/
 bool mas_init(const char* Title, int32_t Width, int32_t Height);
-bool mas_is_terminated();
-void mas_deinit();
+void mas_terminate();
+bool mas_is_running();
 
 
 /********************************************************************************************************
-*
+* WINDOW
 *********************************************************************************************************/
-struct masWindowInfo
-{
-    void       *Handle;
-    const char *Title;
-    int32_t     PosX;
-    int32_t     PosY;
-    int32_t     Width;
-    int32_t     Height;
-    int32_t     ClientWidth;
-    int32_t     ClientHeight;
-};
-
-const masWindowInfo* mas_window_info();
-void                 mas_window_set_pos(int32_t x, int32_t y);
-void                 mas_window_set_size(int32_t w, int32_t h);
-void                 mas_window_set_fullscreen(bool EnableFullScreen);
-void                 mas_window_set_visibility(bool EnableVisibility);
-
+void mas_window_set_pos(int32_t x, int32_t y);
+void mas_window_set_size(int32_t w, int32_t h);
+void mas_window_get_pos(int32_t* x, int32_t* y);
+void mas_window_get_size(int32_t* w, int32_t* y);
+void mas_window_get_draw_area_size(int32_t* w, int32_t* y);
+void mas_window_set_fullscreen(bool EnableFullScreen);
+void mas_window_set_visibility(bool EnableVisibility);
+void mas_window_mouse_set_capture(bool EnableCapture);
+void mas_window_mouse_set_visibility(bool EnableVisibility);
+void mas_window_mosue_get_pos(int32_t* x, int32_t* y);
 
 /********************************************************************************************************
-*
+* TIME
 *********************************************************************************************************/
 double mas_time_now();
 double mas_time_app();
-double mas_time_elapsed_time();
+double mas_time_elapsed();
 
 
+#if 0
 /********************************************************************************************************
-*
+* INPUT
 *********************************************************************************************************/
 enum masInputUser
 {
@@ -277,3 +272,23 @@ void  mas_memory_check_memory_leak();
 #define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size, __FILE__, __LINE__)
 #define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size, __FILE__, __LINE__)
 #define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, __FILE__, __LINE__)
+
+
+/********************************************************************************************************
+*
+*********************************************************************************************************/
+struct masVec3;
+struct masVec4;
+struct masMatrix;
+
+
+/********************************************************************************************************
+*
+*********************************************************************************************************/
+struct masLog;
+masLog* mas_log_create(const char* Name);
+void    mas_log_destroy(masLog** Log);
+void    mas_log_error(masLog* Log, const char* Fmt, ...);
+void    mas_log_info(masLog* Log, const char* Fmt, ...);
+void    mas_log_warning(masLog* Log, const char* Fmt, ...);
+#endif
