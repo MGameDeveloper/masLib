@@ -14,7 +14,8 @@ bool mas_init(const char* Title, int32_t Width, int32_t Height)
 bool mas_is_running()
 {
     mas_impl_time_calculate_elapsed();
-    return !mas_impl_window_close();
+    bool IsOnClose = mas_impl_window_peek_messages();
+    return !IsOnClose;
 }
 
 void mas_terminate()

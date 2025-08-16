@@ -3,13 +3,13 @@
 
 
 /***************************************************************************************************************************
-*
+* MACROS:
 ****************************************************************************************************************************/
 
 
 
 /***************************************************************************************************************************
-* WINDOW: PARTIALLY DONE 
+* WINDOW: PARTIALLY DONE, PENDING WAITING FOR EVENT TO FINISH
 ****************************************************************************************************************************/
 bool        mas_impl_window_init(const char* Title, int32_t Width, int32_t Height);
 void        mas_impl_window_deinit();
@@ -21,7 +21,7 @@ void        mas_impl_window_get_draw_area_size(int32_t* w, int32_t* h);
 void        mas_impl_window_set_pos(int32_t x, int32_t y);
 void        mas_impl_window_set_size(int32_t w, int32_t h);
 void        mas_impl_window_set_visiblity(bool EnableVisibility);
-bool        mas_impl_window_closed();
+bool        mas_impl_window_peek_messages();
 void        mas_impl_window_mouse_set_capture(bool EnableMouseCapture); // TODO:   
 void        mas_impl_window_set_fullscreen(bool EnableFullScreen);      // TODO:  
 void        mas_impl_window_mouse_get_pos(int32_t* x, int32_t* y);      // TODO:
@@ -38,5 +38,48 @@ double mas_impl_time_now();
 
 
 /***************************************************************************************************************************
-* INPUT: 
+* EVENT: IN PROGRESS
 ****************************************************************************************************************************/
+typedef enum masEventType_
+{
+    EventType_Window_Close,
+    EventType_Window_Maximize,
+    EventType_Window_Minimize,
+    EventType_Window_Resize,
+    EventType_Window_Move,
+    EventType_Mouse_Move,
+    EventType_Mouse_Leave,
+    EventType_Mouse_Enter,
+    EventType_Device_Changes,
+
+    EventType_Count
+    
+} masEventType;
+typedef struct masEvent_
+{
+    masEventType Type;
+    union
+    {
+        union 
+        {
+            struct { int32_t x; int32_t y; } Pos;
+            struct { int32_t w; int32_t h; } Size;
+        };
+
+    } Data;
+    
+} masEvent;
+
+void            mas_impl_event_init();
+void            mas_impl_event_deinit();
+const masEvent* mas_impl_event_add(masEventType EventType);
+
+
+
+
+/***************************************************************************************************************************
+* INPUT: PENDING WAITING FOR EVENT TO FINISH
+****************************************************************************************************************************/
+bool mas_impl_input_init();
+void mas_impl_input_deinit();
+void mas_impl_input_check_controllers_connection();

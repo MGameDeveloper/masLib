@@ -1,5 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <windowsx.h>
+
 #include <string.h>
 #include <stdio.h>
 
@@ -37,6 +39,12 @@ static HINSTANCE Instance = NULL;
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
+static LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam);
+
+
+/***************************************************************************************************************************
+*
+****************************************************************************************************************************/
 bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 {
     if(!Title || Width <= 0 || Height <= 0)
@@ -56,7 +64,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.hInstance     = Instance;
 	wc.lpszClassName = WND_CLASSNAME;
-	wc.lpfnWndProc   = &masWindow_Proc;
+	wc.lpfnWndProc   = &mas_internal_win32_proc;
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = DLGWINDOWEXTRA;
 	wc.hIcon         = NULL; //LoadIcon(Instance, MAKEINTRESOURCE(IDI_APPLICATION));
@@ -174,9 +182,20 @@ void mas_impl_window_set_visiblity(bool EnableVisibility)
     ShowWindow(Wnd->Handle, (EnableVisibility) ? 1 : 0);
 }
 
-bool mas_impl_window_closed()
+bool mas_impl_window_peek_messages()
 {
-    return Window.bClosed;
+    bool bClosed = Window.bClosed;
+
+    MSG Msg = {0};
+    while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
+    {
+        if(Msg.message == WM_QUIT)
+            Window.bClosed = true;
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+    }
+
+    return bClosed;
 }
 
 void mas_impl_window_mouse_set_capture(bool EnableMouseCapture)
@@ -192,4 +211,77 @@ void mas_impl_window_set_fullscreen(bool EnableFullScreen)
 void mas_impl_window_mouse_get_pos(int32_t* x, int32_t* y)
 {
     // TODO: 
+}
+
+
+/***************************************************************************************************************************
+*
+****************************************************************************************************************************/
+LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam)
+{
+    switch(Msg)
+    {
+    case WM_CLOSE:
+        DestroyWindow(Hwnd);
+        PostQuitMessage(0);
+        return 0;
+
+    case WM_DEVICECHANGE: 
+        mas_impl_input_check_controllers_connection();
+        break;
+
+    case WM_SIZE: 
+    {
+       	RECT Rect = {};
+		GetWindowRect(Wnd->Handle, &Rect);
+		int32_t Width        = Rect.right - Rect.left;
+		int32_t Height       = Rect.bottom - Rect.top;
+        int32_t ScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
+        int32_t ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+		switch (wparam)
+		{
+		case SIZE_MAXIMIZED: mas_impl_window_set_size(ScreenWidth, ScreenHeight);
+		case SIZE_MINIMIZED: mas_impl_window_set_size(0, 0);
+		case SIZE_RESTORED:  mas_impl_window_set_size(Width, Height);
+		} 
+
+        // Event = mas_impl_event_add(EventType_Window_Resize);
+        // Event->WindowSize = { Width, Height };
+    }
+        return 0;
+
+    case WM_MOVE:
+        mas_impl_window_set_pos(GET_X_LPARAM(Lparam), GET_Y_LPARAM(Lparam));
+        return 0;
+
+    case WM_MOUSEMOVE:  return 0;
+    case WM_MOUSELEAVE: return 0;
+    case WM_MOUSEWHEEL: return 0;
+
+    case WM_LBUTTONDOWN:   return 0;
+    case WM_LBUTTONUP:	   return 0;
+    case WM_LBUTTONDBLCLK: return 0;
+    case WM_MBUTTONDOWN:   return 0;
+    case WM_MBUTTONUP:	   return 0;
+    case WM_MBUTTONDBLCLK: return 0;
+    case WM_RBUTTONDOWN:   return 0;
+    case WM_RBUTTONUP:	   return 0;
+    case WM_RBUTTONDBLCLK: return 0;
+    case WM_XBUTTONDOWN:   return 0;
+    case WM_XBUTTONUP:     return 0;
+    case WM_XBUTTONDBLCLK: return 0;
+
+    case WM_KEYUP:
+    case WM_KEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_SYSKEYDOWN:
+        return 0;
+    
+    case WM_CHAR:
+    case WM_SYSCHAR:
+        return 0;
+    }
+
+    return DefWindowProc(Hwnd, Msg, Wparam, Lparam);
 }
