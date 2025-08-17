@@ -1,3 +1,6 @@
+#include <string.h>
+#include <assert.h>
+
 #include "masInternal.h"
 
 #define MAS_EVENT_MAX 64
@@ -24,7 +27,7 @@ void mas_impl_event_deinit()
 masEvent* mas_impl_event_add(masEventType EventType)
 {
     if(EventType <= EventType_None || EventType >= EventType_Count)
-        return NULL;
+        assert(false && "EventType is invalid");
 
     int32_t   AddIdx = EventQueue.AddIdx;
     masEvent *Event  = &EventQueue.Events[AddIdx];
@@ -36,8 +39,8 @@ masEvent* mas_impl_event_add(masEventType EventType)
         return Event;
     }
 
-    assert(false);
-    
+    assert(false && "EventQueue is full, can't add events");
+
     return NULL;
 }
 

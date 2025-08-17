@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "masInputTypes.h"
+
 
 /***************************************************************************************************************************
 * MACROS:
@@ -20,11 +22,12 @@ void        mas_impl_window_get_size(int32_t* w, int32_t* h);
 void        mas_impl_window_get_draw_area_size(int32_t* w, int32_t* h);
 void        mas_impl_window_set_pos(int32_t x, int32_t y);
 void        mas_impl_window_set_size(int32_t w, int32_t h);
-void        mas_impl_window_set_visiblity(bool EnableVisibility);
+void        mas_impl_window_show(bool EnableVisibility);
 bool        mas_impl_window_peek_messages();
-void        mas_impl_window_mouse_set_capture(bool EnableMouseCapture); // TODO:   
-void        mas_impl_window_set_fullscreen(bool EnableFullScreen);      // TODO:  
-void        mas_impl_window_mouse_get_pos(int32_t* x, int32_t* y);      // TODO:
+void        mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:   
+void        mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO:  
+void        mas_impl_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
+void        mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
 
 /***************************************************************************************************************************
@@ -52,30 +55,50 @@ typedef enum masEventType_
     EventType_Mouse_Move,
     EventType_Mouse_Leave,
     EventType_Mouse_Enter,
+    EventType_Mouse_Wheel,
+    EventType_Mouse_Button,
+    EventType_Text_Enter,
+    EventType_Keyboard_Button,
+    EventType_Controller_Button,
     EventType_Device_Changes,
 
     EventType_Count
     
 } masEventType;
+
 typedef struct masEvent_
 {
+    double       TimeStamp;
     masEventType Type;
     union
     {
-        union 
+        struct 
         {
-            struct { int32_t x; int32_t y; } Pos;
-            struct { int32_t w; int32_t h; } Size;
-        };
+            masKey      Code;
+            masKeyMod   Mod;
+            masKeyState State;
+            
+        } Key;
+        
+        struct 
+        {
+            masKey    Direction;
+            masKeyMod Mod;
+
+        } MouseWheel;
+
+        struct { int32_t x; int32_t y; } Pos;
+        struct { int32_t w; int32_t h; } Size;
+        uint32_t Unicode;
 
     } Data;
     
 } masEvent;
 
-void            mas_impl_event_init();
-void            mas_impl_event_deinit();
-const masEvent* mas_impl_event_add(masEventType EventType);
-bool            mas_impl_event_get(masEvent* Event);
+void      mas_impl_event_init();
+void      mas_impl_event_deinit();
+masEvent* mas_impl_event_add(masEventType EventType);
+bool      mas_impl_event_get(masEvent* Event);
 
 
 /***************************************************************************************************************************
