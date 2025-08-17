@@ -70,6 +70,8 @@ typedef struct masEvent_
 {
     double       TimeStamp;
     masEventType Type;
+    masInputUser InputUser;
+    
     union
     {
         struct 
