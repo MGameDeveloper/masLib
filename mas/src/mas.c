@@ -15,6 +15,48 @@ bool mas_is_running()
 {
     mas_impl_time_calculate_elapsed();
     bool IsOnClose = mas_impl_window_peek_messages();
+
+    masEvent Event = {0};
+    while(mas_impl_event_get(&Event))
+    {
+        switch(Event.Type)
+        {
+        case EventType_Window_Close: 
+            break;
+
+        //case EventType_Window_Maximize: break;
+        //case EventType_Window_Minimize: break;
+
+        case EventType_Window_Resize:
+            mas_impl_window_set_size(Event.Data.Size.x, Event.Data.Size.y);
+            break;
+
+        case EventType_Window_Move:
+            mas_impl_window_set_pos(Event.Data.Pos.x, Event.Data.Pos.y);
+            break;
+
+        //case EventType_Mouse_Move : break;
+        //case EventType_Mouse_Leave: break;
+        //case EventType_Mouse_Enter: break;
+
+        case EventType_Mouse_Wheel:
+            mas_impl_input_on_wheel(Event.InputUser, Event.Data.MouseWheel.Direction, Event.Data.MouseWheel.Mod);
+            break;
+
+        case EventType_Button:
+            mas_impl_input_on_key(Event.InputUser, Event.Data.Key.Code, Event.Data.Key.State, Event.Data.Key.Mod, Event.TimeStamp);
+            break;
+
+        case EventType_Text_Enter:
+            mas_impl_input_on_text_enter(Event.InputUser, Event.Data.Unicode);
+            break;
+
+        case EventType_Device_Changes:
+            mas_impl_input_controller_check_connection();
+            break;
+        }
+    }
+
     return !IsOnClose;
 }
 

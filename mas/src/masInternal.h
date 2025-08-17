@@ -11,7 +11,7 @@
 
 
 /***************************************************************************************************************************
-* WINDOW: PARTIALLY DONE, PENDING WAITING FOR EVENT TO FINISH
+* WINDOW: PARTIALLY DONE, PENDING( MOUSE_ENABLE_CAPTURE, ENABLE_FULLSCREEN )
 ****************************************************************************************************************************/
 bool        mas_impl_window_init(const char* Title, int32_t Width, int32_t Height);
 void        mas_impl_window_deinit();
@@ -41,7 +41,7 @@ double mas_impl_time_now();
 
 
 /***************************************************************************************************************************
-* EVENT: IN PROGRESS
+* EVENT: DONE, MAY BE VISITED OFTEN DUE TO OTHER SYSTEM DECLARING NEW EVENT TYPES
 ****************************************************************************************************************************/
 typedef enum masEventType_
 {
@@ -56,10 +56,8 @@ typedef enum masEventType_
     EventType_Mouse_Leave,
     EventType_Mouse_Enter,
     EventType_Mouse_Wheel,
-    EventType_Mouse_Button,
+    EventType_Button,
     EventType_Text_Enter,
-    EventType_Keyboard_Button,
-    EventType_Controller_Button,
     EventType_Device_Changes,
 
     EventType_Count
@@ -71,7 +69,7 @@ typedef struct masEvent_
     double       TimeStamp;
     masEventType Type;
     masInputUser InputUser;
-    
+
     union
     {
         struct 
@@ -104,8 +102,16 @@ bool      mas_impl_event_get(masEvent* Event);
 
 
 /***************************************************************************************************************************
-* INPUT: PENDING WAITING FOR EVENT TO FINISH
+* INPUT: IN PROGRESS
 ****************************************************************************************************************************/
 bool mas_impl_input_init();
 void mas_impl_input_deinit();
-void mas_impl_input_check_controllers_connection();
+void mas_impl_input_on_key(masInputUser User, masKey Key, masKeyState KeyState, masKeyMod KeyMod, double TimeStamp);
+void mas_impl_input_on_wheel(masInputUser User, masKey Key, masKeyMod KeyMod);
+void mas_impl_input_on_axis(masInputUser User, masKey Key, float Value);
+void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode);
+
+void mas_impl_input_controller_init();
+void mas_impl_input_controller_deinit();
+void mas_impl_input_controller_check_connection();
+void mas_impl_input_controller_tick();
