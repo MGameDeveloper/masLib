@@ -9,12 +9,17 @@ bool mas_init(const char* Title, int32_t Width, int32_t Height)
 
     if(!mas_impl_window_init(Title, Width, Height))
         return false;
+    
+    mas_impl_input_init();
+    mas_impl_input_controller_init();
 }
 
 bool mas_is_running()
 {
     mas_impl_time_calculate_elapsed();
     bool IsOnClose = mas_impl_window_peek_messages();
+
+    mas_impl_input_controller_tick();
 
     masEvent Event = {0};
     while(mas_impl_event_get(&Event))
@@ -62,6 +67,8 @@ bool mas_is_running()
 
 void mas_terminate()
 {
+    mas_impl_input_controller_deinit();
+    mas_impl_input_deinit();
     mas_impl_window_deinit();
 }
 
