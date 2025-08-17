@@ -114,4 +114,8 @@ void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode);
 void mas_impl_input_controller_init();
 void mas_impl_input_controller_deinit();
 void mas_impl_input_controller_check_connection();
+void mas_impl_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog);
+void mas_impl_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger);
+void mas_impl_input_controller_restore_setting(masInputUser User);
+void mas_impl_input_controller_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
 void mas_impl_input_controller_tick();

@@ -135,7 +135,20 @@ static void mas_internal_event_add_controller_button(masInputUser User, masButto
 ****************************************************************************************************************************/
 void mas_impl_input_controller_init()
 {
-    mas_impl_input_controller_check_connection();
+    XINPUT_STATE State = { 0 };
+    for(int32_t i = 0; i < InputUser_Count; ++i)
+    {
+        if(XInputGetState(i, &State) == ERROR_SUCCESS)
+        {
+            masInputUser User = (masInputUser)i;    
+            if(Controllers[i].bConnected == false)
+            {
+                Controllers[i].bConnected = true;
+                mas_impl_input_controller_restore_setting(User);
+                printf("[ INFO ]: Controller( %d ) Connected\n", i);
+            }
+        }
+    }
 }
 
 void mas_impl_input_controller_deinit()
@@ -165,6 +178,38 @@ void mas_impl_input_controller_check_connection()
             }
         }
     }
+}
+
+void mas_impl_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog)
+{
+    if(User < InputUser_1 || User >= InputUser_Count)
+        return;
+    Controllers[User].Deadzone.LAnalog = LAnalog;
+    Controllers[User].Deadzone.RAnalog = RAnalog;
+}
+
+void mas_impl_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger)
+{
+    if(User < InputUser_1 || User >= InputUser_Count)
+        return;
+    Controllers[User].Threshold.LTrigger = LTrigger;
+    Controllers[User].Threshold.RTrigger = RTrigger;
+}
+
+void mas_impl_input_controller_restore_setting(masInputUser User)
+{
+    Controllers[User].Deadzone.LAnalog   = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE  / 32768.f;
+    Controllers[User].Deadzone.RAnalog   = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE / 32768.f;
+    Controllers[User].Threshold.LTrigger = XINPUT_GAMEPAD_TRIGGER_THRESHOLD    / 255.f;
+    Controllers[User].Threshold.RTrigger = XINPUT_GAMEPAD_TRIGGER_THRESHOLD    / 255.f;
+}
+
+void mas_impl_input_controller_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed)
+{
+    XINPUT_VIBRATION Rumble = { 0 };
+    Rumble.wLeftMotorSpeed  = LMotorSpeed;
+    Rumble.wRightMotorSpeed = RMotorSpeed;
+    XInputSetState(User, &Rumble);
 }
 
 void mas_impl_input_controller_tick()
@@ -258,5 +303,8 @@ void mas_impl_input_controller_tick()
         }
 
         memcpy(Controller->ButtonLastState, Buttons, sizeof(bool) * Button_Count);
+
+        XINPUT_VIBRATION Rumble = { 0 };
+        XInputSetState(User, &Rumble);
     }
 }
