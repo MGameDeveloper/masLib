@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include "src/masTypes.h"
+
 
 /*
 * API_CONTENT_TABLE:
@@ -47,14 +49,12 @@ double mas_time_app();
 double mas_time_elapsed();
 
 
-#if 0
+
 /********************************************************************************************************
 * INPUT
 *********************************************************************************************************/
-#include "src/masInputTypes.h"
-
-bool  mas_input_key_state(masInputUser User, masKey Key, masKeyState State, uint8_t KeyMod_);
-float mas_input_axis_value(masInputUser User, masKey Key, KeyMod_ KeyMod);
+bool  mas_input_key_state(masInputUser User, masInputKey Key, masInputKeyState State, uint8_t KeyMod_);
+float mas_input_axis_value(masInputUser User, masInputAxis Key, masInputKeyMod KeyMod);
 void  mas_input_controller_connection_callback(masInputControllerConnectionCallback Callback);
 void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
 
@@ -71,11 +71,12 @@ struct masFileInfo
 };
 
 const char*  mas_directory_current_path();
+const char*  mas_directory_find_folder(const char* FolderName);
 masFileItr*  mas_directory_search_for(const char* DirectoryPath, const char** Targets, int32_t TargetCount);
 masFileItr*  mas_directory_file_itr_next(masFileItr* FileItr);
 masFileInfo* mas_directory_file_info_from_itr(masFileItr* FileItr);
 
-
+#if 0
 /********************************************************************************************************
 *
 *********************************************************************************************************/

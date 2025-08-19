@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "masInputTypes.h"
+#define MAS_UNICODE
+#include "masTypes.h"
 
 
 /***************************************************************************************************************************
@@ -13,22 +14,22 @@
 /***************************************************************************************************************************
 * WINDOW: PARTIALLY DONE, PENDING( MOUSE_ENABLE_CAPTURE, ENABLE_FULLSCREEN )
 ****************************************************************************************************************************/
-bool        mas_impl_window_init(const char* Title, int32_t Width, int32_t Height);
-void        mas_impl_window_deinit();
-void*       mas_impl_window_handle();
-const char* mas_impl_window_title();
-void        mas_impl_window_get_pos(int32_t* x, int32_t* y);
-void        mas_impl_window_get_size(int32_t* w, int32_t* h);
-void        mas_impl_window_get_draw_area_size(int32_t* w, int32_t* h);
-void        mas_impl_window_set_pos(int32_t x, int32_t y);
-void        mas_impl_window_set_size(int32_t w, int32_t h);
-void        mas_impl_window_show(bool EnableVisibility);
-bool        mas_impl_window_peek_messages(); 
-void        mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO: 
-
-void        mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:  
-void        mas_impl_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
-void        mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y);
+bool           mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height);
+void           mas_impl_window_deinit();
+void*          mas_impl_window_handle();
+const masChar* mas_impl_window_title();
+void           mas_impl_window_get_pos(int32_t* x, int32_t* y);
+void           mas_impl_window_get_size(int32_t* w, int32_t* h);
+void           mas_impl_window_get_draw_area_size(int32_t* w, int32_t* h);
+void           mas_impl_window_set_pos(int32_t x, int32_t y);
+void           mas_impl_window_set_size(int32_t w, int32_t h);
+void           mas_impl_window_show(bool EnableVisibility);
+bool           mas_impl_window_peek_messages(); 
+void           mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO: 
+   
+void           mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:  
+void           mas_impl_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
+void           mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
 
 /***************************************************************************************************************************
@@ -116,3 +117,12 @@ void mas_impl_input_controller_set_threshold(masInputUser User, float LTrigger, 
 void mas_impl_input_controller_restore_setting(masInputUser User);
 void mas_impl_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
 void mas_impl_input_controller_tick();
+
+
+/***************************************************************************************************************************
+* DIRECTORY: IN PROGRESS
+****************************************************************************************************************************/
+bool mas_impl_directory_init();
+void mas_impl_directory_deinit();
+bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t Count);
+const masChar* mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName);

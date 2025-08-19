@@ -1,4 +1,13 @@
 
+#ifdef MAS_UNICODE
+    #define UNICODE
+#endif
+
+#ifdef MAS_UNICODE
+    typedef wchar_t masChar;
+#else
+    typedef char masChar;
+#endif 
 
 typedef enum masInputUser_
 {

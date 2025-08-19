@@ -1,18 +1,19 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <windowsx.h>
+#include <tchar.h>
 
 #include <string.h>
 #include <stdio.h>
 
-#include "masInternal.h"
+#include "masImpl.h"
 
 
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
 #define MAS_WINDOW_TITLE_SIZE 32
-#define MAS_WINDOW_CLASS_NAME "masWindowCls"
+#define MAS_WINDOW_CLASS_NAME _T("masWindowCls")
 #define MAS_LOG_ERROR(fmt, ...) printf("[ ERROR ]: "##fmt, __VA_ARGS__)
 
 
@@ -41,8 +42,8 @@ static HINSTANCE Instance = NULL;
 *
 ****************************************************************************************************************************/
 static LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam);
-static masKeyMod        mas_internal_win32_key_mod();
-static masKey           mas_internal_win32_map_key(int32_t VKCode);
+static masInputKeyMod   mas_internal_win32_key_mod();
+static masInputKey      mas_internal_win32_map_key(int32_t VKCode);
 static void             mas_internal_event_add_mouse_button(int32_t VKCode, masKeyState KeyState);
 static void             mas_internal_event_add_keyboard_key(int32_t VKCode, masKeyState KeyState);
 
@@ -50,12 +51,12 @@ static void             mas_internal_event_add_keyboard_key(int32_t VKCode, masK
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
-bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
+bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 {
     if(!Title || Width <= 0 || Height <= 0)
         return false;
     
-    int32_t TitleSize = strlen(Title);
+    int32_t TitleSize = _tcslen(Title);
     if(TitleSize <= 0 || TitleSize >= MAS_WINDOW_TITLE_SIZE)
     {
         MAS_LOG_ERROR("Window Title length is either <= 0 or greater than %d\n", MAS_WINDOW_TITLE_SIZE);
@@ -93,7 +94,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 	if (!Handle)
 	{
         MAS_LOG_ERROR("[ WIN32 ]: CreateWindowEx failed\n");
-		UnregisterClassA(MAS_WINDOW_CLASS_NAME, Instance);
+		UnregisterClass(MAS_WINDOW_CLASS_NAME, Instance);
 		return false;
 	}
 
@@ -102,7 +103,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 	int32_t DrawAreaWidth  = { Rect.right - Rect.left, Rect.bottom - Rect.top };
 	int32_t DrawAreaHeight = { Rect.right - Rect.left, Rect.bottom - Rect.top };
 
-	memcpy(masWindow->Title, Title, sizeof(char) ** TitleSize);
+	memcpy(masWindow->Title, Title, sizeof(masChar) * TitleSize);
     Window->Handle         = Handle;
     Window->PosX           = PosX;
     Window->PosY           = PosY;
@@ -117,7 +118,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 
 void mas_impl_window_deinit()
 {
-    UnregisterClassA(MAS_WINDOW_CLASS_NAME, Window.Handle);
+    UnregisterClass(MAS_WINDOW_CLASS_NAME, Window.Handle);
 }
 
 void* mas_impl_window_handle()
@@ -240,6 +241,7 @@ void mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y)
             *y = Pos.y;
     }
 }
+
 
 /***************************************************************************************************************************
 *
