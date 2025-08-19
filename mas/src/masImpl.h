@@ -23,9 +23,10 @@ void        mas_impl_window_get_draw_area_size(int32_t* w, int32_t* h);
 void        mas_impl_window_set_pos(int32_t x, int32_t y);
 void        mas_impl_window_set_size(int32_t w, int32_t h);
 void        mas_impl_window_show(bool EnableVisibility);
-bool        mas_impl_window_peek_messages();
-void        mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:   
-void        mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO:  
+bool        mas_impl_window_peek_messages(); 
+void        mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO: 
+
+void        mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:  
 void        mas_impl_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
 void        mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
@@ -41,7 +42,7 @@ double mas_impl_time_now();
 
 
 /***************************************************************************************************************************
-* EVENT: DONE, MAY BE VISITED OFTEN DUE TO OTHER SYSTEM DECLARING NEW EVENT TYPES
+* EVENT: DONE, MAY BE VISITED OFTEN DUE TO OTHER SYSTEMS DECLARING NEW EVENT TYPES
 ****************************************************************************************************************************/
 typedef enum masEventType_
 {
@@ -111,11 +112,15 @@ void mas_impl_input_on_wheel(masInputUser User, masKey Key, masKeyMod KeyMod);
 void mas_impl_input_on_axis(masInputUser User, masKey Key, float Value);
 void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode);
 
+bool  mas_impl_input_key_state();
+float mas_impl_input_axis_value();
+void  mas_impl_input_connection_callback(masInputControllerConnectionCallback Callback);
+
 void mas_impl_input_controller_init();
 void mas_impl_input_controller_deinit();
 void mas_impl_input_controller_check_connection();
 void mas_impl_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog);
 void mas_impl_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger);
 void mas_impl_input_controller_restore_setting(masInputUser User);
-void mas_impl_input_controller_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
+void mas_impl_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
 void mas_impl_input_controller_tick();

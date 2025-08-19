@@ -32,9 +32,9 @@ void mas_window_set_size(int32_t w, int32_t h);
 void mas_window_get_pos(int32_t* x, int32_t* y);
 void mas_window_get_size(int32_t* w, int32_t* y);
 void mas_window_get_draw_area_size(int32_t* w, int32_t* y);
-void mas_window_set_fullscreen(bool EnableFullScreen);
-void mas_window_set_visibility(bool EnableVisibility);
-void mas_window_mouse_set_capture(bool EnableCapture);
+void mas_window_enable_fullscreen(bool EnableFullScreen);
+void mas_window_show(bool EnableVisibility);
+void mas_window_mouse_enable_capture(bool EnableCapture);
 void mas_window_mouse_set_visibility(bool EnableVisibility);
 void mas_window_mosue_get_pos(int32_t* x, int32_t* y);
 
@@ -55,8 +55,8 @@ double mas_time_elapsed();
 
 bool  mas_input_key_state(masInputUser User, masKey Key, masKeyState State, uint8_t KeyMod_);
 float mas_input_axis_value(masInputUser User, masKey Key, KeyMod_ KeyMod);
-void  mas_input_controller_connection_callback(void(*Callback)(masInputUser User, bool IsConnected));
-//void  mas_input_feedback();
+void  mas_input_controller_connection_callback(masInputControllerConnectionCallback Callback);
+void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
 
 
 /********************************************************************************************************

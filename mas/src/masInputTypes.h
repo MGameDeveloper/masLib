@@ -142,3 +142,5 @@ typedef enum masKey_
 
     Key_Count
 } masKey;
+
+typedef void(*masInputControllerConnectionCallback)(masInputUser User, bool IsConnected);
