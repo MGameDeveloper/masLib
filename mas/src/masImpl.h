@@ -124,5 +124,5 @@ void mas_impl_input_controller_tick();
 ****************************************************************************************************************************/
 bool mas_impl_directory_init();
 void mas_impl_directory_deinit();
-bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t Count);
+bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
 const masChar* mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName);
