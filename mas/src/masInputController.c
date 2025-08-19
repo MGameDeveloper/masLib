@@ -36,14 +36,14 @@ typedef enum masButton_
     Button_R3,
     Button_Option,
     Button_Share,
-    Button_LeftAnalogUp,
-    Button_LeftAnalogDown,
-    Button_LeftAnalogLeft,
-    Button_LeftAnalogRight,
-    Button_RightAnalogUp,
-    Button_RightAnalogDown,
-    Button_RightAnalogLeft,
-    Button_RightAnalogRight,
+    Button_LStickUp,
+    Button_LStickDown,
+    Button_LStickLeft,
+    Button_LStickRight,
+    Button_RStickUp,
+    Button_RStickDown,
+    Button_RStickLeft,
+    Button_RStickRight,
 
     Button_Count
 } masButton;
@@ -77,43 +77,43 @@ static masController Controllers[InputUser_Count] = { 0 };
 /***************************************************************************************************************************
 * 
 ****************************************************************************************************************************/
-static masKey mas_internal_input_controller_map_button(masButton Button)
+static masInputKey mas_internal_input_controller_map_button(masButton Button)
 {
     switch(Button)
     {
-    case Button_Square:           return Key_Controller_Square; 
-    case Button_Cross:            return Key_Controller_Cross; 
-    case Button_Circle:           return Key_Controller_Circle; 
-    case Button_Triangle:         return Key_Controller_Triangle;
-    case Button_DpadUp:           return Key_Controller_DpadUp;
-    case Button_DpadDown:         return Key_Controller_DpadDown;
-    case Button_DpadLeft:         return Key_Controller_DpadLeft; 
-    case Button_DpadRight:        return Key_Controller_DpadRight;
-    case Button_Touchpad:         return Key_Controller_Touchpad,
-    case Button_L1:               return Key_Controller_L1;
-    case Button_L2:               return Key_Controller_L2;
-    case Button_L3:               return Key_Controller_L3;
-    case Button_R1:               return Key_Controller_R1;
-    case Button_R2:               return Key_Controller_R2;
-    case Button_R3:               return Key_Controller_R3;
-    case Button_Option            return Key_Controller_Option;
-    case Button_Share             return Key_Controller_Share;
-    case Button_LeftAnalogUp:     return Key_Controller_LeftAnalgoUp;
-    case Button_LeftAnalogDown:   return Key_Controller_LeftAnalgoDown;
-    case Button_LeftAnalogLeft:   return Key_Controller_LeftAnalgoLeft;
-    case Button_LeftAnalogRight:  return Key_Controller_LeftAnalgoRight;
-    case Button_RightAnalogUp:    return Key_Controller_RightAnalgoUp;
-    case Button_RightAnalogDown:  return Key_Controller_RightAnalgoDown; 
-    case Button_RightAnalogLeft:  return Key_Controller_RightAnalgoLeft; 
-    case Button_RightAnalogRight: return Key_Controller_RightAnalgoRight;   
+    case Button_Square:       return InputKey_Controller_Square; 
+    case Button_Cross:        return InputKey_Controller_Cross; 
+    case Button_Circle:       return InputKey_Controller_Circle; 
+    case Button_Triangle:     return InputKey_Controller_Triangle;
+    case Button_DpadUp:       return InputKey_Controller_DpadUp;
+    case Button_DpadDown:     return InputKey_Controller_DpadDown;
+    case Button_DpadLeft:     return InputKey_Controller_DpadLeft; 
+    case Button_DpadRight:    return InputKey_Controller_DpadRight;
+    case Button_Touchpad:     return InputKey_Controller_Touchpad,
+    case Button_L1:           return InputKey_Controller_L1;
+    case Button_L2:           return InputKey_Controller_L2;
+    case Button_L3:           return InputKey_Controller_L3;
+    case Button_R1:           return InputKey_Controller_R1;
+    case Button_R2:           return InputKey_Controller_R2;
+    case Button_R3:           return InputKey_Controller_R3;
+    case Button_Option        return InputKey_Controller_Option;
+    case Button_Share         return InputKey_Controller_Share;
+    case Button_LStickUp:     return InputKey_Controller_LStickUp;
+    case Button_LStickDown:   return InputKey_Controller_LStickDown;
+    case Button_LStickLeft:   return InputKey_Controller_LStickLeft;
+    case Button_LStickRight:  return InputKey_Controller_LStickRight;
+    case Button_RStickUp:     return InputKey_Controller_RStickUp;
+    case Button_RStickDown:   return InputKey_Controller_RStickDown; 
+    case Button_RStickLeft:   return InputKey_Controller_RStickLeft; 
+    case Button_RStickRight:  return InputKey_Controller_RStickRight;   
     }
 
-    return Key_None;
+    return InputKey_None;
 }
 
 static void mas_internal_input_controller_on_analog(masInputUser User, masButton Button, float Value, float Deadzone)
 {
-    masKey Key = mas_internal_input_controller_map_button(Button);
+    masInputKey Key = mas_internal_input_controller_map_button(Button);
     if(Value > Deadzone || Value < -Deadzone) 
         mas_impl_input_on_axis(User, Key, Value);
     else
@@ -122,14 +122,14 @@ static void mas_internal_input_controller_on_analog(masInputUser User, masButton
 
 static void mas_internal_input_controller_on_trigger(masInputUser User, masButton Button, float Value, float Threshold)
 {
-    masKey Key = mas_internal_input_controller_map_button(Button);
+    masInputKey Key = mas_internal_input_controller_map_button(Button);
     if(Value > Threshold) 
         mas_impl_input_on_axis(User, Key, Value);
     else
         mas_impl_input_on_axis(User, Key, 0.0);
 }
 
-static void mas_internal_event_add_controller_button(masInputUser User, masButton Button, masKeyState KeyState)
+static void mas_internal_event_add_controller_button(masInputUser User, masButton Button, masInputKeyState KeyState)
 {
     masEvent* Event = mas_impl_event_add(EventType_Button);
     Event->TimeStamp      = mas_impl_time_now();
@@ -213,7 +213,7 @@ void mas_impl_input_controller_restore_setting(masInputUser User)
     Controllers[User].Threshold.RTrigger = XINPUT_GAMEPAD_TRIGGER_THRESHOLD    / 255.f;
 }
 
-void mas_impl_input_controller_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed)
+void mas_impl_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed)
 {
     XINPUT_VIBRATION Rumble = { 0 };
     Rumble.wLeftMotorSpeed  = LMotorSpeed;
@@ -259,29 +259,29 @@ void mas_impl_input_controller_tick()
 		Buttons[Button_L3]           = Gamepad->wButtons & XINPUT_GAMEPAD_LEFT_THUMB;
 		Buttons[Button_R3]           = Gamepad->wButtons & XINPUT_GAMEPAD_RIGHT_THUMB;
 		/////////////////////////////////////////////////////////////////////////////////////
-		Buttons[Button_L2]               = Gamepad->bLeftTrigger >   Controller->Threshold.LTrigger;
-		Buttons[Button_R2]               = Gamepad->bRightTrigger >  Controller->Threshold.RTrigger;
-		Buttons[Button_LeftAnalogUp]     = Gamepad->sThumbLY >       Controller->Deadzone.LAnalog;
-		Buttons[Button_LeftAnalogDown]   = Gamepad->sThumbLY <      -Controller->Deadzone.LAnalog;
-		Buttons[Button_LeftAnalogRight]  = Gamepad->sThumbLX >       Controller->Deadzone.LAnalog;
-		Buttons[Button_LeftAnalogLeft]   = Gamepad->sThumbLX <      -Controller->Deadzone.LAnalog;
-		Buttons[Button_RightAnalogUp]    = Gamepad->sThumbRY >       Controller->Deadzone.RAnalog;
-		Buttons[Button_RightAnalogDown]  = Gamepad->sThumbRY <      -Controller->Deadzone.RAnalog;
-		Buttons[Button_RightAnalogLeft]  = Gamepad->sThumbRX <      -Controller->Deadzone.RAnalog;
-		Buttons[Button_RightAnalogRight] = Gamepad->sThumbRX >       Controller->Deadzone.RAnalog;
+		Buttons[Button_L2]           = Gamepad->bLeftTrigger >   Controller->Threshold.LTrigger;
+		Buttons[Button_R2]           = Gamepad->bRightTrigger >  Controller->Threshold.RTrigger;
+		Buttons[Button_LStickUp]     = Gamepad->sThumbLY >       Controller->Deadzone.LAnalog;
+		Buttons[Button_LStickDown]   = Gamepad->sThumbLY <      -Controller->Deadzone.LAnalog;
+		Buttons[Button_LStickRight]  = Gamepad->sThumbLX >       Controller->Deadzone.LAnalog;
+		Buttons[Button_LStickLeft]   = Gamepad->sThumbLX <      -Controller->Deadzone.LAnalog;
+		Buttons[Button_RStickUp]     = Gamepad->sThumbRY >       Controller->Deadzone.RAnalog;
+		Buttons[Button_RStickDown]   = Gamepad->sThumbRY <      -Controller->Deadzone.RAnalog;
+		Buttons[Button_RStickLeft]   = Gamepad->sThumbRX <      -Controller->Deadzone.RAnalog;
+		Buttons[Button_RStickRight]  = Gamepad->sThumbRX >       Controller->Deadzone.RAnalog;
 
 
         masInputUser User = (masInputUser)ControllerIdx;
-        mas_internal_input_controller_on_trigger(User, Button_L2,               Gamepad->bLeftTrigger  / 255.f,   Controller->Threshold.LTrigger);
-        mas_internal_input_controller_on_trigger(User, Button_R2,               Gamepad->bRightTrigger / 255.f,   Controller->Threshold.RTrigger);
-        mas_internal_input_controller_on_analog (User, Button_LeftAnalogUp,     Gamepad->sThumbLY      / 32767.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_analog (User, Button_LeftAnalogDown,   Gamepad->sThumbLY      / 32768.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_analog (User, Button_LeftAnalogRight,  Gamepad->sThumbLX      / 32767.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_analog (User, Button_LeftAnalogLeft,   Gamepad->sThumbLX      / 32768.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_analog (User, Button_RightAnalogUp,    Gamepad->sThumbRY      / 32767.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_analog (User, Button_RightAnalogDown,  Gamepad->sThumbRY      / 32768.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_analog (User, Button_RightAnalogLeft,  Gamepad->sThumbRX      / 32768.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_analog (User, Button_RightAnalogRight, Gamepad->sThumbRX      / 32767.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_trigger(User, Button_L2,          Gamepad->bLeftTrigger  / 255.f,   Controller->Threshold.LTrigger);
+        mas_internal_input_controller_on_trigger(User, Button_R2,          Gamepad->bRightTrigger / 255.f,   Controller->Threshold.RTrigger);
+        mas_internal_input_controller_on_analog (User, Button_LStickUp,    Gamepad->sThumbLY      / 32767.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LStickDown,  Gamepad->sThumbLY      / 32768.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LStickRight, Gamepad->sThumbLX      / 32767.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LStickLeft,  Gamepad->sThumbLX      / 32768.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RStickUp,    Gamepad->sThumbRY      / 32767.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RStickDown,  Gamepad->sThumbRY      / 32768.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RStickLeft,  Gamepad->sThumbRX      / 32768.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RStickRight, Gamepad->sThumbRX      / 32767.f, Controller->Deadzone.RAnalog);
 
 
         double AppTime = mas_impl_time_now();
@@ -298,15 +298,15 @@ void mas_impl_input_controller_tick()
 			{
 				if (Controller->ButtonRepeatTime[ButtonIdx] <= AppTime)
 				{
-                    mas_internal_event_add_controller_button(User, Button, KeyState_Repeat);
+                    mas_internal_event_add_controller_button(User, Button, InputKeyState_Repeat);
 					Gamepad->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_DELAY_TIME;
 				}
 			}
 			else if (IsReleased)
-				mas_internal_event_add_controller_button(User, Button, KeyState_Release);
+				mas_internal_event_add_controller_button(User, Button, InputKeyState_Release);
 			else if (IsPressed)
 			{
-				mas_internal_event_add_controller_button(User, Button, KeyState_Press);
+				mas_internal_event_add_controller_button(User, Button, InputKeyState_Press);
 				Gamepad->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_INIT_TIME;
 			}
         }

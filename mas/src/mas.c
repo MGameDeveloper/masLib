@@ -44,10 +44,6 @@ bool mas_is_running()
         //case EventType_Mouse_Leave: break;
         //case EventType_Mouse_Enter: break;
 
-        case EventType_Mouse_Wheel:
-            mas_impl_input_on_wheel(Event.InputUser, Event.Data.MouseWheel.Direction, Event.Data.MouseWheel.Mod);
-            break;
-
         case EventType_Button:
             mas_impl_input_on_key(Event.InputUser, Event.Data.Key.Code, Event.Data.Key.State, Event.Data.Key.Mod, Event.TimeStamp);
             break;

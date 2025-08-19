@@ -244,97 +244,97 @@ void mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y)
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
-static masKeyMod mas_internal_win32_key_mod()
+static masInputKeyMod mas_internal_win32_key_mod()
 {
 	uint8_t KeyMod = 0;
-	KeyMod |= (GetAsyncKeyState(VK_LCONTROL) & 0x8000) ? KeyMod_LCtrl  : 0;
-	KeyMod |= (GetAsyncKeyState(VK_LSHIFT  ) & 0x8000) ? KeyMod_LShift : 0;
-	KeyMod |= (GetAsyncKeyState(VK_LMENU   ) & 0x8000) ? KeyMod_LAlt   : 0;
-	KeyMod |= (GetAsyncKeyState(VK_RCONTROL) & 0x8000) ? KeyMod_RCtrl  : 0;
-	KeyMod |= (GetAsyncKeyState(VK_RSHIFT  ) & 0x8000) ? KeyMod_RShift : 0;
-	KeyMod |= (GetAsyncKeyState(VK_RMENU   ) & 0x8000) ? KeyMod_RAlt   : 0;
+	KeyMod |= (GetAsyncKeyState(VK_LCONTROL) & 0x8000) ? InputKeyMod_LCtrl  : 0;
+	KeyMod |= (GetAsyncKeyState(VK_LSHIFT  ) & 0x8000) ? InputKeyMod_LShift : 0;
+	KeyMod |= (GetAsyncKeyState(VK_LMENU   ) & 0x8000) ? InputKeyMod_LAlt   : 0;
+	KeyMod |= (GetAsyncKeyState(VK_RCONTROL) & 0x8000) ? InputKeyMod_RCtrl  : 0;
+	KeyMod |= (GetAsyncKeyState(VK_RSHIFT  ) & 0x8000) ? InputKeyMod_RShift : 0;
+	KeyMod |= (GetAsyncKeyState(VK_RMENU   ) & 0x8000) ? InputKeyMod_RAlt   : 0;
 
     return (masKeyMod)KeyMod;
 }
 
-static masKey mas_internal_win32_map_key(int32_t VKCode)
+static masInputKey mas_internal_win32_map_key(int32_t VKCode)
 {
     switch (VKCode)
 	{
-	case 'A': return Key_A;
-	case 'B': return Key_B;
-	case 'C': return Key_C;
-	case 'D': return Key_D;
-	case 'E': return Key_E;
-	case 'F': return Key_F;
-	case 'G': return Key_G;
-	case 'H': return Key_H;
-	case 'I': return Key_I;
-	case 'J': return Key_J;
-	case 'K': return Key_K;
-	case 'L': return Key_L;
-	case 'M': return Key_M;
-	case 'N': return Key_N;
-	case 'O': return Key_O;
-	case 'P': return Key_P;
-	case 'Q': return Key_Q;
-	case 'R': return Key_R;
-	case 'S': return Key_S;
-	case 'T': return Key_T;
-	case 'U': return Key_U;
-	case 'V': return Key_V;
-	case 'W': return Key_W;
-	case 'X': return Key_X;
-	case 'Y': return Key_Y;
-	case 'Z': return Key_Z;
+	case 'A': return InputKey_A;
+	case 'B': return InputKey_B;
+	case 'C': return InputKey_C;
+	case 'D': return InputKey_D;
+	case 'E': return InputKey_E;
+	case 'F': return InputKey_F;
+	case 'G': return InputKey_G;
+	case 'H': return InputKey_H;
+	case 'I': return InputKey_I;
+	case 'J': return InputKey_J;
+	case 'K': return InputKey_K;
+	case 'L': return InputKey_L;
+	case 'M': return InputKey_M;
+	case 'N': return InputKey_N;
+	case 'O': return InputKey_O;
+	case 'P': return InputKey_P;
+	case 'Q': return InputKey_Q;
+	case 'R': return InputKey_R;
+	case 'S': return InputKey_S;
+	case 'T': return InputKey_T;
+	case 'U': return InputKey_U;
+	case 'V': return InputKey_V;
+	case 'W': return InputKey_W;
+	case 'X': return InputKey_X;
+	case 'Y': return InputKey_Y;
+	case 'Z': return InputKey_Z;
 
-	case VK_NUMLOCK: return Key_NumLock;
-	case VK_NUMPAD0: return Key_Numpad0;
-	case VK_NUMPAD1: return Key_Numpad1;
-	case VK_NUMPAD2: return Key_Numpad2;
-	case VK_NUMPAD3: return Key_Numpad3;
-	case VK_NUMPAD4: return Key_Numpad4;
-	case VK_NUMPAD5: return Key_Numpad5;
-	case VK_NUMPAD6: return Key_Numpad6;
-	case VK_NUMPAD7: return Key_Numpad7;
-	case VK_NUMPAD8: return Key_Numpad8;
-	case VK_NUMPAD9: return Key_Numpad9;
+	case VK_NUMLOCK: return InputKey_NumLock;
+	case VK_NUMPAD0: return InputKey_Numpad0;
+	case VK_NUMPAD1: return InputKey_Numpad1;
+	case VK_NUMPAD2: return InputKey_Numpad2;
+	case VK_NUMPAD3: return InputKey_Numpad3;
+	case VK_NUMPAD4: return InputKey_Numpad4;
+	case VK_NUMPAD5: return InputKey_Numpad5;
+	case VK_NUMPAD6: return InputKey_Numpad6;
+	case VK_NUMPAD7: return InputKey_Numpad7;
+	case VK_NUMPAD8: return InputKey_Numpad8;
+	case VK_NUMPAD9: return InputKey_Numpad9;
 
-	case VK_F1:  return Key_F1;
-	case VK_F2:  return Key_F2;
-	case VK_F3:  return Key_F3;
-	case VK_F4:  return Key_F4;
-	case VK_F5:  return Key_F5;
-	case VK_F6:  return Key_F6;
-	case VK_F7:  return Key_F7;
-	case VK_F8:  return Key_F8;
-	case VK_F9:  return Key_F9;
-	case VK_F10: return Key_F10;
-	case VK_F11: return Key_F11;
-	case VK_F12: return Key_F12;
+	case VK_F1:  return InputKey_F1;
+	case VK_F2:  return InputKey_F2;
+	case VK_F3:  return InputKey_F3;
+	case VK_F4:  return InputKey_F4;
+	case VK_F5:  return InputKey_F5;
+	case VK_F6:  return InputKey_F6;
+	case VK_F7:  return InputKey_F7;
+	case VK_F8:  return InputKey_F8;
+	case VK_F9:  return InputKey_F9;
+	case VK_F10: return InputKey_F10;
+	case VK_F11: return InputKey_F11;
+	case VK_F12: return InputKey_F12;
 
-	case VK_DECIMAL:  return Key_Decimal;
-	case VK_PRIOR:    return Key_PageUp;
-	case VK_NEXT:     return Key_PageDown;
-	case VK_SPACE:    return Key_Space;
-	case VK_RETURN:   return Key_Enter;
-	case VK_BACK:     return Key_Backspace;
-	case VK_TAB:      return Key_Tab;
-	case VK_SNAPSHOT: return Key_PrintScreen;
-	case VK_INSERT:   return Key_Insert;
-	case VK_DELETE:   return Key_Delete;
-	case VK_DIVIDE:   return Key_Divide;
-	case VK_MULTIPLY: return Key_Multipy;
-	case VK_SUBTRACT: return Key_Subtract;
-	case VK_ADD:      return Key_Addition;
-	case VK_HOME:     return Key_Home;
-	case VK_END:      return Key_End;
-	case VK_ESCAPE:   return Key_Escape;
-	case VK_CAPITAL:  return Key_CapsLock;
-	case VK_UP:       return Key_Up;
-	case VK_DOWN:     return Key_Down;
-	case VK_LEFT:     return Key_Left;
-	case VK_RIGHT:    return Key_Right;
+	case VK_DECIMAL:  return InputKey_Decimal;
+	case VK_PRIOR:    return InputKey_PageUp;
+	case VK_NEXT:     return InputKey_PageDown;
+	case VK_SPACE:    return InputKey_Space;
+	case VK_RETURN:   return InputKey_Enter;
+	case VK_BACK:     return InputKey_Backspace;
+	case VK_TAB:      return InputKey_Tab;
+	case VK_SNAPSHOT: return InputKey_PrintScreen;
+	case VK_INSERT:   return InputKey_Insert;
+	case VK_DELETE:   return InputKey_Delete;
+	case VK_DIVIDE:   return InputKey_Divide;
+	case VK_MULTIPLY: return InputKey_Multipy;
+	case VK_SUBTRACT: return InputKey_Subtract;
+	case VK_ADD:      return InputKey_Addition;
+	case VK_HOME:     return InputKey_Home;
+	case VK_END:      return InputKey_End;
+	case VK_ESCAPE:   return InputKey_Escape;
+	case VK_CAPITAL:  return InputKey_CapsLock;
+	case VK_UP:       return InputKey_Up;
+	case VK_DOWN:     return InputKey_Down;
+	case VK_LEFT:     return InputKey_Left;
+	case VK_RIGHT:    return InputKey_Right;
 
 	//case VK_LCONTROL: return Key_LCtrl;
 	//case VK_LSHIFT:	  return Key_LShift;
@@ -343,9 +343,9 @@ static masKey mas_internal_win32_map_key(int32_t VKCode)
 	//case VK_RSHIFT:	  return Key_RShift;
 	//case VK_RMENU:	  return Key_RAlt;
 
-    case VK_LBUTTON: return Key_Mouse_Left;
-    case VK_RBUTTON: return Key_Mouse_Right;
-    case VK_MBUTTON: return Key_Mouse_Middle;
+    case VK_LBUTTON: return InputKey_Mouse_Left;
+    case VK_RBUTTON: return InputKey_Mouse_Right;
+    case VK_MBUTTON: return InputKey_Mouse_Middle;
 
 	case VK_OEM_102:
 	case VK_OEM_NEC_EQUAL:
@@ -379,27 +379,27 @@ static masKey mas_internal_win32_map_key(int32_t VKCode)
 #define MAS_CHAR_KEY(UNSHIFTED, SHIFTED, UNSHIFTED_KEY, SHIFTED_KEY) case UNSHIFTED: if(bShift) return SHIFTED_KEY; else return UNSHIFTED_KEY; break
 		switch (CharCode)
 		{
-			MAS_CHAR_KEY(';', ':',   Key_SemiColon,          Key_Colon);
-			MAS_CHAR_KEY('\'', '\"', Key_Apostrophe,         Key_DoubleQuote);
-			MAS_CHAR_KEY('[', '{',   Key_LeftSquareBracket,  Key_LeftCurlyBrace);
-			MAS_CHAR_KEY(']', '}',   Key_RightSquareBracket, Key_RightCurlyBrace);
-			MAS_CHAR_KEY('\\', '|',  Key_BackSlash,          Key_VerticalBar);
-			MAS_CHAR_KEY(',', '<',   Key_Comma,              Key_LessThan);
-			MAS_CHAR_KEY('.', '>',   Key_Period,             Key_GreaterThan);
-			MAS_CHAR_KEY('/', '?',   Key_ForwardSlash,       Key_QuestionMark);
-			MAS_CHAR_KEY('`', '~',   Key_GraveAccent,        Key_Tilde);
-			MAS_CHAR_KEY('1', '!',   Key_Num1,               Key_ExclamationMark);
-			MAS_CHAR_KEY('2', '@',   Key_Num2,               Key_At);
-			MAS_CHAR_KEY('3', '#',   Key_Num3,               Key_Hash);
-			MAS_CHAR_KEY('4', '$',   Key_Num4,               Key_Dollar);
-			MAS_CHAR_KEY('5', '%',   Key_Num5,               Key_Percent);
-			MAS_CHAR_KEY('6', '^',   Key_Num6,               Key_Caret);
-			MAS_CHAR_KEY('7', '&',   Key_Num7,               Key_Ampersand);
-			MAS_CHAR_KEY('8', '*',   Key_Num8,               Key_Asterisk);
-			MAS_CHAR_KEY('9', '(',   Key_Num9,               Key_LeftParenthesis);
-			MAS_CHAR_KEY('0', ')',   Key_Num0,               Key_RightParenthesis);
-			MAS_CHAR_KEY('-', '_',   Key_Hyphen,             Key_UnderScore);
-			MAS_CHAR_KEY('=', '+',   Key_Equals,             Key_Plus);
+			MAS_CHAR_KEY(';', ':',   Key_SemiColon,          InputKey_Colon);
+			MAS_CHAR_KEY('\'', '\"', Key_Apostrophe,         InputKey_DoubleQuote);
+			MAS_CHAR_KEY('[', '{',   Key_LeftSquareBracket,  InputKey_LeftCurlyBrace);
+			MAS_CHAR_KEY(']', '}',   Key_RightSquareBracket, InputKey_RightCurlyBrace);
+			MAS_CHAR_KEY('\\', '|',  Key_BackSlash,          InputKey_VerticalBar);
+			MAS_CHAR_KEY(',', '<',   Key_Comma,              InputKey_LessThan);
+			MAS_CHAR_KEY('.', '>',   Key_Period,             InputKey_GreaterThan);
+			MAS_CHAR_KEY('/', '?',   Key_ForwardSlash,       InputKey_QuestionMark);
+			MAS_CHAR_KEY('`', '~',   Key_GraveAccent,        InputKey_Tilde);
+			MAS_CHAR_KEY('1', '!',   Key_Num1,               InputKey_ExclamationMark);
+			MAS_CHAR_KEY('2', '@',   Key_Num2,               InputKey_At);
+			MAS_CHAR_KEY('3', '#',   Key_Num3,               InputKey_Hash);
+			MAS_CHAR_KEY('4', '$',   Key_Num4,               InputKey_Dollar);
+			MAS_CHAR_KEY('5', '%',   Key_Num5,               InputKey_Percent);
+			MAS_CHAR_KEY('6', '^',   Key_Num6,               InputKey_Caret);
+			MAS_CHAR_KEY('7', '&',   Key_Num7,               InputKey_Ampersand);
+			MAS_CHAR_KEY('8', '*',   Key_Num8,               InputKey_Asterisk);
+			MAS_CHAR_KEY('9', '(',   Key_Num9,               InputKey_LeftParenthesis);
+			MAS_CHAR_KEY('0', ')',   Key_Num0,               InputKey_RightParenthesis);
+			MAS_CHAR_KEY('-', '_',   Key_Hyphen,             InputKey_UnderScore);
+			MAS_CHAR_KEY('=', '+',   Key_Equals,             InputKey_Plus);
 		}
 #undef MAS_CHAR_KEY
 	}
@@ -520,30 +520,30 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 
     case WM_MOUSEWHEEL:
         {
-            Event = mas_impl_event_add(EventType_Mouse_Wheel);
+            Event = mas_impl_event_add(EventType_Button);
 
             int32_t WheelDelta = GET_WHEEL_DELTA_WPARAM(Wparam);
             if(WheelDelta < 0)
-                Event->Data.MosueWheel.Direction = Key_Mouse_WheelDown;
+                Event->Data.Key.Code = InputKey_Mouse_WheelDown;
             else
-                Event->Data.MosueWheel.Direction = Key_Mouse_WheelUp;
-
-            Event->Data.MosueWheel.Mod = mas_internal_win32_key_mods();
+                Event->Data.Key.Code = InputKey_Mouse_WheelUp;
+            Event->TimeStamp    = mas_impl_time_now();
+            Event->Data.Key.Mod = mas_internal_win32_key_mods();
         } 
         return 0;
 
-    case WM_LBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_LBUTTON, KeyState_Press);       return 0;
-    case WM_LBUTTONUP:	   mas_internal_event_add_mouse_button(VK_LBUTTON, KeyState_Release);     return 0;
-    case WM_LBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_LBUTTON, KeyState_DoubleClick); return 0;
-    case WM_MBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_MBUTTON, KeyState_Press);       return 0;
-    case WM_MBUTTONUP:	   mas_internal_event_add_mouse_button(VK_MBUTTON, KeyState_Release);     return 0;
-    case WM_MBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_MBUTTON, KeyState_DoubleClick); return 0;
-    case WM_RBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_RBUTTON, KeyState_Press);       return 0;
-    case WM_RBUTTONUP:	   mas_internal_event_add_mouse_button(VK_RBUTTON, KeyState_Release);     return 0;
-    case WM_RBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_RBUTTON, KeyState_DoubleClick); return 0;
-    case WM_XBUTTONDOWN:   mas_internal_event_add_mouse_button(Wparam,     KeyState_Press);       return 0;
-    case WM_XBUTTONUP:     mas_internal_event_add_mouse_button(Wparam,     KeyState_Release);     return 0;
-    case WM_XBUTTONDBLCLK: mas_internal_event_add_mouse_button(Wparam,     KeyState_DoubleClick); return 0;
+    case WM_LBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_LBUTTON, InputKeyState_Press);       return 0;
+    case WM_LBUTTONUP:	   mas_internal_event_add_mouse_button(VK_LBUTTON, InputKeyState_Release);     return 0;
+    case WM_LBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_LBUTTON, InputKeyState_DoubleClick); return 0;
+    case WM_MBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_MBUTTON, InputKeyState_Press);       return 0;
+    case WM_MBUTTONUP:	   mas_internal_event_add_mouse_button(VK_MBUTTON, InputKeyState_Release);     return 0;
+    case WM_MBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_MBUTTON, InputKeyState_DoubleClick); return 0;
+    case WM_RBUTTONDOWN:   mas_internal_event_add_mouse_button(VK_RBUTTON, InputKeyState_Press);       return 0;
+    case WM_RBUTTONUP:	   mas_internal_event_add_mouse_button(VK_RBUTTON, InputKeyState_Release);     return 0;
+    case WM_RBUTTONDBLCLK: mas_internal_event_add_mouse_button(VK_RBUTTON, InputKeyState_DoubleClick); return 0;
+    case WM_XBUTTONDOWN:   mas_internal_event_add_mouse_button(Wparam,     InputKeyState_Press);       return 0;
+    case WM_XBUTTONUP:     mas_internal_event_add_mouse_button(Wparam,     InputKeyState_Release);     return 0;
+    case WM_XBUTTONDBLCLK: mas_internal_event_add_mouse_button(Wparam,     InputKeyState_DoubleClick); return 0;
 
     case WM_KEYUP:
     case WM_KEYDOWN:

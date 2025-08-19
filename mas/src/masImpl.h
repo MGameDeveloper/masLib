@@ -56,7 +56,6 @@ typedef enum masEventType_
     EventType_Mouse_Move,
     EventType_Mouse_Leave,
     EventType_Mouse_Enter,
-    EventType_Mouse_Wheel,
     EventType_Button,
     EventType_Text_Enter,
     EventType_Device_Changes,
@@ -80,13 +79,6 @@ typedef struct masEvent_
             masKeyState State;
             
         } Key;
-        
-        struct 
-        {
-            masKey    Direction;
-            masKeyMod Mod;
-
-        } MouseWheel;
 
         struct { int32_t x; int32_t y; } Pos;
         struct { int32_t w; int32_t h; } Size;
@@ -103,18 +95,18 @@ bool      mas_impl_event_get(masEvent* Event);
 
 
 /***************************************************************************************************************************
-* INPUT: IN PROGRESS
+* INPUT: PARTIALLY DONE, PENDING( ON_TEXT_ENTER, CONTROLLERS_CONNECTION_CALLBACK )
 ****************************************************************************************************************************/
 bool mas_impl_input_init();
 void mas_impl_input_deinit();
-void mas_impl_input_on_key(masInputUser User, masKey Key, masKeyState KeyState, masKeyMod KeyMod, double TimeStamp);
-void mas_impl_input_on_wheel(masInputUser User, masKey Key, masKeyMod KeyMod);
-void mas_impl_input_on_axis(masInputUser User, masKey Key, float Value);
-void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode);
+void mas_impl_input_tick();
+void mas_impl_input_on_key(masInputUser User, masInputKey Key, masInputKeyState KeyState, masInputKeyMod KeyMod, double TimeStamp);
+void mas_impl_input_on_axis(masInputUser User, masInputAxis Axis, float Value);
+void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode); // TODO: 
 
-bool  mas_impl_input_key_state();
-float mas_impl_input_axis_value();
-void  mas_impl_input_connection_callback(masInputControllerConnectionCallback Callback);
+bool  mas_impl_input_key_state(masInputUser User, masInputKeyState KeyState, masInputKey Key, masInputKeyMod KeyMod);
+float mas_impl_input_axis_value(masInputUser User, masInputAxis Axis);
+void  mas_impl_input_connection_callback(masInputControllerConnectionCallback Callback); // TODO: 
 
 void mas_impl_input_controller_init();
 void mas_impl_input_controller_deinit();
