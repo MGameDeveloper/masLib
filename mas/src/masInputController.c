@@ -111,13 +111,22 @@ static masKey mas_internal_input_controller_map_button(masButton Button)
     return Key_None;
 }
 
-static void mas_internal_input_controller_on_axis(masInputUser User, masButton Button, float Value, float ThresholdOrDeadzone)
+static void mas_internal_input_controller_on_analog(masInputUser User, masButton Button, float Value, float Deadzone)
 {
-    if(Value > ThresholdOrDeadzone || Value < -ThresholdOrDeadzone)
-    {
-        masKey Key = mas_internal_input_controller_map_button(Button);
+    masKey Key = mas_internal_input_controller_map_button(Button);
+    if(Value > Deadzone || Value < -Deadzone) 
         mas_impl_input_on_axis(User, Key, Value);
-    }
+    else
+        mas_impl_input_on_axis(User, Key, 0.0);
+}
+
+static void mas_internal_input_controller_on_trigger(masInputUser User, masButton Button, float Value, float Threshold)
+{
+    masKey Key = mas_internal_input_controller_map_button(Button);
+    if(Value > Threshold) 
+        mas_impl_input_on_axis(User, Key, Value);
+    else
+        mas_impl_input_on_axis(User, Key, 0.0);
 }
 
 static void mas_internal_event_add_controller_button(masInputUser User, masButton Button, masKeyState KeyState)
@@ -263,16 +272,16 @@ void mas_impl_input_controller_tick()
 
 
         masInputUser User = (masInputUser)ControllerIdx;
-        mas_internal_input_controller_on_axis(User, Button_L2,               Gamepad->bLeftTrigger  / 255.f,   Controller->Threshold.LTrigger);
-        mas_internal_input_controller_on_axis(User, Button_R2,               Gamepad->bRightTrigger / 255.f,   Controller->Threshold.RTrigger);
-        mas_internal_input_controller_on_axis(User, Button_LeftAnalogUp,     Gamepad->sThumbLY      / 32767.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_axis(User, Button_LeftAnalogDown,   Gamepad->sThumbLY      / 32768.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_axis(User, Button_LeftAnalogRight,  Gamepad->sThumbLX      / 32767.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_axis(User, Button_LeftAnalogLeft,   Gamepad->sThumbLX      / 32768.f, Controller->Deadzone.LAnalog);
-        mas_internal_input_controller_on_axis(User, Button_RightAnalogUp,    Gamepad->sThumbRY      / 32767.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_axis(User, Button_RightAnalogDown,  Gamepad->sThumbRY      / 32768.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_axis(User, Button_RightAnalogLeft,  Gamepad->sThumbRX      / 32768.f, Controller->Deadzone.RAnalog);
-        mas_internal_input_controller_on_axis(User, Button_RightAnalogRight, Gamepad->sThumbRX      / 32767.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_trigger(User, Button_L2,               Gamepad->bLeftTrigger  / 255.f,   Controller->Threshold.LTrigger);
+        mas_internal_input_controller_on_trigger(User, Button_R2,               Gamepad->bRightTrigger / 255.f,   Controller->Threshold.RTrigger);
+        mas_internal_input_controller_on_analog (User, Button_LeftAnalogUp,     Gamepad->sThumbLY      / 32767.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LeftAnalogDown,   Gamepad->sThumbLY      / 32768.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LeftAnalogRight,  Gamepad->sThumbLX      / 32767.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_LeftAnalogLeft,   Gamepad->sThumbLX      / 32768.f, Controller->Deadzone.LAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RightAnalogUp,    Gamepad->sThumbRY      / 32767.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RightAnalogDown,  Gamepad->sThumbRY      / 32768.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RightAnalogLeft,  Gamepad->sThumbRX      / 32768.f, Controller->Deadzone.RAnalog);
+        mas_internal_input_controller_on_analog (User, Button_RightAnalogRight, Gamepad->sThumbRX      / 32767.f, Controller->Deadzone.RAnalog);
 
 
         double AppTime = mas_impl_time_now();
