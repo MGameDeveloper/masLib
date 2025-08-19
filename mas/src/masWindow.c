@@ -588,6 +588,12 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
         }
         return 0;
     
+    case WM_INPUT: // To receive this you need register input device using -> RegisterRawInputDevices
+        return 0;
+
+    case WM_INPUT_DEVICE_CHANGE: // To receive this you need to supply RegisterRawInputDevices's struct's flag with RIDEV_DEVNOTIFY
+        return 0;
+
     case WM_CHAR:
     case WM_SYSCHAR:
         Event = mas_impl_event_add(EventType_Text_Enter);

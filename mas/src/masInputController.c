@@ -4,7 +4,7 @@
 #include <Xinput.h>
 #pragma comment(lib, "xinput.lib")
 
-#include "masInternal.h"
+#include "masImpl.h"
 
 
 /***************************************************************************************************************************
