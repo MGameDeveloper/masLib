@@ -1,6 +1,3 @@
-#include <string.h>
-#include <assert.h>
-
 #include "masImpl.h"
 
 

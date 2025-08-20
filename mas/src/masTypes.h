@@ -1,9 +1,13 @@
+#pragma once 
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+
 
 /***************************************************************************************************************************
 * MACROS: 
@@ -31,7 +35,10 @@ typedef struct _masFile
     masChar *Path;
     masChar *Name;
     masChar *Extension;
-    uint64_t Size;
+    uint32_t PathSize;
+    uint32_t NameSize;
+    uint32_t ExtensionSize;
+    uint32_t Size;
 } masFile;
 
 
