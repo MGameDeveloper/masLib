@@ -42,12 +42,12 @@ void mas_impl_time_init()
     QueryPerformanceFrequency(&LargeInt);
     Time.Frequency = 1.0 / (double)LargeInt.QuadPart;
 
-    Time.InitTime = mas_impl_time_stamp() / Time.Frequency;
+    Time.InitTime = mas_internal_time_stamp() / Time.Frequency;
 }
 
 void mas_impl_time_calculate_elapsed()
 {
-    double TimeStamp = mas_impl_time_stamp();  
+    double TimeStamp = mas_internal_time_stamp();  
     if(Time.ElapsedTime == 0.0)
         Time.ElapsedTime = TimeStamp - Time.InitTime;
     else
@@ -57,7 +57,7 @@ void mas_impl_time_calculate_elapsed()
 
 double mas_impl_time_app()
 {
-    double TimeStamp   = mas_impl_time_stamp() / Time.Frequency;
+    double TimeStamp   = mas_internal_time_stamp() / Time.Frequency;
     double RunningTime = TimeStamp - Time.InitTime;
     return RunningTime;
 }
@@ -69,5 +69,5 @@ double mas_impl_time_elapsed()
 
 double mas_impl_time_now()
 {
-    return mas_impl_time_stamp();
+    return mas_internal_time_stamp();
 }

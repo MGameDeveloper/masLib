@@ -1,15 +1,24 @@
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 /***************************************************************************************************************************
 * MACROS: 
 ****************************************************************************************************************************/
 #ifdef MAS_UNICODE
     #define UNICODE
+    #define _UNICODE
 #endif
 
 #ifdef MAS_UNICODE
     typedef wchar_t masChar;
+    #define MAS_TEXT(s) L##s
 #else
     typedef char masChar;
+    #define MAS_TEXT(s) s
 #endif 
 
 
@@ -19,10 +28,10 @@
 typedef struct _masFileBuf masFileBuf;
 typedef struct _masFile
 {
-    const masChar *Path;
-    const masChar *Name;
-    const masChar *Extension;
-    uint64_t       Size;
+    masChar *Path;
+    masChar *Name;
+    masChar *Extension;
+    uint64_t Size;
 } masFile;
 
 
@@ -104,8 +113,10 @@ typedef enum masInputKey_
     InputKey_Minus,
     InputKey_Plus,
     InputKey_Multiply,
+	InputKey_Subtract,
+	InputKey_Addition,
     InputKey_Divide,
-    InputKey_Equal,
+    InputKey_Equals,
     InputKey_Asterisk,
     InputKey_Colon,
     InputKey_Semicolon,
@@ -120,21 +131,23 @@ typedef enum masInputKey_
     InputKey_Ampersand,
     InputKey_Backspace,
     InputKey_Enter,
-    InputKey_LeftParentheses,
-    InputKey_RightParentheses,
+    InputKey_LeftParenthesis,
+    InputKey_RightParenthesis,
     InputKey_LeftCurlyBraces,
     InputKey_RightCurlyBraces,
     InputKey_LeftSquareBrackets,
     InputKey_RightSquareBrackets,
-    InputKey_Pipe,
+    InputKey_VerticalBar,
     InputKey_Backslash,
     InputKey_Forwardslash,
-    InputKey_Colon,
     InputKey_LessThan,
     InputKey_GreaterThan,
     InputKey_Decimal,
     InputKey_QuestionMark,
-
+    InputKey_Period,
+    InputKey_At,
+    InputKey_Dollar,
+    
     InputKey_Mouse_Left,
     InputKey_Mouse_Right,
     InputKey_Mouse_Middle,
@@ -175,6 +188,8 @@ typedef enum masInputKey_
 
 typedef enum masInputAxis_
 {
+    InputAxis_None = -1,
+
     InputAxis_Controller_L2,
     InputAxis_Controller_R2,
     InputAxis_Controller_LStickX,

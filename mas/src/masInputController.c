@@ -89,15 +89,15 @@ static masInputKey mas_internal_input_controller_map_button(masButton Button)
     case Button_DpadDown:     return InputKey_Controller_DpadDown;
     case Button_DpadLeft:     return InputKey_Controller_DpadLeft; 
     case Button_DpadRight:    return InputKey_Controller_DpadRight;
-    case Button_Touchpad:     return InputKey_Controller_Touchpad,
+    case Button_Touchpad:     return InputKey_Controller_Touchpad;
     case Button_L1:           return InputKey_Controller_L1;
     case Button_L2:           return InputKey_Controller_L2;
     case Button_L3:           return InputKey_Controller_L3;
     case Button_R1:           return InputKey_Controller_R1;
     case Button_R2:           return InputKey_Controller_R2;
     case Button_R3:           return InputKey_Controller_R3;
-    case Button_Option        return InputKey_Controller_Option;
-    case Button_Share         return InputKey_Controller_Share;
+    case Button_Option:       return InputKey_Controller_Option;
+    case Button_Share:        return InputKey_Controller_Share;
     case Button_LStickUp:     return InputKey_Controller_LStickUp;
     case Button_LStickDown:   return InputKey_Controller_LStickDown;
     case Button_LStickLeft:   return InputKey_Controller_LStickLeft;
@@ -113,20 +113,55 @@ static masInputKey mas_internal_input_controller_map_button(masButton Button)
 
 static void mas_internal_input_controller_on_analog(masInputUser User, masButton Button, float Value, float Deadzone)
 {
-    masInputKey Key = mas_internal_input_controller_map_button(Button);
+    masInputAxis Axis = InputAxis_None;
+    switch(Button)
+    {
+    case Button_LStickUp:
+    case Button_LStickDown:
+        Axis = InputAxis_Controller_LStickY;
+        break;
+
+    case Button_LStickLeft:
+    case Button_LStickRight:
+        Axis = InputAxis_Controller_LStickX;
+        break;
+
+    case Button_RStickUp:
+    case Button_RStickDown:
+        Axis = InputAxis_Controller_RStickY;
+        break;
+
+    case Button_RStickLeft:
+    case Button_RStickRight:
+        Axis = InputAxis_Controller_RStickX;
+        break;
+    }
+
+    if(Axis == InputAxis_None)
+        return;
+
     if(Value > Deadzone || Value < -Deadzone) 
-        mas_impl_input_on_axis(User, Key, Value);
+        mas_impl_input_on_axis(User, Axis, Value);
     else
-        mas_impl_input_on_axis(User, Key, 0.0);
+        mas_impl_input_on_axis(User, Axis, 0.0);
 }
 
 static void mas_internal_input_controller_on_trigger(masInputUser User, masButton Button, float Value, float Threshold)
 {
-    masInputKey Key = mas_internal_input_controller_map_button(Button);
+    masInputAxis Axis = InputAxis_None;
+    switch(Button)
+    {
+    case Button_L2: Axis = InputAxis_Controller_L2; break;
+    case Button_R2: Axis = InputAxis_Controller_R2; break;
+    }
+
+    if(Axis == InputAxis_None)
+        return;
+
     if(Value > Threshold) 
-        mas_impl_input_on_axis(User, Key, Value);
+        mas_impl_input_on_axis(User, Axis, Value);
     else
-        mas_impl_input_on_axis(User, Key, 0.0);
+        mas_impl_input_on_axis(User, Axis, 0.0);
 }
 
 static void mas_internal_event_add_controller_button(masInputUser User, masButton Button, masInputKeyState KeyState)
@@ -242,7 +277,7 @@ void mas_impl_input_controller_tick()
         Gamepad = &State.Gamepad;
 
         static bool Buttons[Button_Count];
-        memset(Buttons, 0, sizeof(masButton) * ButtonCount);
+        memset(Buttons, 0, sizeof(masButton) * Button_Count);
 
         Buttons[Button_Square]       = Gamepad->wButtons & XINPUT_GAMEPAD_X;
 		Buttons[Button_Cross]        = Gamepad->wButtons & XINPUT_GAMEPAD_A;
@@ -285,7 +320,7 @@ void mas_impl_input_controller_tick()
 
 
         double AppTime = mas_impl_time_now();
-        for(int32_t ButtonIdx = 0; ButtonIdx < EButton_Count; ++ButtonIdx)
+        for(int32_t ButtonIdx = 0; ButtonIdx < Button_Count; ++ButtonIdx)
         {
 			bool CurrState  = Buttons[ButtonIdx];
 			bool LastState  = Controller->ButtonLastState[ButtonIdx];
@@ -299,7 +334,7 @@ void mas_impl_input_controller_tick()
 				if (Controller->ButtonRepeatTime[ButtonIdx] <= AppTime)
 				{
                     mas_internal_event_add_controller_button(User, Button, InputKeyState_Repeat);
-					Gamepad->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_DELAY_TIME;
+					Controller->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_DELAY_TIME;
 				}
 			}
 			else if (IsReleased)
@@ -307,13 +342,17 @@ void mas_impl_input_controller_tick()
 			else if (IsPressed)
 			{
 				mas_internal_event_add_controller_button(User, Button, InputKeyState_Press);
-				Gamepad->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_INIT_TIME;
+				Controller->ButtonRepeatTime[ButtonIdx] = AppTime + MAS_REPEAT_INIT_TIME;
 			}
         }
 
         memcpy(Controller->ButtonLastState, Buttons, sizeof(bool) * Button_Count);
 
-        XINPUT_VIBRATION Rumble = { 0 };
-        XInputSetState(User, &Rumble);
+        //mas_impl_input_controller_feedback_rumble(User, 0, 0);// doesn work as expected we may need to introduce duration
     }
+}
+
+void  mas_impl_input_controller_connection_callback(masInputControllerConnectionCallback Callback)
+{
+    // TODO: 
 }

@@ -1,7 +1,3 @@
-#include <stdint.h>
-#include <stdbool.h>
-
-#define MAS_UNICODE
 #include "masTypes.h"
 
 
@@ -26,7 +22,7 @@ void           mas_impl_window_set_size(int32_t w, int32_t h);
 void           mas_impl_window_show(bool EnableVisibility);
 bool           mas_impl_window_peek_messages(); 
 void           mas_impl_window_enable_fullscreen(bool EnableFullScreen);      // TODO: 
-   
+void           mas_impl_window_mouse_show(bool EnableVisibility);             // TODO: 
 void           mas_impl_window_mouse_enable_capture(bool EnableMouseCapture); // TODO:  
 void           mas_impl_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
 void           mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y);
@@ -71,13 +67,13 @@ typedef struct masEvent_
     masEventType Type;
     masInputUser InputUser;
 
-    union
+    union 
     {
         struct 
         {
-            masKey      Code;
-            masKeyMod   Mod;
-            masKeyState State;
+            masInputKey      Code;
+            masInputKeyMod   Mod;
+            masInputKeyState State;
             
         } Key;
 
@@ -104,10 +100,11 @@ void mas_impl_input_tick();
 void mas_impl_input_on_key(masInputUser User, masInputKey Key, masInputKeyState KeyState, masInputKeyMod KeyMod, double TimeStamp);
 void mas_impl_input_on_axis(masInputUser User, masInputAxis Axis, float Value);
 void mas_impl_input_on_text_enter(masInputUser User, uint32_t Unicode); // TODO: 
+void mas_impl_input_clear();
 
 bool  mas_impl_input_key_state(masInputUser User, masInputKeyState KeyState, masInputKey Key, masInputKeyMod KeyMod);
 float mas_impl_input_axis_value(masInputUser User, masInputAxis Axis);
-void  mas_impl_input_connection_callback(masInputControllerConnectionCallback Callback); // TODO: 
+void  mas_impl_input_controller_connection_callback(masInputControllerConnectionCallback Callback); // TODO: 
 
 void mas_impl_input_controller_init();
 void mas_impl_input_controller_deinit();
@@ -125,6 +122,12 @@ void mas_impl_input_controller_tick();
 bool        mas_impl_directory_init();
 void        mas_impl_directory_deinit();
 int32_t     mas_impl_directory_current_path(masChar* Path, int32_t PathSize);
-masFileBuf* mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
-masFile*    mas_impl_directory_filebuf_next_file(masFileBuf* FileBuf);
-int32_t     mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
+masFileBuf*    mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
+const masFile* mas_impl_directory_filebuf_next_file(masFileBuf* FileBuf);
+int32_t        mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
+
+
+/***************************************************************************************************************************
+* LOG: IN PROGRESS
+****************************************************************************************************************************/
+void mas_impl_log(const masChar* Text, ...);

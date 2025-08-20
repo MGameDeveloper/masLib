@@ -50,6 +50,7 @@ masEvent* mas_impl_event_add(masEventType EventType)
     masEvent *Event  = &EventQueue.Events[AddIdx];
     if(Event->Type == EventType_None)
     {
+        Event->Type = EventType;
         EventQueue.AddIdx++;
         if(EventQueue.AddIdx >= MAS_EVENT_MAX)
             EventQueue.AddIdx = 0;
@@ -65,7 +66,7 @@ bool mas_impl_event_get(masEvent* Event)
 {
     int32_t   GetIdx       = EventQueue.GetIdx;
     masEvent *CurrentEvent = &EventQueue.Events[GetIdx];
-    if(Event->Type != EventType_None)
+    if(CurrentEvent->Type != EventType_None)
     {
         memcpy(Event, CurrentEvent, sizeof(masEvent));
         memset(CurrentEvent, 0, sizeof(masEvent));

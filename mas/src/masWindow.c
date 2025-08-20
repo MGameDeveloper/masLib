@@ -1,12 +1,9 @@
+#include "masImpl.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <windowsx.h>
 #include <tchar.h>
-
-#include <string.h>
-#include <stdio.h>
-
-#include "masImpl.h"
 
 
 /***************************************************************************************************************************
@@ -23,7 +20,7 @@
 typedef struct masWindow_
 {
     HWND     Handle;
-    char     Title[MAS_WINDOW_TITLE_SIZE];
+    masChar  Title[MAS_WINDOW_TITLE_SIZE];
     int32_t  PosX;
     int32_t  PosY;
     int32_t  Width;
@@ -44,8 +41,8 @@ static HINSTANCE Instance = NULL;
 static LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam);
 static masInputKeyMod   mas_internal_win32_key_mod();
 static masInputKey      mas_internal_win32_map_key(int32_t VKCode);
-static void             mas_internal_event_add_mouse_button(int32_t VKCode, masKeyState KeyState);
-static void             mas_internal_event_add_keyboard_key(int32_t VKCode, masKeyState KeyState);
+static void             mas_internal_event_add_mouse_button(int32_t VKCode, masInputKeyState KeyState);
+static void             mas_internal_event_add_keyboard_key(int32_t VKCode, masInputKeyState KeyState);
 
 
 /***************************************************************************************************************************
@@ -69,7 +66,7 @@ bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 	wc.style         = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS;
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.hInstance     = Instance;
-	wc.lpszClassName = WND_CLASSNAME;
+	wc.lpszClassName = MAS_WINDOW_CLASS_NAME;
 	wc.lpfnWndProc   = &mas_internal_win32_proc;
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = DLGWINDOWEXTRA;
@@ -86,8 +83,8 @@ bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 
 	int32_t ScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
 	int32_t ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-	int32_t PosX         = { (ScreenWidth - Width) / 2, (ScreenHeight - Height) / 2 };
-	int32_t PosY         = { (ScreenWidth - Width) / 2, (ScreenHeight - Height) / 2 };
+	int32_t PosX         = (ScreenWidth - Width) / 2;
+	int32_t PosY         = (ScreenHeight - Height) / 2;
 
 	HWND Handle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, MAS_WINDOW_CLASS_NAME, Title, WS_OVERLAPPEDWINDOW,
 		PosX, PosY, Width, Height, NULL, NULL, Instance, NULL);
@@ -98,27 +95,27 @@ bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 		return false;
 	}
 
-	RECT Rect = {};
+	RECT Rect = { 0 };
 	GetClientRect(Handle, &Rect);
-	int32_t DrawAreaWidth  = { Rect.right - Rect.left, Rect.bottom - Rect.top };
-	int32_t DrawAreaHeight = { Rect.right - Rect.left, Rect.bottom - Rect.top };
+	int32_t DrawAreaWidth  = Rect.right - Rect.left;
+	int32_t DrawAreaHeight = Rect.bottom - Rect.top;
 
-	memcpy(masWindow->Title, Title, sizeof(masChar) * TitleSize);
-    Window->Handle         = Handle;
-    Window->PosX           = PosX;
-    Window->PosY           = PosY;
-    Window->Width          = Width;
-    Window->Height         = Height;
-    Window->DrawAreaWidth  = DrawAreaWidth;
-    Window->DrawAreaHeight = DrawAreaHeight;
-    Window->bClose         = false;
+	memcpy(Window.Title, Title, sizeof(masChar) * TitleSize);
+    Window.Handle         = Handle;
+    Window.PosX           = PosX;
+    Window.PosY           = PosY;
+    Window.Width          = Width;
+    Window.Height         = Height;
+    Window.DrawAreaWidth  = DrawAreaWidth;
+    Window.DrawAreaHeight = DrawAreaHeight;
+    Window.bClosed        = false;
 
 	return true;
 }
 
 void mas_impl_window_deinit()
 {
-    UnregisterClass(MAS_WINDOW_CLASS_NAME, Window.Handle);
+    UnregisterClass(MAS_WINDOW_CLASS_NAME, Instance);
 }
 
 void* mas_impl_window_handle()
@@ -126,7 +123,7 @@ void* mas_impl_window_handle()
     return Window.Handle;
 }
 
-const char* mas_impl_window_title()
+const masChar* mas_impl_window_title()
 {
     return Window.Title;
 }
@@ -162,7 +159,7 @@ void mas_impl_window_set_pos(int32_t x, int32_t y)
 
     Window.PosX = x;
     Window.PosY = y;
-    SetWindowPos(Window->Handle, NULL, x, y, Window.Width, Window.Height, SWP_NOZORDER | SWP_NOSIZE); 
+    SetWindowPos(Window.Handle, NULL, x, y, Window.Width, Window.Height, SWP_NOZORDER | SWP_NOSIZE); 
 }
 
 void mas_impl_window_set_size(int32_t w, int32_t h)
@@ -172,12 +169,12 @@ void mas_impl_window_set_size(int32_t w, int32_t h)
 
 	Window.Width  = w;
     Window.Height = h;
-	SetWindowPos(Window.Handle, NULL, Wnd->PosX, Wnd->PosY, w, h, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(Window.Handle, NULL, Window.PosX, Window.PosY, w, h, SWP_NOMOVE | SWP_NOZORDER);
 
-	RECT Rect = {};
+	RECT Rect = { 0 };
 	GetClientRect(Window.Handle, &Rect);
-	Wnd->DrawAreaWidth  = Rect.right - Rect.left;
-	Wnd->DrawAreaHeight = Rect.bottom - Rect.top;
+	Window.DrawAreaWidth  = Rect.right - Rect.left;
+	Window.DrawAreaHeight = Rect.bottom - Rect.top;
 }
 
 void mas_impl_window_show(bool EnableVisibility)
@@ -185,7 +182,7 @@ void mas_impl_window_show(bool EnableVisibility)
     if (!Window.Handle)
 	    return;
 
-    ShowWindow(Wnd->Handle, (EnableVisibility) ? 1 : 0);
+    ShowWindow(Window.Handle, (EnableVisibility) ? 1 : 0);
 }
 
 bool mas_impl_window_peek_messages()
@@ -242,11 +239,16 @@ void mas_impl_window_mouse_pos_in_window(int32_t* x, int32_t* y)
     }
 }
 
+void mas_impl_window_mouse_show(bool EnableVisibility)
+{
+    // TODO: 
+}
+
 
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
-static masInputKeyMod mas_internal_win32_key_mod()
+static masInputKeyMod mas_internal_win32_key_mods()
 {
 	uint8_t KeyMod = 0;
 	KeyMod |= (GetAsyncKeyState(VK_LCONTROL) & 0x8000) ? InputKeyMod_LCtrl  : 0;
@@ -256,7 +258,7 @@ static masInputKeyMod mas_internal_win32_key_mod()
 	KeyMod |= (GetAsyncKeyState(VK_RSHIFT  ) & 0x8000) ? InputKeyMod_RShift : 0;
 	KeyMod |= (GetAsyncKeyState(VK_RMENU   ) & 0x8000) ? InputKeyMod_RAlt   : 0;
 
-    return (masKeyMod)KeyMod;
+    return (masInputKeyMod)KeyMod;
 }
 
 static masInputKey mas_internal_win32_map_key(int32_t VKCode)
@@ -326,7 +328,7 @@ static masInputKey mas_internal_win32_map_key(int32_t VKCode)
 	case VK_INSERT:   return InputKey_Insert;
 	case VK_DELETE:   return InputKey_Delete;
 	case VK_DIVIDE:   return InputKey_Divide;
-	case VK_MULTIPLY: return InputKey_Multipy;
+	case VK_MULTIPLY: return InputKey_Multiply;
 	case VK_SUBTRACT: return InputKey_Subtract;
 	case VK_ADD:      return InputKey_Addition;
 	case VK_HOME:     return InputKey_Home;
@@ -381,65 +383,65 @@ static masInputKey mas_internal_win32_map_key(int32_t VKCode)
 #define MAS_CHAR_KEY(UNSHIFTED, SHIFTED, UNSHIFTED_KEY, SHIFTED_KEY) case UNSHIFTED: if(bShift) return SHIFTED_KEY; else return UNSHIFTED_KEY; break
 		switch (CharCode)
 		{
-			MAS_CHAR_KEY(';', ':',   Key_SemiColon,          InputKey_Colon);
-			MAS_CHAR_KEY('\'', '\"', Key_Apostrophe,         InputKey_DoubleQuote);
-			MAS_CHAR_KEY('[', '{',   Key_LeftSquareBracket,  InputKey_LeftCurlyBrace);
-			MAS_CHAR_KEY(']', '}',   Key_RightSquareBracket, InputKey_RightCurlyBrace);
-			MAS_CHAR_KEY('\\', '|',  Key_BackSlash,          InputKey_VerticalBar);
-			MAS_CHAR_KEY(',', '<',   Key_Comma,              InputKey_LessThan);
-			MAS_CHAR_KEY('.', '>',   Key_Period,             InputKey_GreaterThan);
-			MAS_CHAR_KEY('/', '?',   Key_ForwardSlash,       InputKey_QuestionMark);
-			MAS_CHAR_KEY('`', '~',   Key_GraveAccent,        InputKey_Tilde);
-			MAS_CHAR_KEY('1', '!',   Key_Num1,               InputKey_ExclamationMark);
-			MAS_CHAR_KEY('2', '@',   Key_Num2,               InputKey_At);
-			MAS_CHAR_KEY('3', '#',   Key_Num3,               InputKey_Hash);
-			MAS_CHAR_KEY('4', '$',   Key_Num4,               InputKey_Dollar);
-			MAS_CHAR_KEY('5', '%',   Key_Num5,               InputKey_Percent);
-			MAS_CHAR_KEY('6', '^',   Key_Num6,               InputKey_Caret);
-			MAS_CHAR_KEY('7', '&',   Key_Num7,               InputKey_Ampersand);
-			MAS_CHAR_KEY('8', '*',   Key_Num8,               InputKey_Asterisk);
-			MAS_CHAR_KEY('9', '(',   Key_Num9,               InputKey_LeftParenthesis);
-			MAS_CHAR_KEY('0', ')',   Key_Num0,               InputKey_RightParenthesis);
-			MAS_CHAR_KEY('-', '_',   Key_Hyphen,             InputKey_UnderScore);
-			MAS_CHAR_KEY('=', '+',   Key_Equals,             InputKey_Plus);
+			MAS_CHAR_KEY(';', ':',   InputKey_Semicolon,          InputKey_Colon);
+			MAS_CHAR_KEY('\'', '\"', InputKey_Apostrophe,         InputKey_Quotation);
+			MAS_CHAR_KEY('[', '{',   InputKey_LeftSquareBrackets,  InputKey_LeftCurlyBraces);
+			MAS_CHAR_KEY(']', '}',   InputKey_RightSquareBrackets, InputKey_RightCurlyBraces);
+			MAS_CHAR_KEY('\\', '|',  InputKey_Backslash,          InputKey_VerticalBar);
+			MAS_CHAR_KEY(',', '<',   InputKey_Comma,              InputKey_LessThan);
+			MAS_CHAR_KEY('.', '>',   InputKey_Period,             InputKey_GreaterThan);
+			MAS_CHAR_KEY('/', '?',   InputKey_Forwardslash,       InputKey_QuestionMark);
+			MAS_CHAR_KEY('`', '~',   InputKey_GraveAccent,        InputKey_Tilde);
+			MAS_CHAR_KEY('1', '!',   InputKey_Num1,               InputKey_Exclamation);
+			MAS_CHAR_KEY('2', '@',   InputKey_Num2,               InputKey_At);
+			MAS_CHAR_KEY('3', '#',   InputKey_Num3,               InputKey_Hash);
+			MAS_CHAR_KEY('4', '$',   InputKey_Num4,               InputKey_Dollar);
+			MAS_CHAR_KEY('5', '%',   InputKey_Num5,               InputKey_Percent);
+			MAS_CHAR_KEY('6', '^',   InputKey_Num6,               InputKey_Caret);
+			MAS_CHAR_KEY('7', '&',   InputKey_Num7,               InputKey_Ampersand);
+			MAS_CHAR_KEY('8', '*',   InputKey_Num8,               InputKey_Asterisk);
+			MAS_CHAR_KEY('9', '(',   InputKey_Num9,               InputKey_LeftParenthesis);
+			MAS_CHAR_KEY('0', ')',   InputKey_Num0,               InputKey_RightParenthesis);
+			MAS_CHAR_KEY('-', '_',   InputKey_Hyphen,             InputKey_UnderScore);
+			MAS_CHAR_KEY('=', '+',   InputKey_Equals,             InputKey_Plus);
 		}
 #undef MAS_CHAR_KEY
 	}
 	break;
 	}
 
-	return Key_None;
+	return InputKey_None;
 }
 
-static void mas_internal_event_add_mouse_button(int32_t VKCode, masKeyState KeyState)
+static void mas_internal_event_add_mouse_button(int32_t VKCode, masInputKeyState KeyState)
 {
-    masKey KeyCode = Key_None;
+    masInputKey KeyCode = InputKey_None;
     if(HIWORD(VKCode) == XBUTTON1)
-        KeyCode = Key_Mouse_X1;
+        KeyCode = InputKey_Mouse_X1;
     else if(HIWORD(VKCode) == XBUTTON2)
-        KeyCode = Key_Mouse_X2;
+        KeyCode = InputKey_Mouse_X2;
     else
         KeyCode = mas_internal_win32_map_key(VKCode);
 
-    masEvent* Event       = mas_impl_event_add(EventType_Mouse_Button);
+    masEvent* Event       = mas_impl_event_add(EventType_Button);
     Event->TimeStamp      = mas_impl_time_now();
     Event->Data.Key.Code  = KeyCode;
-    Event->Data.Key.Mod   = mas_internal_win32_key_mod();
+    Event->Data.Key.Mod   = mas_internal_win32_key_mods();
     Event->Data.Key.State = KeyState;
 }
 
-void mas_internal_event_add_keyboard_key(int32_t VKCode, masKeyState KeyState)
+void mas_internal_event_add_keyboard_key(int32_t VKCode, masInputKeyState KeyState)
 {
-    masEvent* Event       = mas_impl_event_add(EventType_Keyboard_Button);
+    masEvent* Event       = mas_impl_event_add(EventType_Button);
     Event->TimeStamp      = mas_impl_time_now();
     Event->Data.Key.Code  = mas_internal_win32_map_key(VKCode);
-    Event->Data.Key.Mod   = mas_internal_win32_key_mod();
+    Event->Data.Key.Mod   = mas_internal_win32_key_mods();
     Event->Data.Key.State = KeyState;
 }
 
 LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam)
 {
-    masEvent Event = {0};
+    masEvent *Event = NULL;
 
     switch(Msg)
     {
@@ -455,8 +457,8 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 
     case WM_SIZE: 
     {
-       	RECT Rect = {};
-		GetWindowRect(Wnd->Handle, &Rect);
+       	RECT Rect = { 0 };
+		GetWindowRect(Hwnd, &Rect);
 		int32_t Width        = Rect.right - Rect.left;
 		int32_t Height       = Rect.bottom - Rect.top;
         int32_t ScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
@@ -464,7 +466,7 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 
         int32_t EventWidth  = 0;
         int32_t EventHeight = 0;
-		switch (wparam)
+		switch (Wparam)
 		{
 		case SIZE_MAXIMIZED: 
             EventWidth = ScreenWidth; 
@@ -483,13 +485,15 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 		} 
 
         Event = mas_impl_event_add(EventType_Window_Resize);
-        Event->Data.Size = { EventWidth, EventHeight };
+        Event->Data.Size.w = EventWidth;
+        Event->Data.Size.h = EventHeight;
     }
         return 0;
 
     case WM_MOVE:
         Event            = mas_impl_event_add(EventType_Window_Move);
-        Event->Data.Size = { GET_X_LPARAM(Lparam), GET_Y_LPARAM(Lparam) };
+        Event->Data.Size.w = GET_X_LPARAM(Lparam);
+        Event->Data.Size.h = GET_Y_LPARAM(Lparam);
         return 0;
 
     case WM_MOUSEMOVE:  
@@ -510,8 +514,9 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 
         }
 
-        Event           = mas_impl_event_add(EventType_Mouse_Move);
-        Event->Data.Pos = { GET_X_LPARAM(Lparam), GET_Y_LPARAM(Lparam) };
+        //Event           = mas_impl_event_add(EventType_Mouse_Move);
+        //Event->Data.Pos.x = GET_X_LPARAM(Lparam);
+        //Event->Data.Pos.y = GET_Y_LPARAM(Lparam);
         return 0;
 
     case WM_MOUSELEAVE: 
@@ -582,11 +587,11 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 			}
 
 			if (IsKeyReleased)
-				mas_internal_event_add_keyboard_key(VKCode, KeyState_Release);
+				mas_internal_event_add_keyboard_key(VKCode, InputKeyState_Release);
 			else if (WasKeyDown)
-				mas_internal_event_add_keyboard_key(VKCode, KeyState_Repeat);
+				mas_internal_event_add_keyboard_key(VKCode, InputKeyState_Repeat);
 			else
-				mas_internal_event_add_keyboard_key(VKCode, KeyState_Press);;
+				mas_internal_event_add_keyboard_key(VKCode, InputKeyState_Press);;
         }
         return 0;
     
@@ -599,7 +604,7 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
     case WM_CHAR:
     case WM_SYSCHAR:
         Event = mas_impl_event_add(EventType_Text_Enter);
-        Event->Data.Letter = Wparam;
+        Event->Data.Unicode = Wparam;
         return 0;
     }
 

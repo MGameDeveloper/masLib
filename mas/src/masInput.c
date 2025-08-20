@@ -40,8 +40,8 @@ static masInputPlayer InputPlayers[InputUser_Count] = { 0 };
 ****************************************************************************************************************************/
 bool mas_impl_input_init()
 {
-    if(!mas_impl_input_controller_init())
-        return false;
+    mas_impl_input_controller_init();
+
     return true;
 }
 
@@ -64,8 +64,8 @@ void mas_impl_input_on_key(masInputUser User, masInputKey Key, masInputKeyState 
     masInputButton* Button = &Player->Buttons[Key];
 
     Button->State = KeyState;
-    if((TimeStamp - Button->timeStamp) >= MAS_INPUT_DOUBLE_CLICK_THRESHOLD)
-            Button->State = InputKeyState_DoubleClick;
+    //if((TimeStamp - Button->TimeStamp) >= MAS_INPUT_DOUBLE_CLICK_THRESHOLD)
+    //        Button->State = InputKeyState_DoubleClick;
     Button->Mod       = KeyMod;
     Button->TimeStamp = TimeStamp;
 }
@@ -87,10 +87,16 @@ bool mas_impl_input_key_state(masInputUser User, masInputKeyState KeyState, masI
     return false;
 }
 
-float mas_impl_input_axis_value(masInputUser User, masInputKey Key)
+float mas_impl_input_axis_value(masInputUser User, masInputAxis Axis)
 {
     if(Axis < 0 || Axis >= InputAxis_Count)
-        return;     
+        return 0.0f;     
     masInputPlayer *Player = &InputPlayers[User];
     return Player->Axes[Axis];
+}
+
+void mas_impl_input_clear()
+{
+    for(int32_t i = 0; i < InputUser_Count; ++i)
+        memset(InputPlayers[i].Buttons, 0, sizeof(masInputButton) * InputKey_Count);
 }

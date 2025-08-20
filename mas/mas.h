@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "src/masTypes.h"
 
 
@@ -21,7 +20,7 @@
 /********************************************************************************************************
 * INITIALIZATION
 *********************************************************************************************************/
-bool mas_init(const char* Title, int32_t Width, int32_t Height);
+bool mas_init(const masChar* Title, int32_t Width, int32_t Height);
 void mas_terminate();
 bool mas_is_running();
 
@@ -32,13 +31,15 @@ bool mas_is_running();
 void mas_window_set_pos(int32_t x, int32_t y);
 void mas_window_set_size(int32_t w, int32_t h);
 void mas_window_get_pos(int32_t* x, int32_t* y);
-void mas_window_get_size(int32_t* w, int32_t* y);
-void mas_window_get_draw_area_size(int32_t* w, int32_t* y);
+void mas_window_get_size(int32_t* w, int32_t* h);
+void mas_window_get_draw_area_size(int32_t* w, int32_t* h);
 void mas_window_enable_fullscreen(bool EnableFullScreen);
 void mas_window_show(bool EnableVisibility);
+void mas_window_mouse_show(bool EnableVisibility);
 void mas_window_mouse_enable_capture(bool EnableCapture);
 void mas_window_mouse_set_visibility(bool EnableVisibility);
-void mas_window_mosue_get_pos(int32_t* x, int32_t* y);
+void mas_window_mouse_pos_in_screen(int32_t* x, int32_t* y);
+void mas_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
 
 /********************************************************************************************************
@@ -64,13 +65,26 @@ void  mas_input_controller_restore_setting(masInputUser User);
 /********************************************************************************************************
 * DIRECTORY
 *********************************************************************************************************/
-int32_t     mas_directory_current_path(masChar* Path, int32_t PathSize);
-masFileBuf* mas_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
-masFile*    mas_directory_filebuf_next_file(masFileBuf* FileBuf);
-int32_t     mas_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
+int32_t        mas_directory_current_path(masChar* Path, int32_t PathSize);
+masFileBuf*    mas_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
+const masFile* mas_directory_filebuf_next_file(masFileBuf* FileBuf);
+int32_t        mas_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
 
 
+/********************************************************************************************************
+*
+*********************************************************************************************************/
+void mas_log(const masChar* Text, ...);
 
+//struct masLog;
+//masLog* mas_log_create(const char* Name);
+//void    mas_log_destroy(masLog** Log);
+//void    mas_log_error(masLog* Log, const char* Fmt, ...);
+//void    mas_log_info(masLog* Log, const char* Fmt, ...);
+//void    mas_log_warning(masLog* Log, const char* Fmt, ...);
+
+
+#if 0
 /********************************************************************************************************
 *
 *********************************************************************************************************/
@@ -79,7 +93,7 @@ void                mas_directory_watch_enable(bool value);
 masDirectoryWatchID mas_directory_watch_add(const char* DirectoryPath, const char** Targets, int32_t TargetCount, void(*Callback)(void* Data));
 void                mas_directory_watch_remove(masDirectoryWatchID DirectoryWatchID);
 
-#if 0
+
 
 /********************************************************************************************************
 *
@@ -133,15 +147,4 @@ void  mas_memory_check_memory_leak();
 struct masVec3;
 struct masVec4;
 struct masMatrix;
-
-
-/********************************************************************************************************
-*
-*********************************************************************************************************/
-struct masLog;
-masLog* mas_log_create(const char* Name);
-void    mas_log_destroy(masLog** Log);
-void    mas_log_error(masLog* Log, const char* Fmt, ...);
-void    mas_log_info(masLog* Log, const char* Fmt, ...);
-void    mas_log_warning(masLog* Log, const char* Fmt, ...);
 #endif
