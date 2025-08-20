@@ -1,4 +1,5 @@
-#include "masInternal.h"
+#include "masImpl.h"
+
 
 /********************************************************************************************************
 * INITIALIZATION
@@ -90,3 +91,39 @@ void mas_window_mosue_get_pos       (int32_t* x, int32_t* y) { mas_impl_window_m
 double mas_time_now()     { mas_impl_time_now(); };
 double mas_time_app()     { mas_impl_time_app(); };
 double mas_time_elapsed() { mas_impl_time_elapsed(); };
+
+
+/********************************************************************************************************
+* INPUT
+*********************************************************************************************************/
+bool  mas_input_key_state(masInputUser User, masInputKey Key, masInputKeyState State, uint8_t KeyMod_)    { return mas_impl_input_key_state(User, Key, State, KeyMod_);                }
+float mas_input_axis_value(masInputUser User, masInputAxis Axis)                                          { return mas_impl_input_axis_value(User, Axis);                              }
+void  mas_input_controller_connection_callback(masInputControllerConnectionCallback Callback)             { mas_impl_input_connection_callback(Callback);                              }
+void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed) { mas_impl_input_controller_feedback_rumble(User, LMotorSpeed, RMotorSpeed); }
+void  mas_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog)                  { mas_impl_inut_controller_set_deadzone(User, LAnalog, RAnalog);             }
+void  mas_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger)               { mas_impl_inut_controller_set_threshold(User, LTrigger, RTrigger);          }
+void  mas_input_controller_restore_setting(masInputUser User)                                             { mas_input_controller_restore_setting(User);                                }
+
+
+/********************************************************************************************************
+* DIRECTORY
+*********************************************************************************************************/
+int32_t mas_directory_current_path(masChar* Path, int32_t PathSize) 
+{ 
+    return mas_impl_directory_current_path(Path, PathSize); 
+}
+
+masFileBuf* mas_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount)
+{
+    return mas_impl_directory_search_for_files(DirectoryPath, TargetFiles, TargetCount);
+}
+
+masFile* mas_directory_filebuf_next_file(masFileBuf* FileBuf) 
+{ 
+    return mas_impl_directory_filebuf_next_file(FileBuf); 
+}
+
+int32_t mas_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize)
+{
+    return mas_impl_directory_find_folder(DirectoryPath, FolderName, FolderPath, FolderPathSize);
+}

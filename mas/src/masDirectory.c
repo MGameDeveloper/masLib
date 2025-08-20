@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <shlwapi.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -25,14 +26,6 @@ typedef struct _masFolder
     int32_t        PathSize;
 } masFolder;
 
-typedef struct _masFile
-{
-    const masChar* Path;
-    const masChar* Name;
-    const masChar* Extension;
-    uint64_t       Size;
-} masFile;
-
 typedef struct _masFolderBuf
 {
     uint8_t Folders[MAS_FOLDER_BUF_SIZE];
@@ -41,13 +34,13 @@ typedef struct _masFolderBuf
     int32_t FolderCount;
 } masFolderBuf;
 
-typedef struct _masFileBuf
+struct _masFileBuf
 {
     uint8_t Files[MAS_FILE_BUF_SIZE];
     int32_t AllocIdx;
     int32_t QueryIdx;
     int32_t FileCount;
-} masFileBuf;
+};
 
 typedef struct _masDirecotry
 {
@@ -108,7 +101,7 @@ static void mas_internal_directory_folder_add(const masChar* Path, const masChar
     FolderBuf->FolderCount++;
 }
 
-static const bool mas_internal_directory_folder_get_next(masChar* Path)
+static const bool mas_internal_directory_folder_get_next(masChar* Path, int32_t *PathSize)
 {
     masFolderBuf* FolderBuf = &Directory->FolderBuf;
     if(FolderBuf->QueryIdx >= FolderBuf->AllocIdx)
@@ -119,16 +112,17 @@ static const bool mas_internal_directory_folder_get_next(masChar* Path)
     
     memset(Path, 0, MAS_PATH_SIZE);
     memcpy(Path, Folder->Path, sizeof(masChar) * Folder->PathSize);
-
+    *PathSize = Folder->PathSize;
+     
     return true;
 }
 
-static void mas_internal_directory_file_add(const masChar* FilePath, const masChar* FileName)
+static masFile* mas_internal_directory_file_add(const masChar* FilePath, const masChar* FileName)
 {
     int32_t FilePathSize = MAS_TEXT_LEN(FilePath);
     int32_t FileNameSize = MAS_TEXT_LEN(FileName);
     if(FilePathSize <= 0 || FileNameSize <= 0)
-        return;
+        return NULL;
     int32_t FileExtensionIdx     = mas_internal_directory_file_extension_index(FileName);
     int32_t FileExtensionSize    = FileNameSize - FileExtensionIdx;
     int32_t CompleteFilePathSize = FilePathSize + FileNameSize + 2; // 2 -> 1 for '\' seperator and 1 for the end as null terminator
@@ -138,7 +132,7 @@ static void mas_internal_directory_file_add(const masChar* FilePath, const masCh
     if(FileBuf->AllocIdx + RequiredSize >= MAS_FILE_BUF_SIZE)
     {
         printf("[ ERROR ]: MAS_DIRECTORY_ADD_FILE -> internal buffer is full\n");
-        return;
+        return NULL;
     }
     
     masFile* File   = MAS_PTR_OFFSET(masFile, FileBuf->Files, FileBuf->AllocIdx);
@@ -154,6 +148,8 @@ static void mas_internal_directory_file_add(const masChar* FilePath, const masCh
 
     FileBuf->AllocIdx += RequiredSize;
     FileBuf->FileCount++;
+
+    return File;
 }
 
 static HANDLE mas_internal_directory_win32_find_first(masChar* Path)
@@ -182,31 +178,32 @@ static bool mas_internal_directory_ignore_file(const masChar* Name)
     return false;
 }
 
-static bool mas_internal_directory_file_compare_and_add(const masChar* FilePath, const masChar* FileName, int32_t FileNameSize, const masChar* Target, int32_t TargetSize)
+static masFile* mas_internal_directory_file_compare_and_add(const masChar* FilePath, const masChar* FileName, int32_t FileNameSize, const masChar* Target, int32_t TargetSize)
 {
     if(FileNameSize != TargetSize)
         return false;
     for(int32_t i = 0; i < TargetSize; ++i)
         if(FileName[i] != Target[i])
             return false;
-    mas_internal_directory_file_add(FilePath, FileName);
-    return true;
+
+    return mas_internal_directory_file_add(FilePath, FileName);
 }
 
-static void mas_internal_directory_process_found_file(const masChar* FilePath, const masChar* FileName, const masChar** TargetFiles, int32_t TargetCount)
+static masFile* mas_internal_directory_process_found_file(const masChar* FilePath, const masChar* FileName, const masChar** TargetFiles, int32_t TargetCount)
 {
     int32_t FileNameSize    = MAS_TEXT_LEN(FileName);
     int32_t FileNameExtIdx  = mas_internal_directory_file_extension_index(FileName, FileNameSize);
     int32_t FilenameExtSize = FileNameSize - FileNameExtIdx;
 
+    masFile *File = NULL;
     for(int32_t TargetIdx = 0; TargetIdx < TargetCount; ++TargetIdx)
     {
         const masChar *Target     = TargetFiels[TargetIdx];
         int32_t        TargetSize = MAS_TEXT_LEN(Target);
         
         if(Target[0] == _T('.') )
-        {
-            if(mas_internal_directory_file_compare_and_add(FilePath, FileName + FileNameExtIdx, FileNameExtSize, Target, TargetSize))
+        {       
+            if(File = mas_internal_directory_file_compare_and_add(FilePath, FileName + FileNameExtIdx, FileNameExtSize, Target, TargetSize))
                 break;
         }
         else
@@ -214,16 +211,18 @@ static void mas_internal_directory_process_found_file(const masChar* FilePath, c
             int32_t TargetExtIdx = mas_internal_directory_file_extension_index(Target, TargetSize);
             if(TargetExtIdx == -1)
             {
-                if(mas_internal_directory_file_compare_and_add(FilePath, FileName, FileNameSize - FileNameExtSize, Target, TargetSize))
+                if(File = mas_internal_directory_file_compare_and_add(FilePath, FileName, FileNameSize - FileNameExtSize, Target, TargetSize))
                     break;
             }
             else
             {
-                if(mas_internal_directory_file_compare_and_add(FilePath, FileName, FileNameSize, Target, TargetSize))
+                if(File = mas_internal_directory_file_compare_and_add(FilePath, FileName, FileNameSize, Target, TargetSize))
                     break;
             }
         }
     }
+
+    return File;
 }
 
 
@@ -241,7 +240,16 @@ bool mas_impl_directory_init()
     memset(Directory, 0, sizeof(masDirectory));
 
     Directory->WorkPathSize = GetModuleFileName(NULL, Directory->WorkPath, MAS_PATH_SIZE);
+    if(Directory->WorkPathSize <= 0)
+    {
+        free(Directory);
+        Directory = NULL;
+        return false;
+    }
 
+    PathRemoveFileSpec(Directory->WorkPath);
+    Directory->WorkPathSize = MAS_TEXT_LEN(Directory->WorkPath);
+    
     return true;
 }
 
@@ -251,6 +259,17 @@ void mas_impl_directory_deinit()
         return;
     free(Directory);
     Directory = NULL;
+}
+
+int32_t mas_impl_directory_current_path(masChar* Path, int32_t PathSize)
+{
+    if(!Directory)
+        return 0;
+    if(Directory->WorkPathSize > PathSize)
+        return 0;
+    memset(Path, 0, PathSize);
+    memcpy(Path, Directory->WorkPath, sizeof(masChar) * Directory->WorkPathSize);
+    return Directory->WorkPathSize;
 }
 
 bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount)
@@ -275,13 +294,17 @@ bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const mas
             if(Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 mas_internal_directory_folder_add(Path, Data.cFileName);
             else
-                mas_internal_directory_process_found_file(Path, Data.cFileName, TargetFiles, TargetCount);
+            {
+                masFile* File = mas_internal_directory_process_found_file(Path, Data.cFileName, TargetFiles, TargetCount);
+                if(File)
+                    File->Size = (Data.nFileSizeHigh << 32) | Data.nFileSizeLow;
+            }   
         }
 
         if(!FindNextFile(Handle, &Data))
         {
             FindClose(Handle);
-            if(!mas_internal_directory_folder_get_next(Path))
+            if(!mas_internal_directory_folder_get_next(Path, &PathSize))
                 break;
             
             Handle = mas_internal_directory_win32_find_first(Path);
@@ -296,7 +319,69 @@ bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const mas
     return true;
 }
 
-const masChar* mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName)
+masFile* mas_impl_directory_filebuf_next_file(masFileBuf* FileBuf)
 {
+    if(!Directory || !FileBuf)
+        return NULL;
+    if(FileBuf->QueryIdx >= FileBuf->AddIdx)
+        return NULL;
+        
+    masFile* File     = MAS_PTR_OFFSET(masFile, FileBuf->Files, FileBuf->QueryIdx);
+    FileBuf->QueryIdx = sizeof(masFile) + MAS_TEXT_LEN(File->Path) + MAS_TEXT_LEN(File->Name) + MAS_TEXT_LEN(File->Extension) + 3; // need to debug to ensure correct offset 
+    return File;
+}
 
+int32_t mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize)
+{
+    if(!Directory || !DirectoryPath || !FolderName || !FolderPath)
+        return false;
+
+    int32_t PathSize = MAS_TEXT_LEN(DirectoryPath);
+    masChar Path[MAS_PATH_SIZE];
+    memset(Path, 0, MAS_PATH_SIZE);
+    memcpy(Path, DirectoryPath, PathSize);
+    
+    WIN32_FIND_DATA Data   = { 0 };
+    HANDLE          Handle = mas_internal_directory_win32_find_first(Path);
+    if(Handle == INVALID_HANDLE_VALUE)
+        return 0;
+
+    while(1)
+    {
+        if(!mas_internal_directory_ignore_file(Data.cFileName))
+        {
+            if(Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                if(strcmp(FodlerName, Data.cFileName) != 0)
+                    mas_internal_directory_folder_add(Path, Data.cFileName);
+                else
+                {
+                    int32_t FolderNameSize = MAS_TEXT_LEN(Data.cFileName);
+                    int32_t CompletePathSize = PathSize + FolderNameSize + 2; // + 2 for last "\\\0"
+                    if(FolderPathSize < CompletePathSize)
+                        return 0;
+                    memset(FolderPath, 0, FolderPathSize);
+                    memcpy(FolderPath, Path, PathSize);
+                    memcpy(FolderPath + PathSize, Data.cFilename, FolderNameSize);
+                    memcpy(FolderPath + (PathSize + FolderNameSize), "\\", sizeof(masChar));
+
+                    FindClose(Handle);
+                    return CompletePathSize;
+                }
+            }
+        }
+
+        if(!FindNextFile(Handle, &Data))
+        {
+            FindClose(Handle);
+            if(!mas_internal_directory_folder_get_next(Path, &PathSize))
+                break;
+            
+            Handle = mas_internal_directory_win32_find_first(Path);
+            if(Handle == INVALID_HANDLE_VALUE)
+                break;
+        }
+    }
+
+    return 0;
 }

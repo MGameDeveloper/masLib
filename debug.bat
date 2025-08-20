@@ -1,2 +1,3 @@
+@echo off
 
-devenv /DebugExe build\masDirectorySearch.exe
+devenv /DebugExe Build/mas.exe

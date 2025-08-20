@@ -57,26 +57,20 @@ bool  mas_input_key_state(masInputUser User, masInputKey Key, masInputKeyState S
 float mas_input_axis_value(masInputUser User, masInputAxis Key, masInputKeyMod KeyMod);
 void  mas_input_controller_connection_callback(masInputControllerConnectionCallback Callback);
 void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed);
-
+void  mas_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog);
+void  mas_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger);
+void  mas_input_controller_restore_setting(masInputUser User);
 
 /********************************************************************************************************
-*
+* DIRECTORY
 *********************************************************************************************************/
-struct masFileItr;
-struct masFileInfo
-{
-    const char* Path;
-    const char* Name;
-    const char* Extension;
-};
+int32_t     mas_directory_current_path(masChar* Path, int32_t PathSize);
+masFileBuf* mas_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
+masFile*    mas_directory_filebuf_next_file(masFileBuf* FileBuf);
+int32_t     mas_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
 
-const char*  mas_directory_current_path();
-const char*  mas_directory_find_folder(const char* FolderName);
-masFileItr*  mas_directory_search_for(const char* DirectoryPath, const char** Targets, int32_t TargetCount);
-masFileItr*  mas_directory_file_itr_next(masFileItr* FileItr);
-masFileInfo* mas_directory_file_info_from_itr(masFileItr* FileItr);
 
-#if 0
+
 /********************************************************************************************************
 *
 *********************************************************************************************************/
@@ -85,6 +79,7 @@ void                mas_directory_watch_enable(bool value);
 masDirectoryWatchID mas_directory_watch_add(const char* DirectoryPath, const char** Targets, int32_t TargetCount, void(*Callback)(void* Data));
 void                mas_directory_watch_remove(masDirectoryWatchID DirectoryWatchID);
 
+#if 0
 
 /********************************************************************************************************
 *

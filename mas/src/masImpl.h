@@ -120,9 +120,11 @@ void mas_impl_input_controller_tick();
 
 
 /***************************************************************************************************************************
-* DIRECTORY: IN PROGRESS
+* DIRECTORY: DONE
 ****************************************************************************************************************************/
-bool mas_impl_directory_init();
-void mas_impl_directory_deinit();
-bool mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
-const masChar* mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName);
+bool        mas_impl_directory_init();
+void        mas_impl_directory_deinit();
+int32_t     mas_impl_directory_current_path(masChar* Path, int32_t PathSize);
+masFileBuf* mas_impl_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount);
+masFile*    mas_impl_directory_filebuf_next_file(masFileBuf* FileBuf);
+int32_t     mas_impl_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize);
