@@ -20,12 +20,13 @@ int32_t main(int32_t argc, const char** argv)
     if(mas_directory_find_file(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT("blender.exe"), exe_path, 512))
         mas_log(MAS_TEXT("EXE_PATH: %s\n"), exe_path);
 
-    const masFileGroup* FileGroup = mas_directory_find_file_group(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT(".h"));
+    const masFileGroup* FileGroup = mas_directory_find_file_group(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT(".png"));
     double Duration = mas_time_now() - StartTime;
 
     const masFile* File = NULL;
     while(File = mas_directory_file_group_next_file(FileGroup))
-        mas_log(MAS_TEXT("FILE_PATH: %s\n"),  File->Path);
+        mas_log(MAS_TEXT("FILE_PATH: %s\n"),  mas_directory_file_path(File));
+    mas_log(MAS_TEXT("\n:: FILE_COUNT: %u\n"), mas_directory_file_group_file_count(FileGroup));
 
     while(mas_is_running())
     {

@@ -116,7 +116,9 @@ void  mas_input_controller_restore_setting(masInputUser User)                   
 int32_t             mas_directory_current_path(masChar* Path, int32_t PathSize)                                                   { return mas_impl_directory_current_path(Path, PathSize);                     }
 bool                mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize) { return mas_impl_directory_find_file(TargetPath, FileName, OutBuf, BufSize); }
 const masFileGroup* mas_directory_find_file_group(const masChar* TargetPath, const masChar* TargetName)                           { return mas_impl_directory_find_file_group(TargetPath, TargetName);          }
-const masFile*      mas_directory_file_group_next_file(const masFileGroup* FileGroup)                                             { return mas_impl_file_group_next_file(FileGroup);                            }
+const masFile*      mas_directory_file_group_next_file(const masFileGroup* FileGroup)                                             { return mas_impl_directory_file_group_next_file(FileGroup);                  }
+const masChar*      mas_directory_file_path(const masFile* File)                                                                  { return mas_impl_directory_file_path(File);                                  }
+uint32_t            mas_directory_file_group_file_count(const masFileGroup* FileGroup)                                            { return mas_impl_directory_file_group_file_count(FileGroup);                 }
 
 
 /********************************************************************************************************

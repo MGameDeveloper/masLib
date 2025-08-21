@@ -71,7 +71,8 @@ int32_t             mas_directory_current_path(masChar* Path, int32_t PathSize);
 bool                mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize);
 const masFileGroup* mas_directory_find_file_group(const masChar* TargetPath, const masChar* TargetName);
 const masFile*      mas_directory_file_group_next_file(const masFileGroup* FileGroup);
-
+const masChar*      mas_directory_file_path(const masFile* File);
+uint32_t            mas_directory_file_group_file_count(const masFileGroup* FileGroup);
 
 /********************************************************************************************************
 *
