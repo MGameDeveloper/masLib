@@ -67,12 +67,15 @@ void  mas_input_controller_restore_setting(masInputUser User);
 /********************************************************************************************************
 * DIRECTORY
 *********************************************************************************************************/
-int32_t             mas_directory_current_path(masChar* Path, int32_t PathSize);
-bool                mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize);
-const masFileGroup* mas_directory_find_file_group(const masChar* TargetPath, const masChar* TargetName);
-const masFile*      mas_directory_file_group_next_file(const masFileGroup* FileGroup);
-const masChar*      mas_directory_file_path(const masFile* File);
-uint32_t            mas_directory_file_group_file_count(const masFileGroup* FileGroup);
+int32_t        mas_directory_current_path(masChar* Path, int32_t PathSize);
+bool           mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize);
+masFileGroup*  mas_directory_find_files(const masChar* TargetPath, const masChar* TargetName);
+masFileGroup*  mas_directory_find_mix_files(const masChar* TargetPath, const masChar** TargetList, int32_t TargetCount);
+const masFile* mas_directory_file_group_next_file(masFileGroup* FileGroup);
+const masChar* mas_directory_file_path(const masFile* File);
+uint32_t       mas_directory_file_group_file_count(masFileGroup* FileGroup);
+void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
+
 
 /********************************************************************************************************
 *

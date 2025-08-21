@@ -1,3 +1,3 @@
 @echo off
 
-devenv /DebugExe Build/mas.exe
+devenv Build/mas.exe

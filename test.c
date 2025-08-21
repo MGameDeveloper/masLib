@@ -2,6 +2,7 @@
 //#define MAS_UNICODE
 #include "mas/mas.h"
 
+#define MAS_ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 
 int32_t main(int32_t argc, const char** argv)
 {
@@ -15,18 +16,29 @@ int32_t main(int32_t argc, const char** argv)
     masChar cwd_path[256];
     int32_t cwd_path_len = mas_directory_current_path(cwd_path, 256);
     
-    double StartTime = mas_time_now();
     masChar exe_path[512] = { 0 };
     if(mas_directory_find_file(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT("blender.exe"), exe_path, 512))
         mas_log(MAS_TEXT("EXE_PATH: %s\n"), exe_path);
 
-    const masFileGroup* FileGroup = mas_directory_find_file_group(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT(".png"));
-    double Duration = mas_time_now() - StartTime;
+    //masFileGroup* FileGroup = mas_directory_find_files(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT(".png"));
+
+    const masChar *TextureExtList[] = { MAS_TEXT(".png"), MAS_TEXT(".jpeg"), MAS_TEXT(".jpg"), MAS_TEXT(".tga"), MAS_TEXT(".dds") };
+    int32_t        TextureExtCount  = MAS_ARRAY_SIZE(TextureExtList);
+    masFileGroup  *TextureFiles     = mas_directory_find_mix_files(MAS_TEXT("D:\\Open_Source_Project"), TextureExtList, TextureExtCount);
+
+    const         masChar* ModelExtList[] = { MAS_TEXT(".fbx"), MAS_TEXT(".gltf"), MAS_TEXT(".obj"), MAS_TEXT(".blender") };
+    int32_t       ModelExtCount           = MAS_ARRAY_SIZE(ModelExtList);
+    masFileGroup *ModelFiles              = mas_directory_find_mix_files(MAS_TEXT("D:\\Open_Source_Project"), ModelExtList, ModelExtCount);
 
     const masFile* File = NULL;
-    while(File = mas_directory_file_group_next_file(FileGroup))
-        mas_log(MAS_TEXT("FILE_PATH: %s\n"),  mas_directory_file_path(File));
-    mas_log(MAS_TEXT("\n:: FILE_COUNT: %u\n"), mas_directory_file_group_file_count(FileGroup));
+    while(File = mas_directory_file_group_next_file(TextureFiles))
+        mas_log(MAS_TEXT("TEXTURE_PATH: %s\n"),  mas_directory_file_path(File));
+
+    while(File = mas_directory_file_group_next_file(ModelFiles))
+        mas_log(MAS_TEXT("MODEL_PATH: %s\n"),  mas_directory_file_path(File));
+
+    mas_log(MAS_TEXT("\n:: TEXTURE_COUNT: %u\n"), mas_directory_file_group_file_count(TextureFiles));
+    mas_log(MAS_TEXT("\n:: MODEL_COUNT:   %u\n"), mas_directory_file_group_file_count(ModelFiles));
 
     while(mas_is_running())
     {
