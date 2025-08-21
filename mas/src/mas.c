@@ -31,24 +31,6 @@ bool mas_is_running()
     {
         switch(Event.Type)
         {
-        case EventType_Window_Close: 
-            break;
-
-        //case EventType_Window_Maximize: break;
-        //case EventType_Window_Minimize: break;
-
-        //case EventType_Window_Resize:
-        //    mas_impl_window_set_size(Event.Data.Size.w, Event.Data.Size.h);
-        //    break;
-
-        //case EventType_Window_Move:
-        //    mas_impl_window_set_pos(Event.Data.Pos.x, Event.Data.Pos.y);
-        //    break;
-
-        //case EventType_Mouse_Move : break;
-        //case EventType_Mouse_Leave: break;
-        //case EventType_Mouse_Enter: break;
-
         case EventType_Button:
             mas_impl_input_on_key(Event.InputUser, Event.Data.Key.Code, Event.Data.Key.State, Event.Data.Key.Mod, Event.TimeStamp);
             break;

@@ -46,13 +46,6 @@ double mas_impl_time_now();
 typedef enum masEventType_
 {
     EventType_None,
-
-    EventType_Window_Close,
-    EventType_Window_Maximize,
-    EventType_Window_Minimize,
-    EventType_Window_Resize,
-    EventType_Window_Move,
-    EventType_Mouse_Move,
     EventType_Mouse_Leave,
     EventType_Mouse_Enter,
     EventType_Button,
@@ -132,6 +125,7 @@ const masFile* mas_impl_directory_file_group_next_file(masFileGroup* FileGroup);
 const masChar* mas_impl_directory_file_path(const masFile* File);
 uint32_t       mas_impl_directory_file_group_file_count(masFileGroup* FileGroup);
 void           mas_impl_directory_file_group_destroy(masFileGroup** FileGroup);
+
 
 /***************************************************************************************************************************
 * LOG: IN PROGRESS

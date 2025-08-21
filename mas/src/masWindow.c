@@ -448,7 +448,6 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
     case WM_CLOSE:
         DestroyWindow(Hwnd);
         PostQuitMessage(0);
-        Event = mas_impl_event_add(EventType_Window_Close);
         return 0;
 
     case WM_DEVICECHANGE: 
@@ -463,37 +462,10 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 		int32_t Height       = Rect.bottom - Rect.top;
         int32_t ScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
         int32_t ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-        int32_t EventWidth  = 0;
-        int32_t EventHeight = 0;
-		switch (Wparam)
-		{
-		case SIZE_MAXIMIZED: 
-            EventWidth = ScreenWidth; 
-            EventHeight = ScreenHeight; 
-            break;
-
-		case SIZE_MINIMIZED: 
-            EventWidth = 0; 
-            EventHeight = 0; 
-            break;
-
-		case SIZE_RESTORED:  
-            EventWidth = Width; 
-            EventHeight = Height; 
-            break;
-		} 
-
-        Event = mas_impl_event_add(EventType_Window_Resize);
-        Event->Data.Size.w = EventWidth;
-        Event->Data.Size.h = EventHeight;
     }
         return 0;
 
     case WM_MOVE:
-        Event            = mas_impl_event_add(EventType_Window_Move);
-        Event->Data.Size.w = GET_X_LPARAM(Lparam);
-        Event->Data.Size.h = GET_Y_LPARAM(Lparam);
         return 0;
 
     case WM_MOUSEMOVE:  
@@ -506,22 +478,12 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
             TME.hwndTrack      = Hwnd;      
             TrackMouseEvent(&TME);
 
-            //if(!Window.bMouseInside)
-            //{
-            //    Window.bMouseInside = true;
-                Event = mas_impl_event_add(EventType_Mouse_Enter);
-            //}
-
+            Event = mas_impl_event_add(EventType_Mouse_Enter);
         }
-
-        //Event           = mas_impl_event_add(EventType_Mouse_Move);
-        //Event->Data.Pos.x = GET_X_LPARAM(Lparam);
-        //Event->Data.Pos.y = GET_Y_LPARAM(Lparam);
         return 0;
 
     case WM_MOUSELEAVE: 
         Window.bTrackMouse = false;
-        //Window.bMouseInsid = false;
         Event = mas_impl_event_add(EventType_Mouse_Leave);
         return 0;
 
@@ -562,29 +524,6 @@ LRESULT CALLBACK mas_internal_win32_proc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPA
 			WORD ScanCode      = LOBYTE(KeyFlags);                        // scan code
 			BOOL WasKeyDown    = (KeyFlags & KF_REPEAT) == KF_REPEAT;     // previous key-state flag, 1 on autorepeat
 			BOOL IsKeyReleased = (KeyFlags & KF_UP) == KF_UP;             // transition-state flag, 1 on keyup
-			BOOL IsExtendedKey = (KeyFlags & KF_EXTENDED) == KF_EXTENDED; // extended-key flag, 1 if scancode has 0xE0 prefix
-			if (IsExtendedKey)
-				ScanCode = MAKEWORD(ScanCode, 0xE0);
-
-			WORD ExtKeyCode = 0;
-			switch (VKCode)
-			{
-			case VK_CONTROL: 
-			case VK_SHIFT:
-			case VK_MENU:
-                return 0; // ignore when key is a modifier
-				//ExtKeyCode = LOWORD(MapVirtualKey(ScanCode, MAPVK_VSC_TO_VK_EX));
-				//switch (ExtKeyCode)
-				//{
-				//case VK_LCONTROL: VKCode = VK_LCONTROL; break;
-				//case VK_LSHIFT:   VKCode = VK_LSHIFT;   break;
-				//case VK_LMENU:    VKCode = VK_LMENU;    break;
-				//case VK_RCONTROL: VKCode = VK_RCONTROL; break;
-				//case VK_RSHIFT:   VKCode = VK_RSHIFT;   break;
-				//case VK_RMENU:    VKCode = VK_RMENU;    break;
-				//}
-				//break;
-			}
 
 			if (IsKeyReleased)
 				mas_internal_event_add_keyboard_key(VKCode, InputKeyState_Release);
