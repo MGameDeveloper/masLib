@@ -107,31 +107,16 @@ void  mas_input_controller_connection_callback(masInputControllerConnectionCallb
 void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpeed, uint16_t RMotorSpeed) { mas_impl_input_controller_feedback_rumble(User, LMotorSpeed, RMotorSpeed); }
 void  mas_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog)                  { mas_impl_input_controller_set_deadzone(User, LAnalog, RAnalog);            }
 void  mas_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger)               { mas_impl_input_controller_set_threshold(User, LTrigger, RTrigger);         }
-void  mas_input_controller_restore_setting(masInputUser User)                                             { mas_impl_input_controller_restore_setting(User);                                }
+void  mas_input_controller_restore_setting(masInputUser User)                                             { mas_impl_input_controller_restore_setting(User);                           }
 
 
 /********************************************************************************************************
 * DIRECTORY
 *********************************************************************************************************/
-int32_t mas_directory_current_path(masChar* Path, int32_t PathSize) 
-{ 
-    return mas_impl_directory_current_path(Path, PathSize); 
-}
-
-masFileBuf* mas_directory_search_for_files(const masChar* DirectoryPath, const masChar** TargetFiles, int32_t TargetCount)
-{
-    return mas_impl_directory_search_for_files(DirectoryPath, TargetFiles, TargetCount);
-}
-
-const masFile* mas_directory_filebuf_next_file(masFileBuf* FileBuf) 
-{ 
-    return mas_impl_directory_filebuf_next_file(FileBuf); 
-}
-
-int32_t mas_directory_find_folder(const masChar* DirectoryPath, const masChar* FolderName, masChar* FolderPath, int32_t FolderPathSize)
-{
-    return mas_impl_directory_find_folder(DirectoryPath, FolderName, FolderPath, FolderPathSize);
-}
+int32_t             mas_directory_current_path(masChar* Path, int32_t PathSize)                                                   { return mas_impl_directory_current_path(Path, PathSize);                     }
+bool                mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize) { return mas_impl_directory_find_file(TargetPath, FileName, OutBuf, BufSize); }
+const masFileGroup* mas_directory_find_file_group(const masChar* TargetPath, const masChar* TargetName)                           { return mas_impl_directory_find_file_group(TargetPath, TargetName);          }
+const masFile*      mas_directory_file_group_next_file(const masFileGroup* FileGroup)                                             { return mas_impl_file_group_next_file(FileGroup);                            }
 
 
 /********************************************************************************************************

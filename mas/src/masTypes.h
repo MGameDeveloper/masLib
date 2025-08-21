@@ -29,16 +29,11 @@
 /***************************************************************************************************************************
 * DIRECTORY: 
 ****************************************************************************************************************************/
-typedef struct _masFileBuf masFileBuf;
+typedef struct _masFileGroup masFileGroup;
 typedef struct _masFile
 {
     masChar *Path;
-    masChar *Name;
-    masChar *Extension;
-    uint32_t PathSize;
-    uint32_t NameSize;
-    uint32_t ExtensionSize;
-    uint32_t Size;
+    int32_t  PathSize;
 } masFile;
 
 
