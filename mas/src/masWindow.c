@@ -340,13 +340,6 @@ static masInputKey mas_internal_win32_map_key(int32_t VKCode)
 	case VK_LEFT:     return InputKey_Left;
 	case VK_RIGHT:    return InputKey_Right;
 
-	//case VK_LCONTROL: return Key_LCtrl;
-	//case VK_LSHIFT:	  return Key_LShift;
-	//case VK_LMENU:	  return Key_LAlt;
-	//case VK_RCONTROL: return Key_RCtrl;
-	//case VK_RSHIFT:	  return Key_RShift;
-	//case VK_RMENU:	  return Key_RAlt;
-
     case VK_LBUTTON: return InputKey_Mouse_Left;
     case VK_RBUTTON: return InputKey_Mouse_Right;
     case VK_MBUTTON: return InputKey_Mouse_Middle;

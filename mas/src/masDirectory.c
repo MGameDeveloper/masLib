@@ -1,4 +1,4 @@
-#include "masTypes.h"
+#include "masImpl.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -84,7 +84,7 @@ static void mas_internal_directory_folder_add(const masChar* Path, const masChar
     {
         uint64_t BufSize = sizeof(masChar) * MAS_FOLDER_BUF_SIZE;
         uint64_t MemSize = sizeof(masFolderBuf) + BufSize;
-        FolderBuf = (masFolderBuf*)malloc(MemSize);
+        FolderBuf = MAS_IMPL_MALLOC(masFolderBuf, MemSize);
         if(!FolderBuf)
             return;
         memset(FolderBuf, 0, MemSize);
@@ -102,7 +102,7 @@ static void mas_internal_directory_folder_add(const masChar* Path, const masChar
         {
             uint64_t BufSize = sizeof(masChar) * MAS_FOLDER_BUF_SIZE * FolderBuf->ResizeFactor;
             uint64_t MemSize = sizeof(masFolderBuf) + BufSize;
-            masFolderBuf* NewFolderBuf = realloc(FolderBuf, MemSize);
+            masFolderBuf* NewFolderBuf = MAS_IMPL_REALLOC(masFolderBuf, FolderBuf, MemSize);
             if(!NewFolderBuf)
                 return;
             FolderBuf                = NewFolderBuf;
@@ -193,7 +193,7 @@ static masChar* mas_internal_directory_file_group_add(masFileGroup** FileGroup, 
     {
         uint64_t BufSize = sizeof(masChar) * MAS_FILE_BUF_SIZE;
         uint64_t MemSize = sizeof(masFileGroup) + BufSize;
-        Group = (masFileGroup*)malloc(MemSize);
+        Group = MAS_IMPL_MALLOC(masFileGroup, MemSize);
         if(!Group)
             return NULL;
         memset(Group, 0, MemSize);
@@ -209,9 +209,9 @@ static masChar* mas_internal_directory_file_group_add(masFileGroup** FileGroup, 
     {
         if(Group->AddIdx + FileSize >= Group->BufSize)
         {
-            uint64_t BufSize = sizeof(masChar) * MAS_FILE_BUF_SIZE * Group->ResizeFactor;
-            uint64_t MemSize = sizeof(masFileGroup) + BufSize;
-            masFileGroup* NewGroup = realloc(Group, MemSize);
+            uint64_t      BufSize  = sizeof(masChar) * MAS_FILE_BUF_SIZE * Group->ResizeFactor;
+            uint64_t      MemSize  = sizeof(masFileGroup) + BufSize;
+            masFileGroup *NewGroup = MAS_IMPL_REALLOC(masFileGroup, Group, MemSize);
             if(!NewGroup)
                 return NULL;
             Group                = NewGroup;
@@ -222,8 +222,8 @@ static masChar* mas_internal_directory_file_group_add(masFileGroup** FileGroup, 
         }
     }
 
-    masFile* File  = MAS_PTR_OFFSET(masFile, Group->Buf, Group->AddIdx);
-    masChar* Path = MAS_PTR_OFFSET(masChar, File, sizeof(masFile));
+    masFile *File  = MAS_PTR_OFFSET(masFile, Group->Buf, Group->AddIdx);
+    masChar *Path  = MAS_PTR_OFFSET(masChar, File, sizeof(masFile));
     File->PathSize = PathSize;
 
     Group->FileCounter++;
@@ -316,8 +316,7 @@ void mas_impl_directory_deinit()
 {
     if(!Directory.FolderBuf)
         return;
-    free(Directory.FolderBuf);
-    Directory.FolderBuf = NULL;
+    MAS_IMPL_FREE(Directory.FolderBuf);
 }
 
 int32_t mas_impl_directory_current_path(masChar* Path, int32_t PathSize)
@@ -566,6 +565,7 @@ void mas_impl_directory_file_group_destroy(masFileGroup** FileGroup)
     if(!FileGroup || !(*FileGroup))
         return;
 
-    free(*FileGroup);
-    *FileGroup = NULL;
+    //free(*FileGroup);
+    //*FileGroup = NULL;
+    MAS_IMPL_FREE(FileGroup);
 }

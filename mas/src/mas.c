@@ -53,6 +53,8 @@ void mas_terminate()
     mas_impl_input_controller_deinit();
     mas_impl_input_deinit();
     mas_impl_window_deinit();
+    mas_impl_directory_deinit();
+    mas_impl_memory_leak_detect();
 }
 
 
@@ -106,7 +108,7 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup)       
 
 
 /********************************************************************************************************
-* LOG
+* LOG:
 *********************************************************************************************************/
 void mas_log(const masChar* Text, ...) 
 { 
@@ -115,3 +117,16 @@ void mas_log(const masChar* Text, ...)
     mas_impl_log(Text, Args);
     va_end(Args);
 }
+
+
+/***************************************************************************************************************************
+* MEMORY: 
+****************************************************************************************************************************/
+void* mas_memory_alloc(uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line)             { return mas_impl_memory_alloc(Size, Source, File, Line);       }
+void* mas_memory_resize(void* Mem, uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line) { return mas_impl_memory_resize(Mem, Size, Source, File, Line); }
+void  mas_memory_free(void** Mem, const masChar* Source, const masChar* File, uint32_t Line)                 { mas_impl_memory_free(Mem, Source, File, Line);                }
+void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size)                                            { mas_impl_memory_copy(Dest, Src, Size); }
+void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)                                            { mas_impl_memory_move(Dest, Src, Size); }
+void  mas_memory_zero(void* Mem, uint64_t Size)                                                              { mas_impl_memory_zero(Mem, Size);       }
+void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                                                { mas_impl_memory_set(Mem, Value, Size); }
+void  mas_memory_dump()                                                                                      { mas_impl_memory_dump();                }

@@ -6,7 +6,23 @@
 /***************************************************************************************************************************
 * MACROS:
 ****************************************************************************************************************************/
+#define MAS_IMPL_MALLOC(type, size)       (type*)mas_impl_memory_alloc (size,               MAS_TEXT("MAS_IMPL"), MAS_FILE, __LINE__)
+#define MAS_IMPL_REALLOC(type, ptr, size) (type*)mas_impl_memory_resize(ptr,          size, MAS_TEXT("MAS_IMPL"), MAS_FILE, __LINE__)
+#define MAS_IMPL_FREE(ptr)                       mas_impl_memory_free  ((void**)&ptr,       MAS_TEXT("MAS_IMPL"), MAS_FILE, __LINE__)
 
+
+/***************************************************************************************************************************
+* MEMORY:
+****************************************************************************************************************************/
+void* mas_impl_memory_alloc(uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
+void* mas_impl_memory_resize(void* Mem, uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
+void  mas_impl_memory_free(void** Mem, const masChar* Source, const masChar* File, uint32_t Line);
+void  mas_impl_memory_copy(void* Dest, const void* Src, uint64_t Size);
+void  mas_impl_memory_move(void* Dest, const void* Src, uint64_t Size);
+void  mas_impl_memory_zero(void* Mem, uint64_t Size);
+void  mas_impl_memory_set(void* Mem, int32_t Value, uint64_t Size);
+void  mas_impl_memory_dump();
+void  mas_impl_memory_leak_detect();
 
 
 /***************************************************************************************************************************

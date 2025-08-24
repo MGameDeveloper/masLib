@@ -20,7 +20,15 @@
 
 
 /********************************************************************************************************
-* INITIALIZATION
+* MACROS:
+*********************************************************************************************************/
+#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", MAS_FILE, __LINE__)
+#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", MAS_FILE, __LINE__)
+#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", MAS_FILE, __LINE__)
+
+
+/********************************************************************************************************
+* INITIALIZATION:
 *********************************************************************************************************/
 bool mas_init(const masChar* Title, int32_t Width, int32_t Height);
 void mas_terminate();
@@ -28,7 +36,7 @@ bool mas_is_running();
 
 
 /********************************************************************************************************
-* WINDOW
+* WINDOW:
 *********************************************************************************************************/
 void mas_window_set_pos(int32_t x, int32_t y);
 void mas_window_set_size(int32_t w, int32_t h);
@@ -45,16 +53,15 @@ void mas_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
 
 /********************************************************************************************************
-* TIME
+* TIME:
 *********************************************************************************************************/
 double mas_time_now();
 double mas_time_app();
 double mas_time_elapsed();
 
 
-
 /********************************************************************************************************
-* INPUT
+* INPUT:
 *********************************************************************************************************/
 bool  mas_input_key_state(masInputUser User, masInputKey Key, masInputKeyState State, uint8_t KeyMod_);
 float mas_input_axis_value(masInputUser User, masInputAxis Key, masInputKeyMod KeyMod);
@@ -63,6 +70,7 @@ void  mas_input_controller_feedback_rumble(masInputUser User, uint16_t LMotorSpe
 void  mas_input_controller_set_deadzone(masInputUser User, float LAnalog, float RAnalog);
 void  mas_input_controller_set_threshold(masInputUser User, float LTrigger, float RTrigger);
 void  mas_input_controller_restore_setting(masInputUser User);
+
 
 /********************************************************************************************************
 * DIRECTORY
@@ -78,7 +86,7 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 
 
 /********************************************************************************************************
-*
+* LOG: 
 *********************************************************************************************************/
 void mas_log(const masChar* Text, ...);
 
@@ -88,6 +96,22 @@ void mas_log(const masChar* Text, ...);
 //void    mas_log_error(masLog* Log, const char* Fmt, ...);
 //void    mas_log_info(masLog* Log, const char* Fmt, ...);
 //void    mas_log_warning(masLog* Log, const char* Fmt, ...);
+
+
+/***************************************************************************************************************************
+* MEMORY: 
+****************************************************************************************************************************/
+void* mas_memory_alloc(uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
+void* mas_memory_resize(void* Mem, uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
+void  mas_memory_free(void** Mem, const masChar* Source, const masChar* File, uint32_t Line);
+void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size);
+void  mas_memory_move(void* Dest, const void* Src, uint64_t Size);
+void  mas_memory_zero(void* Mem, uint64_t Size);
+void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size);
+void  mas_memory_dump();
+
+
+
 
 
 #if 0
@@ -131,20 +155,6 @@ struct masHashID;
 masHashTable* mas_hash_table_create(int32_t ItemCount, int32_t ItemSize, void(*ItemDestructor)(void* UserItem), uint64_t(*HashFunc)(const void* Data, uint64_t Size));
 void          mas_hash_table_destroy(masHashTable** HashTable);
 masHashID*
-
-
-/********************************************************************************************************
-*
-*********************************************************************************************************/
-void* mas_memory_alloc(uint64_t size, const char* File, int32_t Line);
-void* mas_memory_resize(uint64_t size, const char* File, int32_t Line);
-void  mas_memory_free(void** ptr, const char* File, int32_t Line);
-void  mas_memory_dump();
-void  mas_memory_check_memory_leak();
-
-#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size, __FILE__, __LINE__)
-#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size, __FILE__, __LINE__)
-#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, __FILE__, __LINE__)
 
 
 /********************************************************************************************************

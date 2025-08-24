@@ -34,11 +34,11 @@ int32_t main(int32_t argc, const char** argv)
     while(File = mas_directory_file_group_next_file(TextureFiles))
         mas_log(MAS_TEXT("TEXTURE_PATH: %s\n"),  mas_directory_file_path(File));
 
-    while(File = mas_directory_file_group_next_file(ModelFiles))
-        mas_log(MAS_TEXT("MODEL_PATH: %s\n"),  mas_directory_file_path(File));
+    //while(File = mas_directory_file_group_next_file(ModelFiles))
+    //    mas_log(MAS_TEXT("MODEL_PATH: %s\n"),  mas_directory_file_path(File));
 
     mas_log(MAS_TEXT("\n:: TEXTURE_COUNT: %u\n"), mas_directory_file_group_file_count(TextureFiles));
-    mas_log(MAS_TEXT("\n:: MODEL_COUNT:   %u\n"), mas_directory_file_group_file_count(ModelFiles));
+    //mas_log(MAS_TEXT("\n:: MODEL_COUNT:   %u\n"), mas_directory_file_group_file_count(ModelFiles));
 
     while(mas_is_running())
     {
