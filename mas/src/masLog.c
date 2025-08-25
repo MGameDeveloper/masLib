@@ -2,11 +2,15 @@
 
 
 
-void mas_impl_log(const masChar* Text, va_list Args)
+void mas_impl_log(const char* Text, ...)
 {
-#ifdef MAS_UNICODE
-    vwprintf(Text, Args);
-#else
+    va_list Args;
+    va_start(Args, Text);
     vprintf(Text, Args);
-#endif
+    va_end(Args);
+}
+
+void mas_impl_log_va_list(const char* Text, va_list Args)
+{
+    vprintf(Text, Args);
 }

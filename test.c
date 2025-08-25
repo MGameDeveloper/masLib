@@ -6,39 +6,41 @@
 
 int32_t main(int32_t argc, const char** argv)
 {
-    if(!mas_init(MAS_TEXT("masFramework"), 800, 600))
+    if(!mas_init("masFramework", 800, 600))
     {
         mas_terminate();
         return -1;
     }
     mas_window_show(true);
 
-    masChar cwd_path[256];
+    char cwd_path[256];
     int32_t cwd_path_len = mas_directory_current_path(cwd_path, 256);
     
-    masChar exe_path[512] = { 0 };
-    if(mas_directory_find_file(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT("blender.exe"), exe_path, 512))
-        mas_log(MAS_TEXT("EXE_PATH: %s\n"), exe_path);
+    char exe_path[512] = { 0 };
+    if(mas_directory_find_file("D:\\Open_Source_Project", "blender.exe", exe_path, 512))
+        mas_log("EXE_PATH: %s\n", exe_path);
 
-    //masFileGroup* FileGroup = mas_directory_find_files(MAS_TEXT("D:\\Open_Source_Project"), MAS_TEXT(".png"));
+    //masFileGroup* FileGroup = mas_directory_find_files("D:\\Open_Source_Project", ".png");
 
-    const masChar *TextureExtList[] = { MAS_TEXT(".png"), MAS_TEXT(".jpeg"), MAS_TEXT(".jpg"), MAS_TEXT(".tga"), MAS_TEXT(".dds") };
+    const char *TextureExtList[] = { ".png", ".jpeg", ".jpg", ".tga", ".dds" };
     int32_t        TextureExtCount  = MAS_ARRAY_SIZE(TextureExtList);
-    masFileGroup  *TextureFiles     = mas_directory_find_mix_files(MAS_TEXT("D:\\Open_Source_Project"), TextureExtList, TextureExtCount);
+    masFileGroup  *TextureFiles     = mas_directory_find_mix_files("D:\\Open_Source_Project", TextureExtList, TextureExtCount);
 
-    const         masChar* ModelExtList[] = { MAS_TEXT(".fbx"), MAS_TEXT(".gltf"), MAS_TEXT(".obj"), MAS_TEXT(".blender") };
+    const         char* ModelExtList[] = { ".fbx", ".gltf", ".obj", ".blender" };
     int32_t       ModelExtCount           = MAS_ARRAY_SIZE(ModelExtList);
-    masFileGroup *ModelFiles              = mas_directory_find_mix_files(MAS_TEXT("D:\\Open_Source_Project"), ModelExtList, ModelExtCount);
+    masFileGroup *ModelFiles              = mas_directory_find_mix_files("D:\\Open_Source_Project", ModelExtList, ModelExtCount);
 
     const masFile* File = NULL;
     while(File = mas_directory_file_group_next_file(TextureFiles))
-        mas_log(MAS_TEXT("TEXTURE_PATH: %s\n"),  mas_directory_file_path(File));
+        mas_log("TEXTURE_PATH: %s\n",  mas_directory_file_path(File));
 
     //while(File = mas_directory_file_group_next_file(ModelFiles))
-    //    mas_log(MAS_TEXT("MODEL_PATH: %s\n"),  mas_directory_file_path(File));
+    //    mas_log("MODEL_PATH: %s\n",  mas_directory_file_path(File));
 
-    mas_log(MAS_TEXT("\n:: TEXTURE_COUNT: %u\n"), mas_directory_file_group_file_count(TextureFiles));
-    //mas_log(MAS_TEXT("\n:: MODEL_COUNT:   %u\n"), mas_directory_file_group_file_count(ModelFiles));
+    mas_log("\n:: TEXTURE_COUNT: %u\n", mas_directory_file_group_file_count(TextureFiles));
+    //mas_log("\n:: MODEL_COUNT:   %u\n", mas_directory_file_group_file_count(ModelFiles));
+
+    mas_directory_file_group_destroy(&TextureFiles);
 
     while(mas_is_running())
     {

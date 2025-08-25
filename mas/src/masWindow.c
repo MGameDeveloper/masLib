@@ -1,16 +1,16 @@
 #include "masImpl.h"
 
+#define UNICODE
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <windowsx.h>
-#include <tchar.h>
 
 
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
 #define MAS_WINDOW_TITLE_SIZE 32
-#define MAS_WINDOW_CLASS_NAME _T("masWindowCls")
+#define MAS_WINDOW_CLASS_NAME TEXT("masWindowCls")
 #define MAS_LOG_ERROR(fmt, ...) printf("[ ERROR ]: "##fmt, __VA_ARGS__)
 
 
@@ -20,7 +20,7 @@
 typedef struct masWindow_
 {
     HWND     Handle;
-    masChar  Title[MAS_WINDOW_TITLE_SIZE];
+    wchar_t  Title[MAS_WINDOW_TITLE_SIZE];
     int32_t  PosX;
     int32_t  PosY;
     int32_t  Width;
@@ -48,17 +48,19 @@ static void             mas_internal_event_add_keyboard_key(int32_t VKCode, masI
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
-bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
+bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 {
     if(!Title || Width <= 0 || Height <= 0)
         return false;
     
-    int32_t TitleSize = _tcslen(Title);
+	wchar_t WTitle[256] = { 0 };
+	int32_t TitleSize = MultiByteToWideChar(CP_UTF8, 0, Title, -1, NULL, 0);
     if(TitleSize <= 0 || TitleSize >= MAS_WINDOW_TITLE_SIZE)
     {
         MAS_LOG_ERROR("Window Title length is either <= 0 or greater than %d\n", MAS_WINDOW_TITLE_SIZE);
         return false;
     }
+	MultiByteToWideChar(CP_UTF8, 0, Title, -1, WTitle, TitleSize);
 
     Instance = GetModuleHandle(NULL);
 
@@ -86,7 +88,7 @@ bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 	int32_t PosX         = (ScreenWidth - Width) / 2;
 	int32_t PosY         = (ScreenHeight - Height) / 2;
 
-	HWND Handle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, MAS_WINDOW_CLASS_NAME, Title, WS_OVERLAPPEDWINDOW,
+	HWND Handle = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, MAS_WINDOW_CLASS_NAME, WTitle, WS_OVERLAPPEDWINDOW,
 		PosX, PosY, Width, Height, NULL, NULL, Instance, NULL);
 	if (!Handle)
 	{
@@ -100,7 +102,7 @@ bool mas_impl_window_init(const masChar* Title, int32_t Width, int32_t Height)
 	int32_t DrawAreaWidth  = Rect.right - Rect.left;
 	int32_t DrawAreaHeight = Rect.bottom - Rect.top;
 
-	memcpy(Window.Title, Title, sizeof(masChar) * TitleSize);
+	memcpy(Window.Title, WTitle, sizeof(wchar_t) * TitleSize);
     Window.Handle         = Handle;
     Window.PosX           = PosX;
     Window.PosY           = PosY;
@@ -123,9 +125,17 @@ void* mas_impl_window_handle()
     return Window.Handle;
 }
 
-const masChar* mas_impl_window_title()
+const char* mas_impl_window_title()
 {
-    return Window.Title;
+	static char OutTitle[256];
+	memset(OutTitle, 0, sizeof(char) * 256);
+
+	int32_t TitleSize = WideCharToMultiByte(CP_UTF8, 0, Window.Title, -1, NULL, 0, NULL, NULL);
+    if(TitleSize == 0)
+	    return NULL;
+	WideCharToMultiByte(CP_UTF8, 0, Window.Title, -1, OutTitle, TitleSize, NULL, NULL);
+
+    return OutTitle;
 }
 
 void mas_impl_window_get_pos(int32_t *x, int32_t *y)

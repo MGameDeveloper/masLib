@@ -22,15 +22,15 @@
 /********************************************************************************************************
 * MACROS:
 *********************************************************************************************************/
-#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", MAS_FILE, __LINE__)
-#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", MAS_FILE, __LINE__)
-#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", MAS_FILE, __LINE__)
+#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", __FILE__, __LINE__)
+#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", __FILE__, __LINE__)
+#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", __FILE__, __LINE__)
 
 
 /********************************************************************************************************
 * INITIALIZATION:
 *********************************************************************************************************/
-bool mas_init(const masChar* Title, int32_t Width, int32_t Height);
+bool mas_init(const char* Title, int32_t Width, int32_t Height);
 void mas_terminate();
 bool mas_is_running();
 
@@ -75,12 +75,12 @@ void  mas_input_controller_restore_setting(masInputUser User);
 /********************************************************************************************************
 * DIRECTORY
 *********************************************************************************************************/
-int32_t        mas_directory_current_path(masChar* Path, int32_t PathSize);
-bool           mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize);
-masFileGroup*  mas_directory_find_files(const masChar* TargetPath, const masChar* TargetName);
-masFileGroup*  mas_directory_find_mix_files(const masChar* TargetPath, const masChar** TargetList, int32_t TargetCount);
+int32_t        mas_directory_current_path(char* Path, int32_t PathSize);
+bool           mas_directory_find_file(const char* TargetPath, const char* FileName, char* OutBuf, int32_t BufSize);
+masFileGroup*  mas_directory_find_files(const char* TargetPath, const char* TargetName);
+masFileGroup*  mas_directory_find_mix_files(const char* TargetPath, const char** TargetList, int32_t TargetCount);
 const masFile* mas_directory_file_group_next_file(masFileGroup* FileGroup);
-const masChar* mas_directory_file_path(const masFile* File);
+const char*    mas_directory_file_path(const masFile* File);
 uint32_t       mas_directory_file_group_file_count(masFileGroup* FileGroup);
 void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 
@@ -88,7 +88,7 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 /********************************************************************************************************
 * LOG: 
 *********************************************************************************************************/
-void mas_log(const masChar* Text, ...);
+void mas_log(const char* Text, ...);
 
 //struct masLog;
 //masLog* mas_log_create(const char* Name);
@@ -101,9 +101,9 @@ void mas_log(const masChar* Text, ...);
 /***************************************************************************************************************************
 * MEMORY: 
 ****************************************************************************************************************************/
-void* mas_memory_alloc(uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
-void* mas_memory_resize(void* Mem, uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line);
-void  mas_memory_free(void** Mem, const masChar* Source, const masChar* File, uint32_t Line);
+void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line);
+void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line);
+void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line);
 void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size);
 void  mas_memory_move(void* Dest, const void* Src, uint64_t Size);
 void  mas_memory_zero(void* Mem, uint64_t Size);

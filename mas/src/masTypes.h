@@ -12,22 +12,7 @@
 /***************************************************************************************************************************
 * MACROS: 
 ****************************************************************************************************************************/
-#ifdef MAS_UNICODE
-    #define UNICODE
-    #define _UNICODE
-#endif
 
-#ifdef MAS_UNICODE
-#pragma message("MAS_UNICODE: DEFINED")
-    typedef wchar_t masChar;
-    #define MAS_TEXT(s) L##s
-    #define MAS_FILE __FILEW__
-#else
-#pragma message("MAS_UNICODE: IGNORED")
-    typedef char masChar;
-    #define MAS_TEXT(s) s
-    #define MAS_FILE __FILE__
-#endif 
 
 
 /***************************************************************************************************************************

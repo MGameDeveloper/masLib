@@ -4,7 +4,7 @@
 /********************************************************************************************************
 * INITIALIZATION
 *********************************************************************************************************/
-bool mas_init(const masChar* Title, int32_t Width, int32_t Height)
+bool mas_init(const char* Title, int32_t Width, int32_t Height)
 {
     mas_impl_time_init();
 
@@ -97,24 +97,24 @@ void  mas_input_controller_restore_setting(masInputUser User)                   
 /********************************************************************************************************
 * DIRECTORY
 *********************************************************************************************************/
-int32_t        mas_directory_current_path(masChar* Path, int32_t PathSize)                                                   { return mas_impl_directory_current_path(Path, PathSize);                        }
-bool           mas_directory_find_file(const masChar* TargetPath, const masChar* FileName, masChar* OutBuf, int32_t BufSize) { return mas_impl_directory_find_file(TargetPath, FileName, OutBuf, BufSize);    }
-masFileGroup*  mas_directory_find_files(const masChar* TargetPath, const masChar* TargetName)                                { return mas_impl_directory_find_files(TargetPath, TargetName);                  }
-masFileGroup*  mas_directory_find_mix_files(const masChar* TargetPath, const masChar** TargetList, int32_t TargetCount)      { return mas_impl_directory_find_mix_files(TargetPath, TargetList, TargetCount); }
-const masFile* mas_directory_file_group_next_file(masFileGroup* FileGroup)                                                   { return mas_impl_directory_file_group_next_file(FileGroup);                     }
-const masChar* mas_directory_file_path(const masFile* File)                                                                  { return mas_impl_directory_file_path(File);                                     }
-uint32_t       mas_directory_file_group_file_count(masFileGroup* FileGroup)                                                  { return mas_impl_directory_file_group_file_count(FileGroup);                    }
-void           mas_directory_file_group_destroy(masFileGroup** FileGroup)                                                    { mas_impl_directory_file_group_destroy(FileGroup);                              }
+int32_t        mas_directory_current_path(char* Path, int32_t PathSize)                                             { return mas_impl_directory_current_path(Path, PathSize);                        }
+bool           mas_directory_find_file(const char* TargetPath, const char* FileName, char* OutBuf, int32_t BufSize) { return mas_impl_directory_find_file(TargetPath, FileName, OutBuf, BufSize);    }
+masFileGroup*  mas_directory_find_files(const char* TargetPath, const char* TargetName)                             { return mas_impl_directory_find_files(TargetPath, TargetName);                  }
+masFileGroup*  mas_directory_find_mix_files(const char* TargetPath, const char** TargetList, int32_t TargetCount)   { return mas_impl_directory_find_mix_files(TargetPath, TargetList, TargetCount); }
+const masFile* mas_directory_file_group_next_file(masFileGroup* FileGroup)                                          { return mas_impl_directory_file_group_next_file(FileGroup);                     }
+const char*    mas_directory_file_path(const masFile* File)                                                         { return mas_impl_directory_file_path(File);                                     }
+uint32_t       mas_directory_file_group_file_count(masFileGroup* FileGroup)                                         { return mas_impl_directory_file_group_file_count(FileGroup);                    }
+void           mas_directory_file_group_destroy(masFileGroup** FileGroup)                                           { mas_impl_directory_file_group_destroy(FileGroup);                              }
 
 
 /********************************************************************************************************
 * LOG:
 *********************************************************************************************************/
-void mas_log(const masChar* Text, ...) 
+void mas_log(const char* Text, ...) 
 { 
     va_list Args;
     va_start(Args, Text);
-    mas_impl_log(Text, Args);
+    mas_impl_log_va_list(Text, Args);
     va_end(Args);
 }
 
@@ -122,11 +122,11 @@ void mas_log(const masChar* Text, ...)
 /***************************************************************************************************************************
 * MEMORY: 
 ****************************************************************************************************************************/
-void* mas_memory_alloc(uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line)             { return mas_impl_memory_alloc(Size, Source, File, Line);       }
-void* mas_memory_resize(void* Mem, uint64_t Size, const masChar* Source, const masChar* File, uint32_t Line) { return mas_impl_memory_resize(Mem, Size, Source, File, Line); }
-void  mas_memory_free(void** Mem, const masChar* Source, const masChar* File, uint32_t Line)                 { mas_impl_memory_free(Mem, Source, File, Line);                }
-void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size)                                            { mas_impl_memory_copy(Dest, Src, Size); }
-void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)                                            { mas_impl_memory_move(Dest, Src, Size); }
-void  mas_memory_zero(void* Mem, uint64_t Size)                                                              { mas_impl_memory_zero(Mem, Size);       }
-void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                                                { mas_impl_memory_set(Mem, Value, Size); }
-void  mas_memory_dump()                                                                                      { mas_impl_memory_dump();                }
+void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line)             { return mas_impl_memory_alloc(Size, Source, File, Line);       }
+void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line) { return mas_impl_memory_resize(Mem, Size, Source, File, Line); }
+void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line)                 { mas_impl_memory_free(Mem, Source, File, Line);                }
+void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size)                                      { mas_impl_memory_copy(Dest, Src, Size); }
+void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)                                      { mas_impl_memory_move(Dest, Src, Size); }
+void  mas_memory_zero(void* Mem, uint64_t Size)                                                        { mas_impl_memory_zero(Mem, Size);       }
+void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                                          { mas_impl_memory_set(Mem, Value, Size); }
+void  mas_memory_dump()                                                                                { mas_impl_memory_dump();                }
