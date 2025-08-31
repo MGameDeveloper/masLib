@@ -22,18 +22,18 @@ int32_t main(int32_t argc, const char** argv)
 
     //masFileGroup* FileGroup = mas_directory_find_files("D:\\Open_Source_Project", ".png");
 
+
     const char *TextureExtList[] = { ".png", ".jpeg", ".jpg", ".tga", ".dds" };
     int32_t        TextureExtCount  = MAS_ARRAY_SIZE(TextureExtList);
     masFileGroup  *TextureFiles     = mas_directory_find_mix_files("D:\\Open_Source_Project", TextureExtList, TextureExtCount);
-
-    const         char* ModelExtList[] = { ".fbx", ".gltf", ".obj", ".blender" };
-    int32_t       ModelExtCount           = MAS_ARRAY_SIZE(ModelExtList);
-    masFileGroup *ModelFiles              = mas_directory_find_mix_files("D:\\Open_Source_Project", ModelExtList, ModelExtCount);
-
     const masFile* File = NULL;
     while(File = mas_directory_file_group_next_file(TextureFiles))
         mas_log("TEXTURE_PATH: %s\n",  mas_directory_file_path(File));
 
+
+    const         char* ModelExtList[] = { ".fbx", ".gltf", ".obj", ".blender" };
+    int32_t       ModelExtCount        = MAS_ARRAY_SIZE(ModelExtList);
+    masFileGroup *ModelFiles           = mas_directory_find_mix_files("D:\\Open_Source_Project", ModelExtList, ModelExtCount);
     //while(File = mas_directory_file_group_next_file(ModelFiles))
     //    mas_log("MODEL_PATH: %s\n",  mas_directory_file_path(File));
 

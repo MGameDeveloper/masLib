@@ -25,7 +25,7 @@ typedef struct _masAlloc
 {
     const void *Data;
     const char *File[TRACK_TYPE_COUNT];
-    const char *Source;
+    const char *Source[TRACK_TYPE_COUNT];
     uint64_t    Size;
     uint32_t    Line[TRACK_TYPE_COUNT];
 } masAlloc;
@@ -78,12 +78,12 @@ static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, cons
         Memory.ResizeCounter++;
     }
 
-    masAlloc *Alloc                  = &Memory.Allocs[Memory.AllocCount++];
-    Alloc->Data                      = Mem;
-    Alloc->File[TRACK_TYPE_ALLOCATE] = File;
-    Alloc->Line[TRACK_TYPE_ALLOCATE] = Line;
-    Alloc->Size                      = Size;
-    Alloc->Source                    = Source;
+    masAlloc *Alloc                    = &Memory.Allocs[Memory.AllocCount++];
+    Alloc->Data                        = Mem;
+    Alloc->File[TRACK_TYPE_ALLOCATE]   = File;
+    Alloc->Line[TRACK_TYPE_ALLOCATE]   = Line;
+    Alloc->Size                        = Size;
+    Alloc->Source[TRACK_TYPE_ALLOCATE] = Source;
 
     if(Size > Memory.LargestAllocSize)
         Memory.LargestAllocSize = Size;
@@ -110,11 +110,11 @@ static void mas_internal_memory_track_resize(const void* OldMem, const void* New
 
     if(Alloc)
     {
-        Alloc->Data                    = NewMem;
-        Alloc->File[TRACK_TYPE_RESIZE] = File;
-        Alloc->Line[TRACK_TYPE_RESIZE] = Line;
-        Alloc->Size                    = Size;
-        Alloc->Source                  = Source;
+        Alloc->Data                      = NewMem;
+        Alloc->File[TRACK_TYPE_RESIZE]   = File;
+        Alloc->Line[TRACK_TYPE_RESIZE]   = Line;
+        Alloc->Size                      = Size;
+        Alloc->Source[TRACK_TYPE_RESIZE] = Source;
 
         if(Size > Memory.LargestAllocSize)
             Memory.LargestAllocSize = Size;
@@ -138,9 +138,9 @@ static bool mas_internal_memory_track_free(const void* Mem, const char* Source, 
 
     if(Alloc)
     {
-        Alloc->File[TRACK_TYPE_FREE] = File;
-        Alloc->Line[TRACK_TYPE_FREE] = Line;
-        Alloc->Source                = Source;
+        Alloc->File[TRACK_TYPE_FREE]   = File;
+        Alloc->Line[TRACK_TYPE_FREE]   = Line;
+        Alloc->Source[TRACK_TYPE_FREE] = Source;
 
         Memory.UsedSize -= Alloc->Size;
         return true;
@@ -172,13 +172,14 @@ void* mas_impl_memory_resize(void* Mem, uint64_t Size, const char* Source, const
     return LocalMem;
 }
 
-void mas_impl_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line)
+void mas_impl_memory_free(void* Mem, const char* Source, const char* File, uint32_t Line)
 {
-    if(Mem && *Mem)
+    if(Mem)
     {
-        mas_internal_memory_track_free(*Mem, Source, File, Line);
-        free(*Mem);
-        *Mem = NULL;
+        if(mas_internal_memory_track_free(Mem, Source, File, Line))
+            free(Mem);
+        else
+            mas_impl_log("[ ERROR ]: calling mas_impl_memory_free on a pointer that is not previously allocated through the api\n");
     }
 }
 
@@ -236,11 +237,12 @@ void mas_impl_memory_leak_detect()
         Alloc = &Memory.Allocs[i];
         if(Alloc->File[TRACK_TYPE_ALLOCATE] && !Alloc->File[TRACK_TYPE_FREE])
         {
-            mas_impl_log("MEMORY_LEAK[ 0x%p ]: %s -> [ %u ] - %s\n", 
-                Alloc->Data,  
-                Alloc->Source, 
-                Alloc->Line[TRACK_TYPE_ALLOCATE], 
+            mas_impl_log("MEMORY_LEAK[ 0x%p ]: [ %s ] -> ( %u ) %s \n", 
+                Alloc->Data, 
+                Alloc->Source[TRACK_TYPE_ALLOCATE], 
+                Alloc->Line[TRACK_TYPE_ALLOCATE],
                 Alloc->File[TRACK_TYPE_ALLOCATE]);
+
             LeakCount++;
         }
     }
@@ -248,7 +250,8 @@ void mas_impl_memory_leak_detect()
     if(LeakCount > 0)
     {
         mas_impl_log("\n    ::MEMORY_LEAK_COUNT: %u\n\n", LeakCount);
-        assert(LeakCount == 0 && "MEMORY_LEAK_DETECTED");
+        //assert(LeakCount == 0 && "MEMORY_LEAK_DETECTED");
+        mas_impl_assert(LeakCount > 0, "MEMORY_LEAK_DETECTED", "Check console output for more info\n    MemoryLeakCount: %u", LeakCount);
     }
 }
 

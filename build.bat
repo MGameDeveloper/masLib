@@ -9,16 +9,16 @@ if errorlevel 1 (
 )
 
 :: FRAMEWORK SROUCE AND HEADER FIELS 
-set MAS_SRC=                   ^
-mas/src/masLog.c               ^
-mas/src/masMemory.c            ^
-mas/src/masEvent.c             ^
-mas/src/masWindow.c            ^
-mas/src/masInputController.c   ^
-mas/src/masInput.c             ^
-mas/src/masTime.c              ^
-mas/src/masDirectory.c         ^
-mas/src/mas.c
+set MAS_SRC= mas/src/*.c
+::mas/src/masLog.c               ^
+::mas/src/masMemory.c            ^
+::mas/src/masEvent.c             ^
+::mas/src/masWindow.c            ^
+::mas/src/masInputController.c   ^
+::mas/src/masInput.c             ^
+::mas/src/masTime.c              ^
+::mas/src/masDirectory.c         ^
+::mas/src/mas.c
 
 set MAS_HDR= ^
 /I"mas/src"  ^ 
