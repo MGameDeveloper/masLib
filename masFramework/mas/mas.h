@@ -18,6 +18,7 @@
 *    - Log
 */
 
+
 /********************************************************************************************************
 * INITIALIZATION:
 *********************************************************************************************************/
@@ -29,18 +30,18 @@ bool mas_is_running();
 /***************************************************************************************************************************
 * MEMORY: 
 ****************************************************************************************************************************/
-void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line);
+void* mas_memory_alloc(uint64_t Size, const char* File, uint32_t Line);
+void* mas_memory_resize(void* Mem, uint64_t Size, const char* File, uint32_t Line);
+void  mas_memory_free(void** Mem, const char* File, uint32_t Line);
 void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size);
 void  mas_memory_move(void* Dest, const void* Src, uint64_t Size);
 void  mas_memory_zero(void* Mem, uint64_t Size);
 void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size);
 void  mas_memory_dump();
 
-#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", __FILE__, __LINE__)
-#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", __FILE__, __LINE__)
-#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", __FILE__, __LINE__)
+#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        __FILE__, __LINE__)
+#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  __FILE__, __LINE__)
+#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, __FILE__, __LINE__)
 
 
 /********************************************************************************************************
@@ -98,12 +99,10 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 *********************************************************************************************************/
 void mas_log(const char* Text, ...);
 
-//struct masLog;
-//masLog* mas_log_create(const char* Name);
-//void    mas_log_destroy(masLog** Log);
-//void    mas_log_error(masLog* Log, const char* Fmt, ...);
-//void    mas_log_info(masLog* Log, const char* Fmt, ...);
-//void    mas_log_warning(masLog* Log, const char* Fmt, ...);
+#define MAS_LOG(Text, ...)         mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: "##Text##"\n", ##__VA_ARGS__)
+#define MAS_LOG_INFO(Text, ...)    mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;32m"##Text##"\033[0m\n", ##__VA_ARGS__)
+#define MAS_LOG_WARNING(Text, ...) mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;33m"##Text##"\033[0m\n", ##__VA_ARGS__)
+#define MAS_LOG_ERROR(Text, ...)   mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;31m"##Text##"\033[0m\n", ##__VA_ARGS__)
 
 
 /***************************************************************************************************************************
@@ -111,6 +110,7 @@ void mas_log(const char* Text, ...);
 ****************************************************************************************************************************/
 void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
 
+#define MAS_ASSERT(Condition, Title, Msg, ...) mas_assert(Condition, Title, Msg, #__VA_ARGS__)
 
 
 

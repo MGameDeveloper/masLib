@@ -14,7 +14,10 @@ bool mas_init(const char* Title, int32_t Width, int32_t Height)
     mas_impl_directory_init();
     mas_impl_input_init();
     mas_impl_input_controller_init();
-
+    MAS_IMPL_LOG_INFO("Initialized");
+    MAS_IMPL_LOG("Just testing message");
+    MAS_IMPL_LOG_WARNING("May cause a problem");
+    MAS_IMPL_LOG_ERROR("Allocation game memory failed");
     return true;
 }
 
@@ -122,11 +125,11 @@ void mas_log(const char* Text, ...)
 /********************************************************************************************************
 * LOG:
 *********************************************************************************************************/
-void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...)
+void mas_assert(bool Condition, const char* Title, const char* ErrorMsg, ...)
 {
     va_list Args;
     va_start(Args, ErrorMsg);
-    mas_impl_assert_va_list(Condition, Desc, ErrorMsg, Args);
+    mas_impl_assert_va_list(Condition, Title, ErrorMsg, Args);
     va_end(Args);
 }
 
@@ -134,11 +137,11 @@ void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...)
 /***************************************************************************************************************************
 * MEMORY: 
 ****************************************************************************************************************************/
-void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line)             { return mas_impl_memory_alloc(Size, Source, File, Line);       }
-void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line) { return mas_impl_memory_resize(Mem, Size, Source, File, Line); }
-void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line)                 { mas_impl_memory_free(Mem, Source, File, Line);                }
-void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size)                                      { mas_impl_memory_copy(Dest, Src, Size); }
-void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)                                      { mas_impl_memory_move(Dest, Src, Size); }
-void  mas_memory_zero(void* Mem, uint64_t Size)                                                        { mas_impl_memory_zero(Mem, Size);       }
-void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                                          { mas_impl_memory_set(Mem, Value, Size); }
-void  mas_memory_dump()                                                                                { mas_impl_memory_dump();                }
+void* mas_memory_alloc(uint64_t Size, const char* File, uint32_t Line)             { return mas_impl_memory_alloc(Size, File, Line);       }
+void* mas_memory_resize(void* Mem, uint64_t Size, const char* File, uint32_t Line) { return mas_impl_memory_resize(Mem, Size, File, Line); }
+void  mas_memory_free(void** Mem, const char* File, uint32_t Line)                 { mas_impl_memory_free(Mem, File, Line);                }
+void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size)                  { mas_impl_memory_copy(Dest, Src, Size); }
+void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)                  { mas_impl_memory_move(Dest, Src, Size); }
+void  mas_memory_zero(void* Mem, uint64_t Size)                                    { mas_impl_memory_zero(Mem, Size);       }
+void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                      { mas_impl_memory_set(Mem, Value, Size); }
+void  mas_memory_dump()                                                            { mas_impl_memory_dump();                }

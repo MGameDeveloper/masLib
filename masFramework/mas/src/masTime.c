@@ -28,7 +28,7 @@ static double mas_internal_time_stamp()
     LARGE_INTEGER LargeInt = {0};
     QueryPerformanceCounter(&LargeInt);
 
-    double TimeStamp = (double)LargeInt.QuadPart / Time.Frequency;
+    double TimeStamp = (double)LargeInt.QuadPart * Time.Frequency;
     return TimeStamp;
 }
 

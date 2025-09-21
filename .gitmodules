@@ -1,0 +1,3 @@
+[submodule "masFramework/externals/imgui"]
+	path = masFramework/externals/imgui
+	url = https://github.com/ocornut/imgui.git

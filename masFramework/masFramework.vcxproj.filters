@@ -14,4 +14,50 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mas\src\mas.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masAssert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masDirectory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masEvent.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masInput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masInputController.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masLog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masMemory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masTime.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mas\src\masWindow.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mas\src\masImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mas\src\masTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mas\mas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -5,6 +5,8 @@
 #include <shlwapi.h>
 #include <tchar.h>
 
+#pragma comment(lib, "Shlwapi.lib")
+
 
 /***************************************************************************************************************************
 * 
@@ -21,15 +23,15 @@
 ****************************************************************************************************************************/
 typedef struct _masFolder
 {
-    uint32_t PathSize;
+    uint64_t PathSize;
 } masFolder;
 
 typedef struct _masFolderBuf
 {
     uint8_t  *Buf;
     uint64_t  BufSize;
-    uint32_t  AddIdx;
-    uint32_t  GetIdx;
+    uint64_t  AddIdx;
+    uint64_t  GetIdx;
     int32_t   ResizeFactor;
     int32_t   ResizeCounter;
     int32_t   FolderCounter;
@@ -39,8 +41,8 @@ struct _masFileGroup
 {
     uint8_t  *Buf;
     uint64_t  BufSize;
-    uint32_t  AddIdx;
-    uint32_t  GetIdx;
+    uint64_t  AddIdx;
+    uint64_t  GetIdx;
     int32_t   ResizeFactor;
     int32_t   ResizeCounter;
     int32_t   FileCounter;
@@ -64,12 +66,12 @@ static masDirectory Directory = { 0 };
 /***************************************************************************************************************************
 * 
 ****************************************************************************************************************************/
-static int32_t mas_internal_directory_path_len(const char* Path)
+static uint64_t mas_internal_directory_path_len(const char* Path)
 {
     const char* LocalPath = Path;
     while(*LocalPath) 
         ++LocalPath;
-    return (LocalPath - Path);
+    return (uint64_t)(LocalPath - Path);
 }
 
 static void mas_internal_directory_folder_add(const char* Path, const char* Name)
@@ -77,8 +79,8 @@ static void mas_internal_directory_folder_add(const char* Path, const char* Name
     if(!Path || !Name)
         return;
     
-    int32_t       CopyPathSize = MAS_TEXT_LEN(Path);
-    int32_t       CopyNameSize = MAS_TEXT_LEN(Name);
+    uint64_t      CopyPathSize = MAS_TEXT_LEN(Path);
+    uint64_t      CopyNameSize = MAS_TEXT_LEN(Name);
     uint64_t      PathSize     = CopyPathSize + CopyNameSize + 2; // + 2, 1 for \\ and 1 for null terminator
     uint64_t      FolderSize   = sizeof(masFolder) + (sizeof(char) * PathSize);
     masFolderBuf *FolderBuf    = Directory.FolderBuf;
@@ -128,7 +130,7 @@ static void mas_internal_directory_folder_add(const char* Path, const char* Name
     Directory.FolderBuf = FolderBuf;
 }
 
-static bool mas_internal_directory_folder_get_next(char* Path, int32_t *PathSize)
+static bool mas_internal_directory_folder_get_next(char* Path, uint64_t *PathSize)
 {
     masFolderBuf* FolderBuf = Directory.FolderBuf;
     if(FolderBuf->GetIdx >= FolderBuf->AddIdx)
@@ -185,7 +187,7 @@ static HANDLE mas_internal_directory_win32_find_first(char* Path, WIN32_FIND_DAT
         return INVALID_HANDLE_VALUE;
 	MultiByteToWideChar(CP_UTF8, 0, Path, -1, WPath, WPathSize);
     
-    HANDLE Handle    = FindFirstFile(Path, Data);
+    HANDLE Handle    = FindFirstFileA(Path, Data);
     Path[--PathSize] = '\0';
 
     return Handle;
@@ -318,7 +320,7 @@ static masFileGroup* mas_internal_directory_return_search_result_to_user(const c
         return NULL;
 
     uint64_t      MemSize = sizeof(masFileGroup) + Directory.FileGroup->AddIdx;
-    masFileGroup *Group   = (masFileGroup*)mas_impl_memory_alloc(MemSize, "MAS_DIRECTORY_FIND_MIX_FILES", __FILE__, __LINE__);
+    masFileGroup *Group   = (masFileGroup*)mas_impl_memory_alloc(MemSize, __FILE__, __LINE__);
     if(!Group)
         return NULL;
     Group->Buf         = MAS_PTR_OFFSET(uint8_t, Group, sizeof(masFileGroup));

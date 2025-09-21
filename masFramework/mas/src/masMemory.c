@@ -1,6 +1,13 @@
 
 #include "masImpl.h"
 
+/*
+*  Used for:
+*     - tracking allocation and deallocation from the system
+*     - detecting memory leak 
+*     - know the maximum memory used during program life time
+*/
+
 
 /*********************************************************************************************************
 *
@@ -25,7 +32,6 @@ typedef struct _masAlloc
 {
     const void *Data;
     const char *File[TRACK_TYPE_COUNT];
-    const char *Source[TRACK_TYPE_COUNT];
     uint64_t    Size;
     uint32_t    Line[TRACK_TYPE_COUNT];
 } masAlloc;
@@ -52,15 +58,15 @@ static masMemory Memory = { 0 };
 /*********************************************************************************************************
 *
 **********************************************************************************************************/
-static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line)
+static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, const char* File, uint32_t Line)
 {
     if(!Memory.Allocs)
     {
         uint64_t MemSize = sizeof(masAlloc) * MAS_INIT_CAPACITY;
         void* Ptr = malloc(MemSize);
-        assert(Ptr != NULL && "Tracking memory list allocating failed");
+        MAS_IMPL_ASSERT(Ptr == NULL, "MAS_MEMORY", "Allocating memory tracking list failed");
 
-        memset(Ptr, 0, MemSize);  
+        mas_impl_memory_zero(Ptr, MemSize);  
         Memory.Allocs       = MAS_PTR_OFFSET(masAlloc, Ptr, 0);
         Memory.Capacity     = MAS_INIT_CAPACITY;
         Memory.ResizeFactor = 2;
@@ -70,7 +76,7 @@ static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, cons
         uint64_t  Capacity = MAS_INIT_CAPACITY * Memory.ResizeFactor;
         uint64_t  MemSize  = sizeof(masAlloc) * Capacity;
         void     *Ptr      = realloc(Memory.Allocs, MemSize);
-        assert(Ptr != NULL && "Tracking memory list resizing failed");
+        MAS_IMPL_ASSERT(Ptr == NULL, "MAS_MEMORY", "Resizing memory tracking list failed");
 
         Memory.Allocs        = MAS_PTR_OFFSET(masAlloc, Ptr, 0);
         Memory.Capacity      = Capacity;
@@ -83,7 +89,6 @@ static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, cons
     Alloc->File[TRACK_TYPE_ALLOCATE]   = File;
     Alloc->Line[TRACK_TYPE_ALLOCATE]   = Line;
     Alloc->Size                        = Size;
-    Alloc->Source[TRACK_TYPE_ALLOCATE] = Source;
 
     if(Size > Memory.LargestAllocSize)
         Memory.LargestAllocSize = Size;
@@ -93,7 +98,7 @@ static void mas_internal_memory_track_alloc(const void* Mem, uint64_t Size, cons
         Memory.TotalSize = Memory.UsedSize;
 }
 
-static void mas_internal_memory_track_resize(const void* OldMem, const void* NewMem, uint64_t Size, const char* Source, const char* File, uint32_t Line)
+static void mas_internal_memory_track_resize(const void* OldMem, const void* NewMem, uint64_t Size, const char* File, uint32_t Line)
 {
     if(!Memory.Allocs)
         return;
@@ -114,14 +119,13 @@ static void mas_internal_memory_track_resize(const void* OldMem, const void* New
         Alloc->File[TRACK_TYPE_RESIZE]   = File;
         Alloc->Line[TRACK_TYPE_RESIZE]   = Line;
         Alloc->Size                      = Size;
-        Alloc->Source[TRACK_TYPE_RESIZE] = Source;
 
         if(Size > Memory.LargestAllocSize)
             Memory.LargestAllocSize = Size;
     }
 }
 
-static bool mas_internal_memory_track_free(const void* Mem, const char* Source, const char* File, uint32_t Line)
+static bool mas_internal_memory_track_free(const void* Mem, const char* File, uint32_t Line)
 {
     if(!Memory.Allocs)
         return false;
@@ -140,7 +144,6 @@ static bool mas_internal_memory_track_free(const void* Mem, const char* Source, 
     {
         Alloc->File[TRACK_TYPE_FREE]   = File;
         Alloc->Line[TRACK_TYPE_FREE]   = Line;
-        Alloc->Source[TRACK_TYPE_FREE] = Source;
 
         Memory.UsedSize -= Alloc->Size;
         return true;
@@ -153,33 +156,33 @@ static bool mas_internal_memory_track_free(const void* Mem, const char* Source, 
 /*********************************************************************************************************
 *
 **********************************************************************************************************/
-void* mas_impl_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line)
+void* mas_impl_memory_alloc(uint64_t Size, const char* File, uint32_t Line)
 {
     void* Mem = malloc(Size);
     if(!Mem)
         return NULL;
-    memset(Mem, 0, Size);
-    mas_internal_memory_track_alloc(Mem, Size, Source, File, Line);
+    mas_impl_memory_zero(Mem, Size);
+    mas_internal_memory_track_alloc(Mem, Size, File, Line);
     return Mem;
 }
 
-void* mas_impl_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line)
+void* mas_impl_memory_resize(void* Mem, uint64_t Size, const char* File, uint32_t Line)
 {
     void* LocalMem = realloc(Mem, Size);
     if(!LocalMem)
         return Mem;
-    mas_internal_memory_track_resize(Mem, LocalMem, Size, Source, File, Line);
+    mas_internal_memory_track_resize(Mem, LocalMem, Size, File, Line);
     return LocalMem;
 }
 
-void mas_impl_memory_free(void* Mem, const char* Source, const char* File, uint32_t Line)
+void mas_impl_memory_free(void* Mem, const char* File, uint32_t Line)
 {
     if(Mem)
     {
-        if(mas_internal_memory_track_free(Mem, Source, File, Line))
+        if(mas_internal_memory_track_free(Mem, File, Line))
             free(Mem);
         else
-            mas_impl_log("[ ERROR ]: calling mas_impl_memory_free on a pointer that is not previously allocated through the api\n");
+            MAS_IMPL_ASSERT(true, "MAS MEMORY", "calling mas_impl_memory_free on a pointer that is not previously allocated through the api\n");
     }
 }
 
@@ -213,14 +216,14 @@ void mas_impl_memory_dump()
     {
         Alloc = &Memory.Allocs[i];
 
-        mas_impl_log("0x%p:", Alloc->Data);
+        MAS_IMPL_LOG("0x%p:", Alloc->Data);
         if(Alloc->File[TRACK_TYPE_FREE])
-            mas_impl_log(" NULL\n");
+            MAS_IMPL_LOG(" NULL\n");
         else
         {
             for(int32_t b = 0; b < Alloc->Size; ++b)
-                mas_impl_log(" %1x", ((const uint8_t*)Alloc->Data)[b]);
-            mas_impl_log("\n");
+                MAS_IMPL_LOG(" %1x", ((const uint8_t*)Alloc->Data)[b]);
+            MAS_IMPL_LOG("\n");
         }
     }
 }
@@ -237,9 +240,8 @@ void mas_impl_memory_leak_detect()
         Alloc = &Memory.Allocs[i];
         if(Alloc->File[TRACK_TYPE_ALLOCATE] && !Alloc->File[TRACK_TYPE_FREE])
         {
-            mas_impl_log("MEMORY_LEAK[ 0x%p ]: [ %s ] -> ( %u ) %s \n", 
+            MAS_IMPL_LOG("MEMORY_LEAK[ 0x%p ]: [ %s ] -> ( %u ) %s \n",
                 Alloc->Data, 
-                Alloc->Source[TRACK_TYPE_ALLOCATE], 
                 Alloc->Line[TRACK_TYPE_ALLOCATE],
                 Alloc->File[TRACK_TYPE_ALLOCATE]);
 
@@ -247,11 +249,6 @@ void mas_impl_memory_leak_detect()
         }
     }
 
-    if(LeakCount > 0)
-    {
-        mas_impl_log("\n    ::MEMORY_LEAK_COUNT: %u\n\n", LeakCount);
-        //assert(LeakCount == 0 && "MEMORY_LEAK_DETECTED");
-        mas_impl_assert(LeakCount > 0, "MEMORY_LEAK_DETECTED", "Check console output for more info\n    MemoryLeakCount: %u", LeakCount);
-    }
+    MAS_IMPL_ASSERT(LeakCount > 0, "MAS_MEMORY", "MEMORY_LEAK_DETECTED\n    MemoryLeakCount: %u", LeakCount);
 }
 

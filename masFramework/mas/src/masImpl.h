@@ -4,25 +4,21 @@
 
 
 /***************************************************************************************************************************
-* MACROS:
-****************************************************************************************************************************/
-#define MAS_IMPL_MALLOC(type, size)       (type*)mas_impl_memory_alloc (size,       "MAS_IMPL", __FILE__, __LINE__)
-#define MAS_IMPL_REALLOC(type, ptr, size) (type*)mas_impl_memory_resize(ptr,  size, "MAS_IMPL", __FILE__, __LINE__)
-#define MAS_IMPL_FREE(ptr)                       mas_impl_memory_free  (ptr,        "MAS_IMPL", __FILE__, __LINE__)
-
-
-/***************************************************************************************************************************
 * MEMORY:
 ****************************************************************************************************************************/
-void* mas_impl_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void* mas_impl_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void  mas_impl_memory_free(void* Mem, const char* Source, const char* File, uint32_t Line);
+void* mas_impl_memory_alloc(uint64_t Size, const char* File, uint32_t Line);
+void* mas_impl_memory_resize(void* Mem, uint64_t Size, const char* File, uint32_t Line);
+void  mas_impl_memory_free(void* Mem, const char* File, uint32_t Line);
 void  mas_impl_memory_copy(void* Dest, const void* Src, uint64_t Size);
 void  mas_impl_memory_move(void* Dest, const void* Src, uint64_t Size);
 void  mas_impl_memory_zero(void* Mem, uint64_t Size);
 void  mas_impl_memory_set(void* Mem, int32_t Value, uint64_t Size);
 void  mas_impl_memory_dump();
 void  mas_impl_memory_leak_detect();
+
+#define MAS_IMPL_MALLOC(type, size)       (type*)mas_impl_memory_alloc (size,       __FILE__, __LINE__)
+#define MAS_IMPL_REALLOC(type, ptr, size) (type*)mas_impl_memory_resize(ptr,  size, __FILE__, __LINE__)
+#define MAS_IMPL_FREE(ptr)                       mas_impl_memory_free  (ptr,        __FILE__, __LINE__)
 
 
 /***************************************************************************************************************************
@@ -128,7 +124,7 @@ void mas_impl_input_controller_tick();
 
 
 /***************************************************************************************************************************
-* DIRECTORY: DONE
+* DIRECTORY: DONE [ NEED REFACTORY ]
 ****************************************************************************************************************************/
 bool           mas_impl_directory_init();
 void           mas_impl_directory_deinit();
@@ -138,7 +134,7 @@ bool           mas_impl_directory_find_file(const char* TargetPath, const char* 
 masFileGroup*  mas_impl_directory_find_files(const char* TargetPath, const char* TargetName);
 masFileGroup*  mas_impl_directory_find_mix_files(const char* TargetPath, const char** TargetList, int32_t TargetCount);
 const masFile* mas_impl_directory_file_group_next_file(masFileGroup* FileGroup);
-const char* mas_impl_directory_file_path(const masFile* File);
+const char*    mas_impl_directory_file_path(const masFile* File);
 uint32_t       mas_impl_directory_file_group_file_count(masFileGroup* FileGroup);
 void           mas_impl_directory_file_group_destroy(masFileGroup** FileGroup);
 
@@ -149,9 +145,15 @@ void           mas_impl_directory_file_group_destroy(masFileGroup** FileGroup);
 void mas_impl_log(const char* Text, ...);
 void mas_impl_log_va_list(const char* Text, va_list Args);
 
+#define MAS_IMPL_LOG(Text, ...)         mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: "##Text##"\n", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_INFO(Text, ...)    mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;32m"##Text##"\n", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_WARNING(Text, ...) mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;33m"##Text##"\n", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_ERROR(Text, ...)   mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;31m"##Text##"\n", ##__VA_ARGS__)
+
 
 /***************************************************************************************************************************
 * ASSERT: IN PROGRESS
 ****************************************************************************************************************************/
-void mas_impl_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
+void mas_impl_assert(bool Condition, const char* Title, const char* ErrorMsg, ...);
 void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* ErrorMsg, va_list Args);
+#define MAS_IMPL_ASSERT(Condition, Module, Msg, ...) do { mas_impl_assert_va_list(Condition, Module, Msg, #__VA_ARGS__); } while(0)

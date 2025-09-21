@@ -79,7 +79,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 
 	if (!RegisterClassEx(&wc))
 	{
-        MAS_LOG_ERROR("[ WIN32 ]: RegisterClassEx failed\n");
+        MAS_IMPL_LOG_ERROR("RegisterClassEx failed\n");
         return false;
     }
 
@@ -92,7 +92,7 @@ bool mas_impl_window_init(const char* Title, int32_t Width, int32_t Height)
 		PosX, PosY, Width, Height, NULL, NULL, Instance, NULL);
 	if (!Handle)
 	{
-        MAS_LOG_ERROR("[ WIN32 ]: CreateWindowEx failed\n");
+        MAS_IMPL_LOG_ERROR("CreateWindowEx failed\n");
 		UnregisterClass(MAS_WINDOW_CLASS_NAME, Instance);
 		return false;
 	}

@@ -6,22 +6,22 @@
 
 void mas_impl_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...)
 {
-    if(!Condition)
-        return;
-    
-    va_list Args;
-    va_start(Args, ErrorMsg);
-    mas_impl_assert_va_list(Condition, Desc, ErrorMsg, Args);
-    va_end(Args);
+    if (Condition)
+    {
+        va_list Args;
+        va_start(Args, ErrorMsg);
+        mas_impl_assert_va_list(Condition, Desc, ErrorMsg, Args);
+        va_end(Args);
+    }
 }
 
 void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* ErrorMsg, va_list Args)
 {
-    if(!Condition)
-        return;
+    if (Condition)
+    {
+        char Buf[512] = { 0 };
+        vsprintf(Buf, ErrorMsg, Args);
 
-    char Buf[512] = { 0 };
-    vsprintf(Buf, ErrorMsg, Args);
-
-    MessageBox(NULL, Buf, Desc, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, Buf, Desc, MB_OK | MB_ICONERROR);
+    }
 }
