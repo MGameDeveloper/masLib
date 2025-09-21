@@ -14,6 +14,8 @@ int32_t main(int32_t argc, const char** argv)
     MAS_LOG_WARNING("Not working properly");
     MAS_LOG_ERROR("Just another test no.%u", 3221);
 
+    MAS_LOG_INFO("THANK YOU FOR USING THE ENGINE");
+
     // user_init( params )
 
     while(mas_is_running())
