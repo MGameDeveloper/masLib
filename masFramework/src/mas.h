@@ -18,21 +18,29 @@
 *    - Log
 */
 
-
-/********************************************************************************************************
-* MACROS:
-*********************************************************************************************************/
-#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", __FILE__, __LINE__)
-#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", __FILE__, __LINE__)
-#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", __FILE__, __LINE__)
-
-
 /********************************************************************************************************
 * INITIALIZATION:
 *********************************************************************************************************/
 bool mas_init(const char* Title, int32_t Width, int32_t Height);
 void mas_terminate();
 bool mas_is_running();
+
+
+/***************************************************************************************************************************
+* MEMORY: 
+****************************************************************************************************************************/
+void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line);
+void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line);
+void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line);
+void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size);
+void  mas_memory_move(void* Dest, const void* Src, uint64_t Size);
+void  mas_memory_zero(void* Mem, uint64_t Size);
+void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size);
+void  mas_memory_dump();
+
+#define MAS_MALLOC(type, size)       (type*)mas_memory_alloc(size,        "MAS_USER", __FILE__, __LINE__)
+#define MAS_REALLOC(type, ptr, size) (type*)mas_memory_resize(ptr, size,  "MAS_USER", __FILE__, __LINE__)
+#define MAS_FREE(ptr)                       mas_memory_free((void**)&ptr, "MAS_USER", __FILE__, __LINE__)
 
 
 /********************************************************************************************************
@@ -103,18 +111,6 @@ void mas_log(const char* Text, ...);
 ****************************************************************************************************************************/
 void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
 
-
-/***************************************************************************************************************************
-* MEMORY: 
-****************************************************************************************************************************/
-void* mas_memory_alloc(uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void* mas_memory_resize(void* Mem, uint64_t Size, const char* Source, const char* File, uint32_t Line);
-void  mas_memory_free(void** Mem, const char* Source, const char* File, uint32_t Line);
-void  mas_memory_copy(void* Dest, const void* Src, uint64_t Size);
-void  mas_memory_move(void* Dest, const void* Src, uint64_t Size);
-void  mas_memory_zero(void* Mem, uint64_t Size);
-void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size);
-void  mas_memory_dump();
 
 
 
