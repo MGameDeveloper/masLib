@@ -99,10 +99,10 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 *********************************************************************************************************/
 void mas_log(const char* Text, ...);
 
-#define MAS_LOG(Text, ...)         mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: "##Text##"\n", ##__VA_ARGS__)
-#define MAS_LOG_INFO(Text, ...)    mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;32m"##Text##"\033[0m\n", ##__VA_ARGS__)
-#define MAS_LOG_WARNING(Text, ...) mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;33m"##Text##"\033[0m\n", ##__VA_ARGS__)
-#define MAS_LOG_ERROR(Text, ...)   mas_log("\033[1;36m[  MAS_GAME  ]\033[0m: \033[1;31m"##Text##"\033[0m\n", ##__VA_ARGS__)
+#define MAS_LOG(Text, ...)         mas_log("\033[0;37m[  MAS_GAME  ]\033[0m: "##Text##"\n", ##__VA_ARGS__)
+#define MAS_LOG_INFO(Text, ...)    mas_log("\033[0;37m[  MAS_GAME  ]\033[0m: \033[1;32m"##Text##"\033[0m\n", ##__VA_ARGS__)
+#define MAS_LOG_WARNING(Text, ...) mas_log("\033[0;37m[  MAS_GAME  ]\033[0m: \033[1;33m"##Text##"\033[0m\n", ##__VA_ARGS__)
+#define MAS_LOG_ERROR(Text, ...)   mas_log("\033[0;37m[  MAS_GAME  ]\033[0m: \033[1;31m"##Text##"\033[0m\n", ##__VA_ARGS__)
 
 
 /***************************************************************************************************************************
