@@ -145,15 +145,63 @@ void           mas_impl_directory_file_group_destroy(masFileGroup** FileGroup);
 void mas_impl_log(const char* Text, ...);
 void mas_impl_log_va_list(const char* Text, va_list Args);
 
-#define MAS_IMPL_LOG(Text, ...)         mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: "##Text##"\n", ##__VA_ARGS__)
-#define MAS_IMPL_LOG_INFO(Text, ...)    mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;32m"##Text##"\n", ##__VA_ARGS__)
-#define MAS_IMPL_LOG_WARNING(Text, ...) mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;33m"##Text##"\n", ##__VA_ARGS__)
-#define MAS_IMPL_LOG_ERROR(Text, ...)   mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;31m"##Text##"\n", ##__VA_ARGS__)
+#define MAS_IMPL_LOG(Text, ...)         mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: "##Text##"\n\033[0m", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_INFO(Text, ...)    mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;32m"##Text##"\n\033[0m", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_WARNING(Text, ...) mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;33m"##Text##"\n\033[0m", ##__VA_ARGS__)
+#define MAS_IMPL_LOG_ERROR(Text, ...)   mas_impl_log("\033[90m[ MAS_ENGINE ]\033[0m: \033[1;31m"##Text##"\n\033[0m", ##__VA_ARGS__)
 
 
 /***************************************************************************************************************************
-* ASSERT: IN PROGRESS
+* ASSERT: DONE
 ****************************************************************************************************************************/
 void mas_impl_assert(bool Condition, const char* Title, const char* ErrorMsg, ...);
 void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* ErrorMsg, va_list Args);
-#define MAS_IMPL_ASSERT(Condition, Module, Msg, ...) do { mas_impl_assert_va_list(Condition, Module, Msg, #__VA_ARGS__); } while(0)
+#define MAS_IMPL_ASSERT(Condition, Module, Msg, ...) do { mas_impl_assert(Condition, Module, Msg, ##__VA_ARGS__); } while(0)
+
+
+
+
+/***************************************************************************************************************************
+* MATH: IN PROGRESS
+****************************************************************************************************************************/
+
+float mas_impl_math_to_rad(float degree);
+float mas_impl_math_to_deg(float radian);
+
+// Vec2 API
+masVec2 mas_impl_vec2();
+masVec2 mas_impl_vec2_set(float x, float y);
+
+// Algebric Operations
+void mas_impl_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void mas_impl_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void mas_impl_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void mas_impl_vec2_div(masVec2* Out, const masVec2* V0, const masVec2* V1);
+
+// Geometric Operations
+float mas_impl_vec2_mag     (const masVec2* V);
+void  mas_impl_vec2_norm    (masVec2* Out, const masVec2* V);
+float mas_impl_vec2_dot     (const masVec2* V0, const masVec2* V1);
+float mas_impl_vec2_angle   (const masVec2* V0, const masVec2* V1);
+float mas_impl_vec2_distance(const masVec2* V0, const masVec2* V1);
+
+// Directional & Transform
+void  mas_impl_vec2_project (masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_vec2_negate  (masVec2* Out, const masVec2* V);
+void  mas_impl_vec2_perp    (masVec2* Out, const masVec2* V);
+void  mas_impl_vec2_lerp    (masVec2* Out, const masVec2* V0, const masVec2* V1, float T);
+void  mas_impl_vec2_reflect (masVec2* Out, const masVec2* V,  const masVec2* Normal);
+void  mas_impl_vec2_hadamard(const masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_vec2_clamp   (masVec2* Out, float Min, float Max, const masVec2* V);
+bool  mas_impl_vec2_equals  (const masVec2* V0, const masVec2* V1);
+void  mas_impl_vec2_min     (masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_vec2_max     (masVec2* Out, const masVec2* V0, const masVec2* V1);
+bool  mas_impl_vec2_near    (const masVec2* V0, const masVec2* V1, float Epsilon);
+void  mas_impl_vec2_rotate  (masVec2* Out, const masVec2* V, float radius);
+
+
+// Vec3 API
+
+// Vec4 API
+
+// Matrix API

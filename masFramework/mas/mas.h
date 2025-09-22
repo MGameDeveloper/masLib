@@ -20,7 +20,7 @@
 
 
 /********************************************************************************************************
-* INITIALIZATION:
+* INITIALIZATION: DONE
 *********************************************************************************************************/
 bool mas_init(const char* Title, int32_t Width, int32_t Height);
 void mas_terminate();
@@ -28,7 +28,7 @@ bool mas_is_running();
 
 
 /***************************************************************************************************************************
-* MEMORY: 
+* MEMORY: DONE
 ****************************************************************************************************************************/
 void* mas_memory_alloc(uint64_t Size, const char* File, uint32_t Line);
 void* mas_memory_resize(void* Mem, uint64_t Size, const char* File, uint32_t Line);
@@ -45,7 +45,7 @@ void  mas_memory_dump();
 
 
 /********************************************************************************************************
-* WINDOW:
+* WINDOW: DONE
 *********************************************************************************************************/
 void mas_window_set_pos(int32_t x, int32_t y);
 void mas_window_set_size(int32_t w, int32_t h);
@@ -62,7 +62,7 @@ void mas_window_mouse_pos_in_window(int32_t* x, int32_t* y);
 
 
 /********************************************************************************************************
-* TIME:
+* TIME: DONE
 *********************************************************************************************************/
 double mas_time_now();
 double mas_time_app();
@@ -70,7 +70,7 @@ double mas_time_elapsed();
 
 
 /********************************************************************************************************
-* INPUT:
+* INPUT: PARTIALLY DONE
 *********************************************************************************************************/
 bool  mas_input_key_state(masInputUser User, masInputKey Key, masInputKeyState State, uint8_t KeyMod_);
 float mas_input_axis_value(masInputUser User, masInputAxis Key, masInputKeyMod KeyMod);
@@ -82,7 +82,7 @@ void  mas_input_controller_restore_setting(masInputUser User);
 
 
 /********************************************************************************************************
-* DIRECTORY
+* DIRECTORY: DONE
 *********************************************************************************************************/
 int32_t        mas_directory_current_path(char* Path, int32_t PathSize);
 bool           mas_directory_find_file(const char* TargetPath, const char* FileName, char* OutBuf, int32_t BufSize);
@@ -95,7 +95,7 @@ void           mas_directory_file_group_destroy(masFileGroup** FileGroup);
 
 
 /********************************************************************************************************
-* LOG: 
+* LOG: DONE
 *********************************************************************************************************/
 void mas_log(const char* Text, ...);
 
@@ -106,12 +106,57 @@ void mas_log(const char* Text, ...);
 
 
 /***************************************************************************************************************************
-* ASSERT: IN PROGRESS
+* ASSERT: DONE
 ****************************************************************************************************************************/
 void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
 
-#define MAS_ASSERT(Condition, Title, Msg, ...) mas_assert(Condition, Title, Msg, #__VA_ARGS__)
+#define MAS_ASSERT(Condition, Title, Msg, ...) do { mas_assert(Condition, Title, Msg, ##__VA_ARGS__); }while(0)
 
+
+/********************************************************************************************************
+* MATH: IN PROGRESS
+*********************************************************************************************************/
+masVec2 mas_vec2();
+void mas_vec2_add();
+void mas_vec2_sub();
+void mas_vec2_mul();
+void mas_vec2_div();
+void mas_vec2_mag();
+void mas_vec2_norm();
+void mas_vec2_dot();
+void mas_vec2_angle();
+void mas_vec2_project();
+void mas_vec2_negate();
+void mas_vec2_perp();
+void mas_vec2_lerp();
+void mas_vec2_reflect();
+void mas_vec2_distance();
+void mas_vec2_hadmard();
+void mas_vec2_clamp();
+
+masVec3 mas_vec3(); // share all of the above
+void mas_vec3_add();
+void mas_vec3_sub();
+void mas_vec3_scale();
+void mas_vec3_div();
+void mas_vec3_mag();
+void mas_vec3_norm();
+void mas_vec3_dot();
+void mas_vec3_angle();
+void mas_vec3_project();
+void mas_vec3_negate();
+void mas_vec3_perp();
+void mas_vec3_lerp();
+void mas_vec3_reflect();
+void mas_vec3_distance();
+void mas_vec3_hadmard();
+void mas_vec3_clamp();
+void mas_vec3_cross();
+void mas_vec3_rotate();
+void mas_vec3_slerp();
+
+
+//masMatrix mas_matrix();
 
 
 
@@ -156,13 +201,4 @@ struct masHashID;
 
 masHashTable* mas_hash_table_create(int32_t ItemCount, int32_t ItemSize, void(*ItemDestructor)(void* UserItem), uint64_t(*HashFunc)(const void* Data, uint64_t Size));
 void          mas_hash_table_destroy(masHashTable** HashTable);
-masHashID*
-
-
-/********************************************************************************************************
-*
-*********************************************************************************************************/
-struct masVec3;
-struct masVec4;
-struct masMatrix;
 #endif

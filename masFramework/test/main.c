@@ -9,12 +9,8 @@ int32_t main(int32_t argc, const char** argv)
     }
     mas_window_show(true);
 
-    MAS_LOG("Normal logging thing");
-    MAS_LOG_INFO("INITIALIZE_TIME: %f", mas_time_app());
-    MAS_LOG_WARNING("Not working properly");
-    MAS_LOG_ERROR("Just another test no.%u", 3221);
-
-    MAS_LOG_INFO("THANK YOU FOR USING THE ENGINE");
+    int32_t* list = MAS_MALLOC(int32_t, sizeof(int32_t) * 5);
+    MAS_ASSERT(list != NULL, "Entity Allocation", "Allocation failed for list");
 
     // user_init( params )
 

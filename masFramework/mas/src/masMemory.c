@@ -240,7 +240,7 @@ void mas_impl_memory_leak_detect()
         Alloc = &Memory.Allocs[i];
         if(Alloc->File[TRACK_TYPE_ALLOCATE] && !Alloc->File[TRACK_TYPE_FREE])
         {
-            MAS_IMPL_LOG("MEMORY_LEAK[ 0x%p ]: [ %s ] -> ( %u ) %s \n",
+            MAS_IMPL_LOG_ERROR("MEMORY_LEAK[ 0x%p ]: [ %u ] -> ( %s )\n",
                 Alloc->Data, 
                 Alloc->Line[TRACK_TYPE_ALLOCATE],
                 Alloc->File[TRACK_TYPE_ALLOCATE]);

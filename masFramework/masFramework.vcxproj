@@ -138,6 +138,7 @@
     <ClCompile Include="mas\src\masInput.c" />
     <ClCompile Include="mas\src\masInputController.c" />
     <ClCompile Include="mas\src\masLog.c" />
+    <ClCompile Include="mas\src\masMath.cpp" />
     <ClCompile Include="mas\src\masMemory.c" />
     <ClCompile Include="mas\src\masTime.c" />
     <ClCompile Include="mas\src\masWindow.c" />

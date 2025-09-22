@@ -192,3 +192,48 @@ typedef enum masInputAxis_
 } masInputAxis;
 
 typedef void(*masInputControllerConnectionCallback)(masInputUser User, bool IsConnected);
+
+
+
+/********************************************************************************************************
+* MATH: IN PROGRESS
+*********************************************************************************************************/
+typedef union _masVec2
+{
+    float xy[2];
+    struct
+    {
+        float x, y;
+    };
+} masVec2;
+
+typedef union _masVec3
+{
+    float xyz[3];
+    struct
+    {
+        float x, y, z;
+    };
+} masVec3;
+
+typedef union _masVec4
+{
+    float xyzw[4];
+    struct
+    {
+        float x, y, z, w;
+    };
+} masVec4;
+
+typedef union _masMat4x4
+{
+    float m16[16];
+    float m4x4[4][4];
+    struct
+    {
+        masVec4 r0;
+        masVec4 r1;
+        masVec4 r2;
+        masVec4 r3;
+    };
+} masMatrix;
