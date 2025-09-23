@@ -164,9 +164,11 @@ void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* Error
 /***************************************************************************************************************************
 * MATH: IN PROGRESS
 ****************************************************************************************************************************/
-
+float mas_impl_math_fclamp(float Value, float Min, float Max);
 float mas_impl_math_to_rad(float degree);
 float mas_impl_math_to_deg(float radian);
+float mas_impl_math_fmin(float V0, float V1);
+float mas_impl_math_fmax(float V0, float V1);
 
 // Vec2 API
 masVec2 mas_impl_vec2();
@@ -192,7 +194,7 @@ void  mas_impl_vec2_perp    (masVec2* Out, const masVec2* V);
 void  mas_impl_vec2_lerp    (masVec2* Out, const masVec2* V0, const masVec2* V1, float T);
 void  mas_impl_vec2_reflect (masVec2* Out, const masVec2* V,  const masVec2* Normal);
 void  mas_impl_vec2_hadamard(const masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_vec2_clamp   (masVec2* Out, float Min, float Max, const masVec2* V);
+void  mas_impl_vec2_clamp   (masVec2 * Out, const masVec2 * V, float Min, float Max);
 bool  mas_impl_vec2_equals  (const masVec2* V0, const masVec2* V1);
 void  mas_impl_vec2_min     (masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_vec2_max     (masVec2* Out, const masVec2* V0, const masVec2* V1);

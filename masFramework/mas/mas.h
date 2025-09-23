@@ -116,8 +116,8 @@ void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
 /********************************************************************************************************
 * MATH: IN PROGRESS
 *********************************************************************************************************/
-masVec2 mas_vec2();
-void mas_vec2_add();
+masVec2 mas_vec2(float x, float y);
+masVec2 mas_vec2_add();
 void mas_vec2_sub();
 void mas_vec2_mul();
 void mas_vec2_div();
