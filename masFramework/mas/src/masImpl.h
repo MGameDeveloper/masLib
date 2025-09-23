@@ -160,50 +160,46 @@ void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* Error
 
 
 
-
+#if 0
 /***************************************************************************************************************************
 * MATH: IN PROGRESS
 ****************************************************************************************************************************/
-float mas_impl_math_fclamp(float Value, float Min, float Max);
-float mas_impl_math_to_rad(float degree);
-float mas_impl_math_to_deg(float radian);
-float mas_impl_math_fmin(float V0, float V1);
-float mas_impl_math_fmax(float V0, float V1);
+float mas_impl_math_float_clamp(float Value, float Min, float Max);
+float mas_impl_math_float_min(float V0, float V1);
+float mas_impl_math_float_max(float V0, float V1);
+float mas_impl_math_deg_to_rad(float Degree);
+float mas_impl_math_rad_to_deg(float Radian);
 
-// Vec2 API
-masVec2 mas_impl_vec2();
-masVec2 mas_impl_vec2_set(float x, float y);
 
-// Algebric Operations
-void mas_impl_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
-void mas_impl_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
-void mas_impl_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1);
-void mas_impl_vec2_div(masVec2* Out, const masVec2* V0, const masVec2* V1);
-
-// Geometric Operations
-float mas_impl_vec2_mag     (const masVec2* V);
-void  mas_impl_vec2_norm    (masVec2* Out, const masVec2* V);
-float mas_impl_vec2_dot     (const masVec2* V0, const masVec2* V1);
-float mas_impl_vec2_angle   (const masVec2* V0, const masVec2* V1);
-float mas_impl_vec2_distance(const masVec2* V0, const masVec2* V1);
-
-// Directional & Transform
-void  mas_impl_vec2_project (masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_vec2_negate  (masVec2* Out, const masVec2* V);
-void  mas_impl_vec2_perp    (masVec2* Out, const masVec2* V);
-void  mas_impl_vec2_lerp    (masVec2* Out, const masVec2* V0, const masVec2* V1, float T);
-void  mas_impl_vec2_reflect (masVec2* Out, const masVec2* V,  const masVec2* Normal);
-void  mas_impl_vec2_hadamard(const masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_vec2_clamp   (masVec2 * Out, const masVec2 * V, float Min, float Max);
-bool  mas_impl_vec2_equals  (const masVec2* V0, const masVec2* V1);
-void  mas_impl_vec2_min     (masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_vec2_max     (masVec2* Out, const masVec2* V0, const masVec2* V1);
-bool  mas_impl_vec2_near    (const masVec2* V0, const masVec2* V1, float Epsilon);
-void  mas_impl_vec2_rotate  (masVec2* Out, const masVec2* V, float radius);
-
+/***************************************************************************************************************************
+* 2D Vector
+****************************************************************************************************************************/
+masVec2 mas_impl_math_vec2();
+void  mas_impl_math_vec2_set(masVec2* Out, float x, float y);
+void  mas_impl_math_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_scale(masVec2* Out, const masVec2* V, float Scaler);
+void  mas_impl_math_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_div_float(masVec2* Out, const masVec2* V, float Scaler);
+void  mas_impl_math_vec2_div(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_negate(masVec2* Out, const masVec2* V);
+void  mas_impl_math_vec2_min(masVec2* Out, const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_max(masVec2* Out, const masVec2* V0, const masVec2* V1);
+float mas_impl_math_vec2_distance(const masVec2* V0, const masVec2* V1);
+float mas_impl_math_vec2_mag(const masVec2* V);
+void  mas_impl_math_vec2_perp(masVec2* Out, const masVec2* V);
+void  mas_impl_math_vec2_norm(masVec2* Out, const masVec2* V);
+float mas_impl_math_vec2_dot(const masVec2* V0, const masVec2* V1);
+void  mas_impl_math_vec2_lerp(masVec2* Out, const masVec2* V0, const masVec2* V1, float T);
+void  mas_impl_math_vec2_clamp(masVec2* Out, const masVec2* V, float Min, float Max);
+bool  mas_impl_math_vec2_equals(const masVec2* V0, const masVec2* V1);
+bool  mas_impl_math_vec2_near(const masVec2* V0, const masVec2* V1, const masVec2* Epsilon);
+void  mas_impl_math_vec2_reflect(masVec2* Out, const masVec2* V, const masVec2* Normal);
+float mas_impl_math_vec2_angle(const masVec2* V0, const masVec2* V1);
 
 // Vec3 API
 
 // Vec4 API
 
 // Matrix API
+#endif

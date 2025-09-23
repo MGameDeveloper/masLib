@@ -113,50 +113,41 @@ void mas_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...);
 #define MAS_ASSERT(Condition, Title, Msg, ...) do { mas_assert(Condition, Title, Msg, ##__VA_ARGS__); }while(0)
 
 
-/********************************************************************************************************
+/***************************************************************************************************************************
 * MATH: IN PROGRESS
-*********************************************************************************************************/
-masVec2 mas_vec2(float x, float y);
-masVec2 mas_vec2_add();
-void mas_vec2_sub();
-void mas_vec2_mul();
-void mas_vec2_div();
-void mas_vec2_mag();
-void mas_vec2_norm();
-void mas_vec2_dot();
-void mas_vec2_angle();
-void mas_vec2_project();
-void mas_vec2_negate();
-void mas_vec2_perp();
-void mas_vec2_lerp();
-void mas_vec2_reflect();
-void mas_vec2_distance();
-void mas_vec2_hadmard();
-void mas_vec2_clamp();
-
-masVec3 mas_vec3(); // share all of the above
-void mas_vec3_add();
-void mas_vec3_sub();
-void mas_vec3_scale();
-void mas_vec3_div();
-void mas_vec3_mag();
-void mas_vec3_norm();
-void mas_vec3_dot();
-void mas_vec3_angle();
-void mas_vec3_project();
-void mas_vec3_negate();
-void mas_vec3_perp();
-void mas_vec3_lerp();
-void mas_vec3_reflect();
-void mas_vec3_distance();
-void mas_vec3_hadmard();
-void mas_vec3_clamp();
-void mas_vec3_cross();
-void mas_vec3_rotate();
-void mas_vec3_slerp();
+****************************************************************************************************************************/
+float mas_math_float_clamp(float Value, float Min, float Max);
+float mas_math_float_min(float V0, float V1);
+float mas_math_float_max(float V0, float V1);
+float mas_math_deg_to_rad(float Degree);
+float mas_math_rad_to_deg(float Radian);
 
 
-//masMatrix mas_matrix();
+/***************************************************************************************************************************
+* 2D Vector
+****************************************************************************************************************************/
+masVec2 mas_math_vec2();
+void  mas_math_vec2_set(masVec2 * Out, float x, float y);
+void  mas_math_vec2_add(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_sub(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_scale(masVec2 * Out, const masVec2 * V, float Scaler);
+void  mas_math_vec2_mul(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_div_float(masVec2 * Out, const masVec2 * V, float Scaler);
+void  mas_math_vec2_div(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_negate(masVec2 * Out, const masVec2 * V);
+void  mas_math_vec2_min(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_max(masVec2 * Out, const masVec2 * V0, const masVec2 * V1);
+float mas_math_vec2_distance(const masVec2 * V0, const masVec2 * V1);
+float mas_math_vec2_mag(const masVec2 * V);
+void  mas_math_vec2_perp(masVec2 * Out, const masVec2 * V);
+void  mas_math_vec2_norm(masVec2 * Out, const masVec2 * V);
+float mas_math_vec2_dot(const masVec2 * V0, const masVec2 * V1);
+void  mas_math_vec2_lerp(masVec2 * Out, const masVec2 * V0, const masVec2 * V1, float T);
+void  mas_math_vec2_clamp(masVec2 * Out, const masVec2 * V, float Min, float Max);
+bool  mas_math_vec2_equals(const masVec2 * V0, const masVec2 * V1);
+bool  mas_math_vec2_near(const masVec2 * V0, const masVec2 * V1, const masVec2 * Epsilon);
+void  mas_math_vec2_reflect(masVec2 * Out, const masVec2 * V, const masVec2 * Normal);
+float mas_math_vec2_angle(const masVec2 * V0, const masVec2 * V1);
 
 
 
