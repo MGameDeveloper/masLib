@@ -160,7 +160,7 @@ void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* Error
 
 
 
-#if 0
+
 /***************************************************************************************************************************
 * MATH: IN PROGRESS
 ****************************************************************************************************************************/
@@ -174,7 +174,6 @@ float mas_impl_math_rad_to_deg(float Radian);
 /***************************************************************************************************************************
 * 2D Vector
 ****************************************************************************************************************************/
-masVec2 mas_impl_math_vec2();
 void  mas_impl_math_vec2_set(masVec2* Out, float x, float y);
 void  mas_impl_math_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
@@ -202,4 +201,3 @@ float mas_impl_math_vec2_angle(const masVec2* V0, const masVec2* V1);
 // Vec4 API
 
 // Matrix API
-#endif

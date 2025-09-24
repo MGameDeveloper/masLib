@@ -145,3 +145,37 @@ void  mas_memory_move(void* Dest, const void* Src, uint64_t Size)               
 void  mas_memory_zero(void* Mem, uint64_t Size)                                    { mas_impl_memory_zero(Mem, Size);       }
 void  mas_memory_set(void* Mem, int32_t Value, uint64_t Size)                      { mas_impl_memory_set(Mem, Value, Size); }
 void  mas_memory_dump()                                                            { mas_impl_memory_dump();                }
+
+
+/***************************************************************************************************************************
+* MATH: IN PROGRESS
+****************************************************************************************************************************/
+float mas_math_float_clamp(float Value, float Min, float Max) { return mas_math_float_clamp(Value, Min, Max); }
+float mas_math_float_min(float V0, float V1)                  { return mas_math_float_min(V0, V1);            }
+float mas_math_float_max(float V0, float V1)                  { return mas_math_float_max(V0, V1);            }
+float mas_math_deg_to_rad(float Degree)                       { return mas_math_deg_to_rad(Degree);           }
+float mas_math_rad_to_deg(float Radian)                       { return mas_math_rad_to_deg(Radian);           }
+
+// 2D Vector
+masVec2 mas_math_vec2();
+void  mas_math_vec2_set(masVec2* Out, float x, float y)                     { mas_math_vec2_set(Out, x, y);            }
+void  mas_math_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_add(Out, V0, V1);          }
+void  mas_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_sub(Out, V0, V1);          }
+void  mas_math_vec2_scale(masVec2* Out, const masVec2* V, float Scaler)     { mas_math_vec2_scale(Out, V, Scaler);     }
+void  mas_math_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_mul(Out, V0, V1);          }
+void  mas_math_vec2_div_float(masVec2* Out, const masVec2* V, float Scaler) { mas_math_vec2_div_float(Out, V, Scaler); }
+void  mas_math_vec2_div(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_div(Out, V0, V1);          }
+void  mas_math_vec2_negate(masVec2* Out, const masVec2* V)                  { mas_math_vec2_negate(Out, V);            }
+void  mas_math_vec2_min(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_min(Out, V0, V1);          }
+void  mas_math_vec2_max(masVec2* Out, const masVec2* V0, const masVec2* V1) { mas_math_vec2_max(Out, V0, V1);          }
+float mas_math_vec2_distance(const masVec2* V0, const masVec2* V1)          { mas_math_vec2_distance(V0, V1);          }
+float mas_math_vec2_mag(const masVec2* V)                                              { ; }
+void  mas_math_vec2_perp(masVec2* Out, const masVec2* V)                               { ; }
+void  mas_math_vec2_norm(masVec2* Out, const masVec2* V)                               { ; }
+float mas_math_vec2_dot(const masVec2* V0, const masVec2* V1)                          { ; }
+void  mas_math_vec2_lerp(masVec2* Out, const masVec2* V0, const masVec2* V1, float T)  { ; }
+void  mas_math_vec2_clamp(masVec2* Out, const masVec2* V, float Min, float Max)        { ; }
+bool  mas_math_vec2_equals(const masVec2* V0, const masVec2* V1)                       { ; }
+bool  mas_math_vec2_near(const masVec2* V0, const masVec2* V1, const masVec2* Epsilon) { ; }
+void  mas_math_vec2_reflect(masVec2* Out, const masVec2* V, const masVec2* Normal)     { ; }
+float mas_math_vec2_angle(const masVec2* V0, const masVec2* V1);
