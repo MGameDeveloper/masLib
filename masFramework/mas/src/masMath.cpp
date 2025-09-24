@@ -1,9 +1,11 @@
 #include <DirectXMath.h> // Require C++
 
-#include "masImpl.h"
+#include "masTypes.h"
 
 using namespace DirectX;
 
+extern "C"
+{
 
 /***************************************************************************************************************************
 *
@@ -52,7 +54,7 @@ void  mas_impl_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1)
 	XMVECTOR Result = XMVectorSubtract(Vec0, Vec1);
 	XMStoreFloat2((XMFLOAT2*)Out->xy, Result);
 }
-void  mas_impl_math_vec2_scale(masVec2* Out, const masVec2* V, float Scaler)
+void  mas_impl_math_vec2_mul_scale(masVec2* Out, const masVec2* V, float Scaler)
 {
 	XMVECTOR Vec    = XMVectorSet(V->x, V->y, 0.0f, 0.0f);
 	XMVECTOR Result = XMVectorScale(Vec, Scaler);
@@ -65,7 +67,7 @@ void  mas_impl_math_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1)
 	XMVECTOR Result = XMVectorMultiply(Vec0, Vec1);
 	XMStoreFloat2((XMFLOAT2*)Out->xy, Result);
 }
-void  mas_impl_math_vec2_div_float(masVec2* Out, const masVec2* V, float Scaler)
+void  mas_impl_math_vec2_div_scale(masVec2* Out, const masVec2* V, float Scaler)
 {
 	XMVECTOR Vec       = XMVectorSet(V->x, V->y, 0.0f, 0.0f);
 	XMVECTOR VecScaler = XMVectorSet(Scaler, Scaler, 0.0f, 0.0f);
@@ -114,7 +116,7 @@ float mas_impl_math_vec2_mag(const masVec2* V)
 	XMVECTOR Result = XMVector2Length(Vec);
 	return XMVectorGetX(Result);
 }
-void  mas_impl_math_vec2_perp(masVec2* Out, const masVec2* V)
+void  mas_impl_math_vec2_perpendicular(masVec2* Out, const masVec2* V)
 {
 	XMVECTOR Vec = XMVectorSet(V->x, V->y, 0.f, 0.f);
 	XMVECTOR Result = XMVector2Orthogonal(Vec);
@@ -178,3 +180,218 @@ float mas_impl_math_vec2_angle(const masVec2* V0, const masVec2* V1)
 /***************************************************************************************************************************
 * 3D Vector
 ****************************************************************************************************************************/
+void mas_impl_vec3_set(masVec3* Out, float x, float y, float z)
+{
+	if (Out)
+	{
+		Out->x = x;
+		Out->y = y;
+		Out->z = z;
+	}
+}
+
+void mas_impl_vec3_add(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0 = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1 = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorAdd(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_sub(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorSubtract(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_mul_scale(masVec3* Out, const masVec3* V, float Scaler)
+{
+	if (Out && V)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVectorScale(Vec0, Scaler);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_mul(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorMultiply(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_div_scale(masVec3* Out, const masVec3* V, float Scaler)
+{
+	if (Out && V)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Vec1   = XMVectorSet(Scaler, Scaler, Scaler, 0.f);
+		XMVECTOR Result = XMVectorDivide(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_div(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorDivide(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_negate(masVec3* Out)
+{
+	if (Out)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)Out);
+		XMVECTOR Result = XMVectorNegate(Vec);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+float  mas_impl_vec3_length(const masVec3* V)
+{
+	if (V)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVector3Length(Vec);
+		return XMVectorGetX(Result);
+	}
+
+	return 0.0f;
+}
+
+float mas_impl_vec3_length_sq(const masVec3* V)
+{
+	if (V)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVector3LengthSq(Vec);
+		return XMVectorGetX(Result);
+	}
+
+	return 0.0f;
+}
+
+void  mas_impl_vec3_norm(masVec3* Out, const masVec3* V);
+float mas_impl_vec3_dot(const masVec3* V0, const masVec3* V1);
+void  mas_impl_vec3_cross(masVec3* Out, const masVec3* V0, const masVec3* V1);
+float mas_impl_vec3_distance(const masVec3* V0, const masVec3* V1);
+float mas_impl_vec3_distance_sq(const masVec3* V0, const masVec3* V1);
+void  mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1);
+
+void mas_impl_vec3_min(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorMin(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_max(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorMax(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_lerp(masVec3* Out, const masVec3* V0, const masVec3* V1, float T)
+{
+	if (Out && V0)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVectorLerp(Vec0, Vec1, T);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+float  mas_impl_vec3_angle(const masVec2* V0, const masVec2* V1)
+{
+	if (V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVector3AngleBetweenVectors(Vec0, Vec1);
+		return XMVectorGetX(Result);
+	}
+}
+
+void mas_impl_vec3_reflect(masVec3* Out, const masVec3* V, const masVec3* Normal)
+{
+	if (Out && V && Normal)
+	{
+		XMVECTOR Vec       = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR NormalVec = XMLoadFloat3((XMFLOAT3*)Normal);
+		XMVECTOR Result    = XMVector3Reflect(Vec, NormalVec);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_rotate_quat(masVec3* Out, const masVec3* V, const masVec4* Quat)
+{
+	if (Out && V && Quat)
+	{
+		XMVECTOR Vec     = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR QuatVec = XMLoadFloat4((XMFLOAT4*)Quat);
+		XMVECTOR Result  = XMVector3Rotate(Vec, QuatVec);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_perpendicular(masVec3* Out, const masVec3* V)
+{
+	if (V)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVector3Orthogonal(Vec);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+void mas_impl_vec3_clamp(masVec3* Out, const masVec3* V, float Min, float Max)
+{
+	if (Out && V)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVector3ClampLength(Vec, Min, Max);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+
+bool mas_impl_vec3_equals(const masVec3* V0, const masVec3* V1)
+{
+	if (V0 && V1)
+	{
+		XMVECTOR Vec0 = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1 = XMLoadFloat3((XMFLOAT3*)V1);
+		return XMVector3Equal(Vec0, Vec1);
+	}
+
+	return false;
+}
+
+}

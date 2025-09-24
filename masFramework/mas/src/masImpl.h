@@ -165,15 +165,12 @@ void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* Error
 * MATH: IN PROGRESS
 ****************************************************************************************************************************/
 float mas_impl_math_float_clamp(float Value, float Min, float Max);
-float mas_impl_math_float_min(float V0, float V1);
-float mas_impl_math_float_max(float V0, float V1);
-float mas_impl_math_deg_to_rad(float Degree);
-float mas_impl_math_rad_to_deg(float Radian);
+float mas_impl_math_float_min  (float V0, float V1);
+float mas_impl_math_float_max  (float V0, float V1);
+float mas_impl_math_deg_to_rad (float Degree);
+float mas_impl_math_rad_to_deg (float Radian);
 
-
-/***************************************************************************************************************************
-* 2D Vector
-****************************************************************************************************************************/
+// 2D Vector
 void  mas_impl_math_vec2_set(masVec2* Out, float x, float y);
 void  mas_impl_math_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
