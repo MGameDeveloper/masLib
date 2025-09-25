@@ -180,7 +180,7 @@ float mas_impl_math_vec2_angle(const masVec2* V0, const masVec2* V1)
 /***************************************************************************************************************************
 * 3D Vector
 ****************************************************************************************************************************/
-void mas_impl_vec3_set(masVec3* Out, float x, float y, float z)
+void  mas_impl_vec3_set(masVec3* Out, float x, float y, float z)
 {
 	if (Out)
 	{
@@ -189,8 +189,7 @@ void mas_impl_vec3_set(masVec3* Out, float x, float y, float z)
 		Out->z = z;
 	}
 }
-
-void mas_impl_vec3_add(masVec3* Out, const masVec3* V0, const masVec3* V1)
+void  mas_impl_vec3_add(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -200,8 +199,7 @@ void mas_impl_vec3_add(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_sub(masVec3* Out, const masVec3* V0, const masVec3* V1)
+void  mas_impl_vec3_sub(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -211,8 +209,7 @@ void mas_impl_vec3_sub(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_mul_scale(masVec3* Out, const masVec3* V, float Scaler)
+void  mas_impl_vec3_mul_scale(masVec3* Out, const masVec3* V, float Scaler)
 {
 	if (Out && V)
 	{
@@ -221,8 +218,7 @@ void mas_impl_vec3_mul_scale(masVec3* Out, const masVec3* V, float Scaler)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_mul(masVec3* Out, const masVec3* V0, const masVec3* V1)
+void  mas_impl_vec3_mul(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -232,8 +228,7 @@ void mas_impl_vec3_mul(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_div_scale(masVec3* Out, const masVec3* V, float Scaler)
+void  mas_impl_vec3_div_scale(masVec3* Out, const masVec3* V, float Scaler)
 {
 	if (Out && V)
 	{
@@ -243,8 +238,7 @@ void mas_impl_vec3_div_scale(masVec3* Out, const masVec3* V, float Scaler)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_div(masVec3* Out, const masVec3* V0, const masVec3* V1)
+void  mas_impl_vec3_div(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -254,8 +248,7 @@ void mas_impl_vec3_div(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_negate(masVec3* Out)
+void  mas_impl_vec3_negate(masVec3* Out)
 {
 	if (Out)
 	{
@@ -264,8 +257,7 @@ void mas_impl_vec3_negate(masVec3* Out)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-float  mas_impl_vec3_length(const masVec3* V)
+float mas_impl_vec3_length(const masVec3* V)
 {
 	if (V)
 	{
@@ -276,7 +268,6 @@ float  mas_impl_vec3_length(const masVec3* V)
 
 	return 0.0f;
 }
-
 float mas_impl_vec3_length_sq(const masVec3* V)
 {
 	if (V)
@@ -288,15 +279,38 @@ float mas_impl_vec3_length_sq(const masVec3* V)
 
 	return 0.0f;
 }
+void  mas_impl_vec3_norm(masVec3* Out, const masVec3* V)
+{
+	if (Out && V)
+	{
+		XMVECTOR Vec    = XMLoadFloat3((XMFLOAT3*)V);
+		XMVECTOR Result = XMVector3Normalize(Vec);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+float mas_impl_vec3_dot(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVector3Dot(Vec0, Vec1);
+		return XMVectorGetX(Result);
+	}
 
-void  mas_impl_vec3_norm(masVec3* Out, const masVec3* V);
-float mas_impl_vec3_dot(const masVec3* V0, const masVec3* V1);
-void  mas_impl_vec3_cross(masVec3* Out, const masVec3* V0, const masVec3* V1);
-float mas_impl_vec3_distance(const masVec3* V0, const masVec3* V1);
-float mas_impl_vec3_distance_sq(const masVec3* V0, const masVec3* V1);
-void  mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1);
-
-void mas_impl_vec3_min(masVec3* Out, const masVec3* V0, const masVec3* V1)
+	return 0.0f;
+}
+void  mas_impl_vec3_cross(masVec3* Out, const masVec3* V0, const masVec3* V1)
+{
+	if (Out && V0 && V1)
+	{
+		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
+		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);
+		XMVECTOR Result = XMVector3Cross(Vec0, Vec1);
+		XMStoreFloat3((XMFLOAT3*)Out, Result);
+	}
+}
+void  mas_impl_vec3_min(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -306,8 +320,7 @@ void mas_impl_vec3_min(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_max(masVec3* Out, const masVec3* V0, const masVec3* V1)
+void  mas_impl_vec3_max(masVec3* Out, const masVec3* V0, const masVec3* V1)
 {
 	if (Out && V0 && V1)
 	{
@@ -317,8 +330,7 @@ void mas_impl_vec3_max(masVec3* Out, const masVec3* V0, const masVec3* V1)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_lerp(masVec3* Out, const masVec3* V0, const masVec3* V1, float T)
+void  mas_impl_vec3_lerp(masVec3* Out, const masVec3* V0, const masVec3* V1, float T)
 {
 	if (Out && V0)
 	{
@@ -328,8 +340,7 @@ void mas_impl_vec3_lerp(masVec3* Out, const masVec3* V0, const masVec3* V1, floa
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-float  mas_impl_vec3_angle(const masVec2* V0, const masVec2* V1)
+float mas_impl_vec3_angle(const masVec2* V0, const masVec2* V1)
 {
 	if (V0 && V1)
 	{
@@ -339,8 +350,7 @@ float  mas_impl_vec3_angle(const masVec2* V0, const masVec2* V1)
 		return XMVectorGetX(Result);
 	}
 }
-
-void mas_impl_vec3_reflect(masVec3* Out, const masVec3* V, const masVec3* Normal)
+void  mas_impl_vec3_reflect(masVec3* Out, const masVec3* V, const masVec3* Normal)
 {
 	if (Out && V && Normal)
 	{
@@ -350,8 +360,7 @@ void mas_impl_vec3_reflect(masVec3* Out, const masVec3* V, const masVec3* Normal
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_rotate_quat(masVec3* Out, const masVec3* V, const masVec4* Quat)
+void  mas_impl_vec3_rotate_quat(masVec3* Out, const masVec3* V, const masVec4* Quat)
 {
 	if (Out && V && Quat)
 	{
@@ -361,8 +370,7 @@ void mas_impl_vec3_rotate_quat(masVec3* Out, const masVec3* V, const masVec4* Qu
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_perpendicular(masVec3* Out, const masVec3* V)
+void  mas_impl_vec3_perpendicular(masVec3* Out, const masVec3* V)
 {
 	if (V)
 	{
@@ -371,8 +379,7 @@ void mas_impl_vec3_perpendicular(masVec3* Out, const masVec3* V)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-void mas_impl_vec3_clamp(masVec3* Out, const masVec3* V, float Min, float Max)
+void  mas_impl_vec3_clamp(masVec3* Out, const masVec3* V, float Min, float Max)
 {
 	if (Out && V)
 	{
@@ -381,8 +388,7 @@ void mas_impl_vec3_clamp(masVec3* Out, const masVec3* V, float Min, float Max)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-
-bool mas_impl_vec3_equals(const masVec3* V0, const masVec3* V1)
+bool  mas_impl_vec3_equals(const masVec3* V0, const masVec3* V1)
 {
 	if (V0 && V1)
 	{
@@ -392,6 +398,99 @@ bool mas_impl_vec3_equals(const masVec3* V0, const masVec3* V1)
 	}
 
 	return false;
+}
+float mas_impl_vec3_distance(const masVec3* V0, const masVec3* V1);
+float mas_impl_vec3_distance_sq(const masVec3* V0, const masVec3* V1);
+void  mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1);
+
+
+/***************************************************************************************************************************
+* 4D Vector
+****************************************************************************************************************************/
+
+
+/***************************************************************************************************************************
+* Quaternion
+****************************************************************************************************************************/
+
+
+/***************************************************************************************************************************
+* Matrix
+****************************************************************************************************************************/
+void mas_impl_math_matrix_init(masMatrix* Out)
+{
+	if (Out)
+	{
+		XMMATRIX Identity = XMMatrixIdentity();
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Identity);
+	}
+}
+
+void mas_impl_math_matrix_mul(masMatrix* Out, const masMatrix* M0, const masMatrix* M1)
+{
+	if (Out && M0 && M1)
+	{
+		XMMATRIX Mat0   = XMLoadFloat4x4((XMFLOAT4X4*)M0);
+		XMMATRIX Mat1   = XMLoadFloat4x4((XMFLOAT4X4*)M1);
+		XMMATRIX Result = XMMatrixMultiply(Mat0, Mat1);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
+}
+
+void mas_impl_math_matrix_transpose(masMatrix* Out, const masMatrix* M)
+{
+	if (Out && M)
+	{
+		XMMATRIX Mat    = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMATRIX Result = XMMatrixTranspose(Mat);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
+}
+
+void mas_impl_math_matrix_inverse(masMatrix* Out, const masMatrix* M)
+{
+	if (Out && M)
+	{
+		XMMATRIX Mat = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMVECTOR Det = XMMatrixDeterminant(Mat);
+		XMMATRIX Result = XMMatrixInverse(&Det, Mat);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
+}
+
+void mas_impl_math_matrix_translate(masMatrix* Out, const masMatrix* M, const masVec3* V)
+{
+	if (Out && M && V)
+	{
+		XMMATRIX Mat    = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMATRIX Result = Mat * XMMatrixTranslation(V->x, V->y, V->z);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
+}
+
+void mas_impl_math_matrix_rotate_euler(masMatrix* Out, const masMatrix* M, const masVec3* Euler)
+{
+	if (Out && M && Euler)
+	{
+		XMMATRIX Mat       = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMATRIX RotateMat = XMMatrixRotationX(Euler->x);
+		RotateMat         *= XMMatrixRotationY(Euler->y);
+		RotateMat         *= XMMatrixRotationZ(Euler->z);
+		XMMATRIX Result = Mat * RotateMat;
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
+}
+
+void mas_impl_math_matrix_rotate_quaternion();
+
+void mas_impl_math_matrix_scale(masMatrix* Out, const masMatrix* M, const masVec3* V)
+{
+	if (Out && M && V)
+	{
+		XMMATRIX Mat    = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMATRIX Result = Mat * XMMatrixScaling(V->x, V->y, V->z);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
+	}
 }
 
 }

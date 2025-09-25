@@ -170,20 +170,21 @@ float mas_impl_math_float_max  (float V0, float V1);
 float mas_impl_math_deg_to_rad (float Degree);
 float mas_impl_math_rad_to_deg (float Radian);
 
+
 // 2D Vector
 void  mas_impl_math_vec2_set(masVec2* Out, float x, float y);
 void  mas_impl_math_vec2_add(masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_sub(masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_math_vec2_scale(masVec2* Out, const masVec2* V, float Scaler);
+void  mas_impl_math_vec2_mul_scale(masVec2* Out, const masVec2* V, float Scaler);
 void  mas_impl_math_vec2_mul(masVec2* Out, const masVec2* V0, const masVec2* V1);
-void  mas_impl_math_vec2_div_float(masVec2* Out, const masVec2* V, float Scaler);
+void  mas_impl_math_vec2_div_scale(masVec2* Out, const masVec2* V, float Scaler);
 void  mas_impl_math_vec2_div(masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_negate(masVec2* Out, const masVec2* V);
 void  mas_impl_math_vec2_min(masVec2* Out, const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_max(masVec2* Out, const masVec2* V0, const masVec2* V1);
 float mas_impl_math_vec2_distance(const masVec2* V0, const masVec2* V1);
 float mas_impl_math_vec2_mag(const masVec2* V);
-void  mas_impl_math_vec2_perp(masVec2* Out, const masVec2* V);
+void  mas_impl_math_vec2_perpendicular(masVec2* Out, const masVec2* V);
 void  mas_impl_math_vec2_norm(masVec2* Out, const masVec2* V);
 float mas_impl_math_vec2_dot(const masVec2* V0, const masVec2* V1);
 void  mas_impl_math_vec2_lerp(masVec2* Out, const masVec2* V0, const masVec2* V1, float T);
@@ -193,7 +194,33 @@ bool  mas_impl_math_vec2_near(const masVec2* V0, const masVec2* V1, const masVec
 void  mas_impl_math_vec2_reflect(masVec2* Out, const masVec2* V, const masVec2* Normal);
 float mas_impl_math_vec2_angle(const masVec2* V0, const masVec2* V1);
 
+
 // Vec3 API
+void   mas_impl_vec3_set(masVec3 * Out, float x, float y, float z);
+void   mas_impl_vec3_add(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_sub(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_mul_scale(masVec3 * Out, const masVec3 * V, float Scaler);
+void   mas_impl_vec3_mul(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_div_scale(masVec3 * Out, const masVec3 * V, float Scaler);
+void   mas_impl_vec3_div(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_negate(masVec3 * Out);
+float  mas_impl_vec3_length(const masVec3 * V);
+float  mas_impl_vec3_length_sq(const masVec3 * V);
+void   mas_impl_vec3_norm(masVec3 * Out, const masVec3 * V);
+float  mas_impl_vec3_dot(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_cross(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_min(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_max(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_impl_vec3_lerp(masVec3 * Out, const masVec3 * V0, const masVec3 * V1, float T);
+float  mas_impl_vec3_angle(const masVec2 * V0, const masVec2 * V1);
+void   mas_impl_vec3_reflect(masVec3 * Out, const masVec3 * V, const masVec3 * Normal);
+void   mas_impl_vec3_rotate_quat(masVec3 * Out, const masVec3 * V, const masVec4 * Quat);
+void   mas_impl_vec3_perpendicular(masVec3 * Out, const masVec3 * V);
+void   mas_impl_vec3_clamp(masVec3 * Out, const masVec3 * V, float Min, float Max);
+bool   mas_impl_vec3_equals(const masVec3 * V0, const masVec3 * V1);
+float  mas_impl_vec3_distance(const masVec3* V0, const masVec3* V1);
+float  mas_impl_vec3_distance_sq(const masVec3* V0, const masVec3* V1);
+void   mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1);
 
 // Vec4 API
 
