@@ -481,7 +481,16 @@ void mas_impl_math_matrix_rotate_euler(masMatrix* Out, const masMatrix* M, const
 	}
 }
 
-void mas_impl_math_matrix_rotate_quaternion();
+void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix *M, const masVec4* Q)
+{
+	if (Out && M && Q)
+	{
+		XMVECTOR Quat   = XMLoadFloat4((XMFLOAT4*)Q);
+		XMMATRIX Mat    = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMATRIX Result = XMMatrixRotationQuaternion(Quat);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Mat);
+	}
+}
 
 void mas_impl_math_matrix_scale(masMatrix* Out, const masMatrix* M, const masVec3* V)
 {

@@ -214,7 +214,7 @@ void   mas_impl_vec3_max(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
 void   mas_impl_vec3_lerp(masVec3 * Out, const masVec3 * V0, const masVec3 * V1, float T);
 float  mas_impl_vec3_angle(const masVec2 * V0, const masVec2 * V1);
 void   mas_impl_vec3_reflect(masVec3 * Out, const masVec3 * V, const masVec3 * Normal);
-void   mas_impl_vec3_rotate_quat(masVec3 * Out, const masVec3 * V, const masVec4 * Quat);
+void   mas_impl_vec3_rotate_quaternion(masVec3 * Out, const masVec3 * V, const masVec4 * Quat);
 void   mas_impl_vec3_perpendicular(masVec3 * Out, const masVec3 * V);
 void   mas_impl_vec3_clamp(masVec3 * Out, const masVec3 * V, float Min, float Max);
 bool   mas_impl_vec3_equals(const masVec3 * V0, const masVec3 * V1);
@@ -222,6 +222,27 @@ float  mas_impl_vec3_distance(const masVec3* V0, const masVec3* V1);
 float  mas_impl_vec3_distance_sq(const masVec3* V0, const masVec3* V1);
 void   mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1);
 
-// Vec4 API
+
+// Euler
+void mas_impl_math_euler_from_quaternion(masVec3 * Out, const masVec4 * Quaternion);
+
+
+// Quaternion API
+void mas_impl_math_quaternion_init(masVec4 * Out);
+void mas_impl_math_quaternion_from_euler(masVec4 * Out, const masVec3 * Euler);
+
 
 // Matrix API
+void mas_impl_math_matrix_init(masMatrix * Out);
+void mas_impl_math_matrix_multiply(masMatrix* Out, const masMatrix* M0, const masMatrix* M1);
+void mas_impl_math_matrix_transpose(masMatrix* Out, const masMatrix* M);
+void mas_impl_math_matrix_inverse(masMatrix* Out, const masMatrix* M);
+void mas_impl_math_matrix_translate(masMatrix* Out, const masMatrix* M, const masVec3* V);
+void mas_impl_math_matrix_rotate_euler(masMatrix* Out, const masMatrix* M, const masVec3* Euler);
+void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix* M, const masVec4* Q);
+void mas_impl_math_matrix_scale(masMatrix* Out, const masMatrix* M, const masVec3* V);
+void mas_impl_math_matrix_transform(masMatrix * Out, const masVec3 * Translate, const masVec3 * Euler, const masVec3 * Scale);
+void mas_impl_math_matrix_perspective();
+void mas_impl_math_matrix_orthographic();
+void mas_impl_math_matrix_view();
+void mat_impl_math_matrix_decompose();
