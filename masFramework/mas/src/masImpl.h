@@ -140,7 +140,7 @@ void           mas_impl_directory_file_group_destroy(masFileGroup** FileGroup);
 
 
 /***************************************************************************************************************************
-* LOG: IN PROGRESS
+* LOG: DONE
 ****************************************************************************************************************************/
 void mas_impl_log(const char* Text, ...);
 void mas_impl_log_va_list(const char* Text, va_list Args);
@@ -162,7 +162,7 @@ void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* Error
 
 
 /***************************************************************************************************************************
-* MATH: IN PROGRESS
+* MATH: PARTIALLY DONE
 ****************************************************************************************************************************/
 float mas_impl_math_float_clamp(float Value, float Min, float Max);
 float mas_impl_math_float_min  (float V0, float V1);
@@ -214,7 +214,7 @@ void   mas_impl_vec3_max(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
 void   mas_impl_vec3_lerp(masVec3 * Out, const masVec3 * V0, const masVec3 * V1, float T);
 float  mas_impl_vec3_angle(const masVec2 * V0, const masVec2 * V1);
 void   mas_impl_vec3_reflect(masVec3 * Out, const masVec3 * V, const masVec3 * Normal);
-void   mas_impl_vec3_rotate_quaternion(masVec3 * Out, const masVec3 * V, const masVec4 * Quat);
+void   mas_impl_vec3_rotate_quaternion(masVec3 * Out, const masVec3 * V, const masQuaternion * Quat);
 void   mas_impl_vec3_perpendicular(masVec3 * Out, const masVec3 * V);
 void   mas_impl_vec3_clamp(masVec3 * Out, const masVec3 * V, float Min, float Max);
 bool   mas_impl_vec3_equals(const masVec3 * V0, const masVec3 * V1);
@@ -224,12 +224,12 @@ void   mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V
 
 
 // Euler
-void mas_impl_math_euler_from_quaternion(masVec3 * Out, const masVec4 * Quaternion);
+void mas_impl_math_euler_from_quaternion(masVec3 * Out, const masQuaternion * Quaternion);
 
 
 // Quaternion API
-void mas_impl_math_quaternion_init(masVec4 * Out);
-void mas_impl_math_quaternion_from_euler(masVec4 * Out, const masVec3 * Euler);
+void mas_impl_math_quaternion_init(masQuaternion * Out);
+void mas_impl_math_quaternion_from_euler(masQuaternion * Out, const masVec3 * Euler);
 
 
 // Matrix API
@@ -239,10 +239,19 @@ void mas_impl_math_matrix_transpose(masMatrix* Out, const masMatrix* M);
 void mas_impl_math_matrix_inverse(masMatrix* Out, const masMatrix* M);
 void mas_impl_math_matrix_translate(masMatrix* Out, const masMatrix* M, const masVec3* V);
 void mas_impl_math_matrix_rotate_euler(masMatrix* Out, const masMatrix* M, const masVec3* Euler);
-void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix* M, const masVec4* Q);
+void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix* M, const masQuaternion* Q);
 void mas_impl_math_matrix_scale(masMatrix* Out, const masMatrix* M, const masVec3* V);
 void mas_impl_math_matrix_transform(masMatrix * Out, const masVec3 * Translate, const masVec3 * Euler, const masVec3 * Scale);
-void mas_impl_math_matrix_perspective();
-void mas_impl_math_matrix_orthographic();
+void mas_impl_math_matrix_perspective(masMatrix * Out, float Fov, float AspectRatio, float NearZ, float FarZ);
+void mas_impl_math_matrix_orthographic(masMatrix * Out, float ViewWidth, float ViewHeight, float NearZ, float FarZ);
 void mas_impl_math_matrix_view();
-void mat_impl_math_matrix_decompose();
+void mat_impl_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, masQuaternion * OutQuat, masVec3 * OutTranslate);
+
+
+/***************************************************************************************************************************
+* STRING: IN PROGRESS
+****************************************************************************************************************************/
+
+masString* mas_impl_string_create(const char* Text, ...);
+void       mas_impl_string_destroy(masString *String);
+void       mas_impl_string_append(masString* String, const char* Text, ...);

@@ -360,12 +360,12 @@ void  mas_impl_vec3_reflect(masVec3* Out, const masVec3* V, const masVec3* Norma
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-void  mas_impl_vec3_rotate_quat(masVec3* Out, const masVec3* V, const masVec4* Quat)
+void  mas_impl_vec3_rotate_quaternion(masVec3* Out, const masVec3* V, const masQuaternion* Q)
 {
-	if (Out && V && Quat)
+	if (Out && V && Q)
 	{
 		XMVECTOR Vec     = XMLoadFloat3((XMFLOAT3*)V);
-		XMVECTOR QuatVec = XMLoadFloat4((XMFLOAT4*)Quat);
+		XMVECTOR QuatVec = XMLoadFloat4((XMFLOAT4*)Q);
 		XMVECTOR Result  = XMVector3Rotate(Vec, QuatVec);
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
@@ -412,6 +412,24 @@ void  mas_impl_vec3_direction(masVec3* Out, const masVec3* V0, const masVec3* V1
 /***************************************************************************************************************************
 * Quaternion
 ****************************************************************************************************************************/
+void mas_impl_math_quaternion_init(masQuaternion* Out)
+{
+	if (Out)
+	{
+		*Out = { 0.0 };
+		Out->w = 1.f;
+	}
+}
+
+void mas_impl_math_quaternion_from_euler(masQuaternion* Out, const masVec3* Euler)
+{
+	if (Out && Euler)
+	{
+		XMVECTOR EulerVec = XMLoadFloat3((XMFLOAT3*)Euler);
+		XMVECTOR Quat     = XMQuaternionRotationRollPitchYawFromVector(EulerVec);
+		XMStoreFloat4((XMFLOAT4*)Out, Quat);
+	}
+}
 
 
 /***************************************************************************************************************************
@@ -426,7 +444,7 @@ void mas_impl_math_matrix_init(masMatrix* Out)
 	}
 }
 
-void mas_impl_math_matrix_mul(masMatrix* Out, const masMatrix* M0, const masMatrix* M1)
+void mas_impl_math_matrix_multiply(masMatrix* Out, const masMatrix* M0, const masMatrix* M1)
 {
 	if (Out && M0 && M1)
 	{
@@ -481,7 +499,7 @@ void mas_impl_math_matrix_rotate_euler(masMatrix* Out, const masMatrix* M, const
 	}
 }
 
-void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix *M, const masVec4* Q)
+void mas_impl_math_matrix_rotate_quaternion(masMatrix* Out, const masMatrix *M, const masQuaternion* Q)
 {
 	if (Out && M && Q)
 	{
@@ -500,6 +518,48 @@ void mas_impl_math_matrix_scale(masMatrix* Out, const masMatrix* M, const masVec
 		XMMATRIX Result = Mat * XMMatrixScaling(V->x, V->y, V->z);
 		XMStoreFloat4x4((XMFLOAT4X4*)Out, Result);
 	}
+}
+
+void mas_impl_math_matrix_transform(masMatrix* Out, const masVec3* Translate, const masVec3* Euler, const masVec3* Scale);
+
+void mas_impl_math_matrix_perspective(masMatrix* Out, float Fov, float AspectRatio, float NearZ, float FarZ)
+{
+	if (Out)
+	{
+		XMMATRIX Mat = XMMatrixPerspectiveFovLH(Fov, AspectRatio, NearZ, FarZ);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Mat);
+	}
+}
+
+void mas_impl_math_matrix_orthographic(masMatrix* Out, float ViewWidth, float ViewHeight, float NearZ, float FarZ)
+{
+	if (Out)
+	{
+		XMMATRIX Mat = XMMatrixOrthographicLH(ViewWidth, ViewHeight, NearZ, FarZ);
+		XMStoreFloat4x4((XMFLOAT4X4*)Out, Mat);
+	}
+}
+
+void mas_impl_math_matrix_view();
+
+void mat_impl_math_matrix_decompose(const masMatrix* M, masVec3* OutScale, masQuaternion* OutQuat, masVec3* OutTranslate)
+{
+	if (M)
+	{
+		XMVECTOR Scale, Quat, Translate;
+		XMMATRIX Mat = XMLoadFloat4x4((XMFLOAT4X4*)M);
+		XMMatrixDecompose(&Scale, &Quat, &Translate, Mat);
+
+		if (OutScale)
+			XMStoreFloat3((XMFLOAT3*)OutScale, Scale);
+
+		if (OutQuat)
+			XMStoreFloat4((XMFLOAT4*)OutQuat, Quat);
+
+		if (OutTranslate)
+			XMStoreFloat3((XMFLOAT3*)OutTranslate, Translate);
+	}
+
 }
 
 }

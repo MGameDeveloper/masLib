@@ -196,7 +196,7 @@ typedef void(*masInputControllerConnectionCallback)(masInputUser User, bool IsCo
 
 
 /********************************************************************************************************
-* MATH: IN PROGRESS
+* MATH:
 *********************************************************************************************************/
 typedef union _masVec2
 {
@@ -225,6 +225,15 @@ typedef union _masVec4
     };
 } masVec4;
 
+typedef union _masQuaternion
+{
+    float xyzw[4];
+    struct
+    {
+        float x, y, z, w;
+    };
+} masQuaternion;
+
 typedef union _masMat4x4
 {
     float m16[16];
@@ -237,3 +246,10 @@ typedef union _masMat4x4
         masVec4 r3;
     };
 } masMatrix;
+
+
+/***************************************************************************************************************************
+* STRING
+****************************************************************************************************************************/
+
+typedef struct _masString masString;
