@@ -251,7 +251,18 @@ void mat_impl_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, mas
 /***************************************************************************************************************************
 * STRING: IN PROGRESS
 ****************************************************************************************************************************/
-
-masString* mas_impl_string_create(const char* Text, ...);
-void       mas_impl_string_destroy(masString *String);
-void       mas_impl_string_append(masString* String, const char* Text, ...);
+masString*  mas_impl_string_create(const char* Text, ...);
+masString*  mas_impl_string_copy(const masString* String);
+void        mas_impl_string_destroy(masString* String);
+void        mas_impl_string_append_cstr(masString* Out, const char* Text, ...);
+void        mas_impl_string_insert_cstr(masString* Out, int32_t At, const char* Text, ...);
+void        mas_impl_string_append(masString* Out, const masString * String);
+void        mas_impl_string_insert(masString* Out, int32_t At, const masString* String);
+int32_t     mas_impl_string_find_first(masString* String, const char* Target);
+int32_t     mas_impl_string_find_last(masString* String, const char* Target);
+uint64_t    mas_impl_string_hash(const masString* String);
+masString*  mas_impl_string_substring(const masString* String, int32_t Index, int32_t Size);
+bool        mas_impl_string_compare_cstr(const masString* String, const char* Text);
+bool        mas_impl_string_compare(const masString* Sting1, const masString* String2);
+uint64_t    mas_impl_string_length(const masString* String);
+const char* mas_impl_string_cstr(const masString* String);
