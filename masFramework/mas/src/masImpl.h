@@ -20,6 +20,8 @@ void  mas_impl_memory_leak_detect();
 #define MAS_IMPL_REALLOC(type, ptr, size) (type*)mas_impl_memory_resize(ptr,  size, __FILE__, __LINE__)
 #define MAS_IMPL_FREE(ptr)                       mas_impl_memory_free  (ptr,        __FILE__, __LINE__)
 
+#define MAS_IMPL_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
+
 
 /***************************************************************************************************************************
 * WINDOW: PARTIALLY DONE, PENDING( MOUSE_ENABLE_CAPTURE, ENABLE_FULLSCREEN )
@@ -251,18 +253,19 @@ void mat_impl_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, mas
 /***************************************************************************************************************************
 * STRING: IN PROGRESS
 ****************************************************************************************************************************/
-masString*  mas_impl_string_create(const char* Text, ...);
+masString*  mas_impl_string_create_from_cstr(const char* Text, ...);
+masString*  mas_impl_string_create_from_size(uint32_t Size);
 masString*  mas_impl_string_copy(const masString* String);
 void        mas_impl_string_destroy(masString** String);
 void        mas_impl_string_append_cstr(masString** Out, const char* Text, ...);
-void        mas_impl_string_insert_cstr(masString* Out, int32_t At, const char* Text, ...);
-void        mas_impl_string_append(masString* Out, const masString * String);
-void        mas_impl_string_insert(masString* Out, int32_t At, const masString* String);
-int32_t     mas_impl_string_find_first(masString* String, const char* Target);
-int32_t     mas_impl_string_find_last(masString* String, const char* Target);
+void        mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, ...);
+void        mas_impl_string_append(masString** Out, const masString * String);
+void        mas_impl_string_insert(masString** Out, int32_t At, const masString* String);
+int32_t     mas_impl_string_find_first(masString* String, const char* Target, uint32_t TargetLen);
+int32_t     mas_impl_string_find_last(masString* String, const char* Target , uint32_t TargetLen);
 uint64_t    mas_impl_string_hash(const masString* String);
 masString*  mas_impl_string_substring(const masString* String, int32_t Index, int32_t Size);
 bool        mas_impl_string_compare_cstr(const masString* String, const char* Text);
-bool        mas_impl_string_compare(const masString* Sting1, const masString* String2);
+bool        mas_impl_string_compare(const masString* String1, const masString* String2);
 uint64_t    mas_impl_string_length(const masString* String);
 const char* mas_impl_string_cstr(const masString* String);
