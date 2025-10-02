@@ -51,6 +51,9 @@
     <ClCompile Include="mas\src\masMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mas\src\masString.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mas\src\masImpl.h">

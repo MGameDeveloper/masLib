@@ -6,7 +6,7 @@
 
 void mas_impl_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...)
 {
-    if (Condition)
+    if (!Condition)
     {
         va_list Args;
         va_start(Args, ErrorMsg);
@@ -17,7 +17,7 @@ void mas_impl_assert(bool Condition, const char* Desc, const char* ErrorMsg, ...
 
 void mas_impl_assert_va_list(bool Condition, const char* Desc, const char* ErrorMsg, va_list Args)
 {
-    if (Condition)
+    if (!Condition)
     {
         char Buf[512] = { 0 };
         vsprintf(Buf, ErrorMsg, Args);

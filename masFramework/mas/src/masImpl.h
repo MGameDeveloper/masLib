@@ -253,8 +253,8 @@ void mat_impl_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, mas
 ****************************************************************************************************************************/
 masString*  mas_impl_string_create(const char* Text, ...);
 masString*  mas_impl_string_copy(const masString* String);
-void        mas_impl_string_destroy(masString* String);
-void        mas_impl_string_append_cstr(masString* Out, const char* Text, ...);
+void        mas_impl_string_destroy(masString** String);
+void        mas_impl_string_append_cstr(masString** Out, const char* Text, ...);
 void        mas_impl_string_insert_cstr(masString* Out, int32_t At, const char* Text, ...);
 void        mas_impl_string_append(masString* Out, const masString * String);
 void        mas_impl_string_insert(masString* Out, int32_t At, const masString* String);
