@@ -209,7 +209,7 @@ void   mas_impl_vec3_negate(masVec3 * Out);
 float  mas_impl_vec3_length(const masVec3 * V);
 float  mas_impl_vec3_length_sq(const masVec3 * V);
 void   mas_impl_vec3_norm(masVec3 * Out, const masVec3 * V);
-float  mas_impl_vec3_dot(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+float  mas_impl_vec3_dot(const masVec3 * V0, const masVec3 * V1);
 void   mas_impl_vec3_cross(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
 void   mas_impl_vec3_min(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
 void   mas_impl_vec3_max(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
@@ -253,12 +253,12 @@ void mat_impl_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, mas
 /***************************************************************************************************************************
 * STRING: IN PROGRESS
 ****************************************************************************************************************************/
-masString*  mas_impl_string_create_from_cstr(const char* Text, ...);
+masString*  mas_impl_string_create_from_cstr(const char* Text, va_list Args);
 masString*  mas_impl_string_create_from_size(uint32_t Size);
 masString*  mas_impl_string_copy(const masString* String);
 void        mas_impl_string_destroy(masString** String);
-void        mas_impl_string_append_cstr(masString** Out, const char* Text, ...);
-void        mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, ...);
+void        mas_impl_string_append_cstr(masString** Out, const char* Text, va_list Args);
+void        mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, va_list Args);
 void        mas_impl_string_append(masString** Out, const masString * String);
 void        mas_impl_string_insert(masString** Out, int32_t At, const masString* String);
 int32_t     mas_impl_string_find_first(masString* String, const char* Target, uint32_t TargetLen);
@@ -269,3 +269,8 @@ bool        mas_impl_string_compare_cstr(const masString* String, const char* Te
 bool        mas_impl_string_compare(const masString* String1, const masString* String2);
 uint64_t    mas_impl_string_length(const masString* String);
 const char* mas_impl_string_cstr(const masString* String);
+
+
+/****************************************************************************************************************************
+*
+*****************************************************************************************************************************/

@@ -288,9 +288,9 @@ void  mas_impl_vec3_norm(masVec3* Out, const masVec3* V)
 		XMStoreFloat3((XMFLOAT3*)Out, Result);
 	}
 }
-float mas_impl_vec3_dot(masVec3* Out, const masVec3* V0, const masVec3* V1)
+float mas_impl_vec3_dot(const masVec3* V0, const masVec3* V1)
 {
-	if (Out && V0 && V1)
+	if (V0 && V1)
 	{
 		XMVECTOR Vec0   = XMLoadFloat3((XMFLOAT3*)V0);
 		XMVECTOR Vec1   = XMLoadFloat3((XMFLOAT3*)V1);

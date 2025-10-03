@@ -64,19 +64,14 @@ static void mas_impl_string_internal_insert(masString** Out, int32_t At, masStri
 /*******************************************************************************************************************
 *
 ********************************************************************************************************************/
-masString* mas_impl_string_create_from_cstr(const char* Text, ...)
+masString* mas_impl_string_create_from_cstr(const char* Text, va_list Args)
 {
 	if (Text)
 	{
-		char TempBuf[512] = { 0 };
-
-		va_list Args;
-		va_start(Args, Text);
-		int32_t Count = vsprintf_s(TempBuf, 512, Text, Args);
-		va_end(Args);
-
+		char       TempBuf[512] = { 0 };
+		int32_t    Count   = vsprintf_s(TempBuf, 512, Text, Args);
 		uint64_t   MemSize = sizeof(masString) + (sizeof(char) * Count);
-		masString* String = MAS_IMPL_MALLOC(masString, MemSize);
+		masString* String  = MAS_IMPL_MALLOC(masString, MemSize);
 		MAS_IMPL_ASSERT(String != NULL, "MAS_STRING", "mas_impl_string_create: allocationi failed for -> %s", TempBuf);
 
 		String->Data = MAS_IMPL_PTR_OFFSET(char, String, sizeof(masString));
@@ -124,23 +119,18 @@ void mas_impl_string_destroy(masString** String)
 	}
 }
 
-void mas_impl_string_append_cstr(masString** Out, const char* Text, ...)
+void mas_impl_string_append_cstr(masString** Out, const char* Text, va_list Args)
 {
 	if (Out && *Out && Text)
 	{
-		char TempBuf[512] = { 0 };
-
-		va_list Args;
-		va_start(Args, Text);
-		int32_t Count = vsprintf_s(TempBuf, 512, Text, Args);
-		va_end(Args);
-
+		char     TempBuf[512] = { 0 };
+		int32_t   Count = vsprintf_s(TempBuf, 512, Text, Args);
 		masString Other = { TempBuf, Count };
 		mas_impl_string_internal_insert(Out, (*Out)->Size, &Other);
 	}
 }
 
-void mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, ...)
+void mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, va_list Args)
 {
 	masString* pOut = NULL;
 	if (Out && *Out)
@@ -150,13 +140,8 @@ void mas_impl_string_insert_cstr(masString** Out, int32_t At, const char* Text, 
 
 	if (At > 0 && At < pOut->Size && Text)
 	{
-		char TempBuf[512] = { 0 };
-
-		va_list Args;
-		va_start(Args, Text);
-		int32_t Count = vsprintf_s(TempBuf, 512, Text, Args);
-		va_end(Args);
-
+		char      TempBuf[512] = { 0 };
+		int32_t   Count = vsprintf_s(TempBuf, 512, Text, Args);
 		masString Other = { TempBuf, Count };
 		mas_impl_string_internal_insert(Out, At, &Other);
 	}

@@ -147,6 +147,78 @@ void  mas_math_vec2_reflect(masVec2* Out, const masVec2* V, const masVec2* Norma
 float mas_math_vec2_angle(const masVec2* V0, const masVec2* V1);
 
 
+// Vec3 API
+void   mas_vec3_set(masVec3 * Out, float x, float y, float z);
+void   mas_vec3_add(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_sub(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_mul_scale(masVec3 * Out, const masVec3 * V, float Scaler);
+void   mas_vec3_mul(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_div_scale(masVec3 * Out, const masVec3 * V, float Scaler);
+void   mas_vec3_div(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_negate(masVec3 * Out);
+float  mas_vec3_length(const masVec3 * V);
+float  mas_vec3_length_sq(const masVec3 * V);
+void   mas_vec3_norm(masVec3 * Out, const masVec3 * V);
+float  mas_vec3_dot(const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_cross(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_min(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_max(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_lerp(masVec3 * Out, const masVec3 * V0, const masVec3 * V1, float T);
+float  mas_vec3_angle(const masVec2 * V0, const masVec2 * V1);
+void   mas_vec3_reflect(masVec3 * Out, const masVec3 * V, const masVec3 * Normal);
+void   mas_vec3_rotate_quaternion(masVec3 * Out, const masVec3 * V, const masQuaternion * Quat);
+void   mas_vec3_perpendicular(masVec3 * Out, const masVec3 * V);
+void   mas_vec3_clamp(masVec3 * Out, const masVec3 * V, float Min, float Max);
+bool   mas_vec3_equals(const masVec3 * V0, const masVec3 * V1);
+float  mas_vec3_distance(const masVec3 * V0, const masVec3 * V1);
+float  mas_vec3_distance_sq(const masVec3 * V0, const masVec3 * V1);
+void   mas_vec3_direction(masVec3 * Out, const masVec3 * V0, const masVec3 * V1);
+
+
+// Euler
+void mas_math_euler_from_quaternion(masVec3 * Out, const masQuaternion * Quaternion);
+
+
+// Quaternion API
+void mas_math_quaternion_init(masQuaternion * Out);
+void mas_math_quaternion_from_euler(masQuaternion * Out, const masVec3 * Euler);
+
+
+// Matrix API
+void mas_math_matrix_init(masMatrix * Out);
+void mas_math_matrix_multiply(masMatrix * Out, const masMatrix * M0, const masMatrix * M1);
+void mas_math_matrix_transpose(masMatrix * Out, const masMatrix * M);
+void mas_math_matrix_inverse(masMatrix * Out, const masMatrix * M);
+void mas_math_matrix_translate(masMatrix * Out, const masMatrix * M, const masVec3 * V);
+void mas_math_matrix_rotate_euler(masMatrix * Out, const masMatrix * M, const masVec3 * Euler);
+void mas_math_matrix_rotate_quaternion(masMatrix * Out, const masMatrix * M, const masQuaternion * Q);
+void mas_math_matrix_scale(masMatrix * Out, const masMatrix * M, const masVec3 * V);
+void mas_math_matrix_transform(masMatrix * Out, const masVec3 * Translate, const masVec3 * Euler, const masVec3 * Scale);
+void mas_math_matrix_perspective(masMatrix * Out, float Fov, float AspectRatio, float NearZ, float FarZ);
+void mas_math_matrix_orthographic(masMatrix * Out, float ViewWidth, float ViewHeight, float NearZ, float FarZ);
+void mas_math_matrix_view();
+void mat_math_matrix_decompose(const masMatrix * M, masVec3 * OutScale, masQuaternion * OutQuat, masVec3 * OutTranslate);
+
+
+/***************************************************************************************************************************
+* STRING: IN PROGRESS
+****************************************************************************************************************************/
+masString*  mas_string_create_from_cstr(const char* Text, ...);
+masString*  mas_string_create_from_size(uint32_t Size);
+masString*  mas_string_copy(const masString * String);
+void        mas_string_destroy(masString * *String);
+void        mas_string_append_cstr(masString * *Out, const char* Text, ...);
+void        mas_string_insert_cstr(masString * *Out, int32_t At, const char* Text, ...);
+void        mas_string_append(masString * *Out, const masString * String);
+void        mas_string_insert(masString * *Out, int32_t At, const masString * String);
+int32_t     mas_string_find_first(masString * String, const char* Target, uint32_t TargetLen);
+int32_t     mas_string_find_last(masString * String, const char* Target, uint32_t TargetLen);
+uint64_t    mas_string_hash(const masString * String);
+masString*  mas_string_substring(const masString * String, int32_t Index, int32_t Size);
+bool        mas_string_compare_cstr(const masString * String, const char* Text);
+bool        mas_string_compare(const masString * String1, const masString * String2);
+uint64_t    mas_string_length(const masString * String);
+const char* mas_string_cstr(const masString * String);
 
 
 #if 0
