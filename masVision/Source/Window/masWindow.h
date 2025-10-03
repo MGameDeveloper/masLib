@@ -1,19 +1,8 @@
 #pragma once
 
-class masWindow
-{
-private:
-	struct GLFWwindow *Handle;
+#include "masCommon.h"
 
-	int32_t Width;
-	int32_t Height;
-
-public:
-	masWindow(int32_t InWidth, int32_t InHeight);
-	~masWindow();
-	masWindow(const masWindow& Other)            = delete;
-	masWindow(masWindow&& Other)                 = delete;
-	masWindow& operator=(const masWindow& Other) = delete;
-	masWindow& operator=(masWindow&& Other)      = delete;
-};
-
+bool masWindow_Init(const char* Title, int32_t Width, int32_t Height);
+void masWindow_Terminate();
+bool masWindow_IsClosed();
+void masWindow_PeekMessages();

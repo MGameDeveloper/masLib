@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-#include "Window/masWindow.h"
+#include "masCommon.h"
 
 
-
+bool    masVision_Init();
+int32_t masVision_Launch();

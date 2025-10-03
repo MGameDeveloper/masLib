@@ -8,18 +8,34 @@
 #pragma comment(lib, "glfw3.lib")
 
 
-masWindow::masWindow(int32_t InWidth, int32_t InHeight) : 
-	Handle(nullptr), 
-	Width(InWidth), 
-	Height(InHeight)
+static GLFWwindow* GWindow = nullptr;
+
+bool masWindow_Init(const char* Title, int32_t Width, int32_t Height)
 {
-	Handle = glfwCreateWindow(Width, Height, "masVision", nullptr, nullptr);
+	if (!glfwInit())
+		return false;
+
+	GWindow = glfwCreateWindow(Width, Height, Title, nullptr, nullptr);
+	if (!GWindow)
+	{
+		glfwTerminate();
+		return NULL;
+	}
+
+	return true;
 }
 
-masWindow::~masWindow()
+void masWindow_Terminate()
 {
-	if (Handle)
-	{
-		glfwDestroyWindow(Handle);
-	}
+	glfwTerminate();
+}
+
+bool masWindow_IsClosed()
+{
+	return glfwWindowShouldClose(GWindow);
+}
+
+void masWindow_PeekMessages()
+{
+	glfwPollEvents();
 }
