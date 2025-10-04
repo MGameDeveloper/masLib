@@ -92,5 +92,12 @@ void masGraphics_Terminate()
 
 void masGraphics_Render()
 {
+	float ClearColor[4] = { 0.3f, 0.3f, 0.3f, 0.f };
+	ID3D11RenderTargetView* pRTV = D3D11.RenderTargetView.Get();
+	D3D11.ImmediateContext->ClearRenderTargetView(pRTV, ClearColor);
 
+	//
+
+	D3D11.SwapChain->Present(0, 0);
 }
+
