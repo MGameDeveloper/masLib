@@ -39,3 +39,10 @@ void masWindow_PeekMessages()
 {
 	glfwPollEvents();
 }
+
+const void* masWindow_NativeHandle()
+{
+	if (!GWindow)
+		return nullptr;
+	return glfwGetWin32Window(GWindow);
+}

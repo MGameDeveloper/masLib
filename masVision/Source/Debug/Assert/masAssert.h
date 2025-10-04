@@ -2,7 +2,7 @@
 
 struct masAssert
 {
-	static void Assert(bool Condition, const char* File, int32_t Line, const char* Description, ...);
+	static void Assert(bool Condition, const char* File, int Line, const char* Description, ...);
 };
 
 #define MAS_ASSERT(Condition, Description, ...)\

@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void masAssert::Assert(bool Condition, const char* File, int32_t Line, const char* Description, ...)
+void masAssert::Assert(bool Condition, const char* File, int Line, const char* Description, ...)
 {
 	if (!Condition)
 	{
