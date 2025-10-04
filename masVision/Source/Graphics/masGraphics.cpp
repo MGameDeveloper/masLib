@@ -81,7 +81,7 @@ bool masGraphics_Init(const void* Window, uint32_t Width, uint32_t Height)
 	D3D11.ImmediateContext = pImmediateContext;
 	D3D11.SwapChain        = pSwapChain1;
 	D3D11.RenderTargetView = pRenderTargetView;
-
+	
 	return true;
 }
 
@@ -92,8 +92,5 @@ void masGraphics_Terminate()
 
 void masGraphics_Render()
 {
-	float ClearColor[4] = { 0.3f, 0.3f, 0.3f, 0.0f };
-	D3D11.ImmediateContext->ClearRenderTargetView(D3D11.RenderTargetView.Get(), ClearColor);
 
-	D3D11.SwapChain->Present(0, 0);
 }
