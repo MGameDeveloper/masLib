@@ -136,10 +136,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="masLaunch.cpp" />
+    <ClCompile Include="Source\Debug\Assert\masAssert.cpp" />
+    <ClCompile Include="Source\Graphics\masGraphics.cpp" />
     <ClCompile Include="Source\masVision.cpp" />
     <ClCompile Include="Source\Window\masWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Debug\Assert\masAssert.h" />
+    <ClInclude Include="Source\Graphics\masGraphics.h" />
     <ClInclude Include="Source\masCommon.h" />
     <ClInclude Include="Source\masVision.h" />
     <ClInclude Include="Source\Window\masWindow.h" />
