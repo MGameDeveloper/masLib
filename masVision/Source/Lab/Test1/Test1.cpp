@@ -1,7 +1,8 @@
+#include <vector>
+
 #include "Test1.h"
 #include "Graphics/masGraphics.h"
 #include "Time/masTime.h"
-
 #include "masModel.h"
 
 
@@ -9,8 +10,8 @@
 *
 ******************************************************************************************************/
 const masD3D11 *dx    = nullptr;
-masModel       *Model = nullptr;
 float           ClearColor[4];
+std::vector<masModel*> Models;
 
 
 /*****************************************************************************************************
@@ -21,8 +22,9 @@ bool Test1::Init()
 	dx = masGraphics_D3D11();
 	memset(ClearColor, 0, sizeof(float) * 4);
 
-	Model = masModel_Load("Assets/Models/AK47/scene.gltf");
-
+	Models.push_back(masModel_Load("RotaryCannon"));
+	Models.push_back(masModel_Load("AK47"));
+	
 	return true;
 }
 
@@ -40,5 +42,6 @@ void Test1::Present()
 
 void Test1::Terminate()
 {
-	masModel_UnLoad(&Model);
+	for (int32_t i = 0; i < Models.size(); ++i)
+		masModel_UnLoad(&Models[i]);
 }

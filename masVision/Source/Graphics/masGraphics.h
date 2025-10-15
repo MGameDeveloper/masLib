@@ -20,3 +20,8 @@ bool masGraphics_Init(const void* Window, uint32_t Width, uint32_t Height);
 void masGraphics_Terminate();
 const masD3D11* masGraphics_D3D11();
 
+
+ComPtr<ID3D11Buffer>             masGraphics_CreateVertexBuffer(const void* Vertices, uint32_t VertexCount, uint64_t VertexSize);
+ComPtr<ID3D11Buffer>             masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t IndexCount);
+ComPtr<ID3D11Texture2D>          masGraphics_CreateTexture2D(const char* Path);
+ComPtr<ID3D11ShaderResourceView> masGraphics_CreateShaderResourceView_Texture2D(ComPtr<ID3D11Texture2D> pTexture2D);
