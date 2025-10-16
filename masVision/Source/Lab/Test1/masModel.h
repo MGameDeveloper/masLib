@@ -6,3 +6,4 @@ struct masModel;
 
 masModel* masModel_Load(const char* Path);
 void masModel_UnLoad(masModel** Model);
+void masModel_Draw(masModel* Model);

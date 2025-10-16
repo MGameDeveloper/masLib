@@ -385,3 +385,24 @@ void masModel_UnLoad(masModel** Model)
 {
 
 }
+
+void masModel_Draw(masModel* Model)
+{
+	const masD3D11* x = masGraphics_D3D11();
+
+	//masSetTopology(MasterTopology);
+	//masSetInputLayout(MasterInputLayout);
+	//masSetShader(MasterShader);
+	//masUpdateCameraData(CurrentCamera);
+	//masUpdateMaterial(MasterMaterial);
+	//
+	//for (auto& Mesh : Model->Meshes)
+	//{
+	//	if (!Mesh || Mesh->IndexCount == 0)
+	//		continue;
+	//
+	//	masBindVertexAndIndexBuffer(Mesh);	
+	//	masUpdateTextures(Mesh);
+	//	x->ImmediateContext->DrawIndexed(Mesh->IndexCount, 0, 0);
+	//}
+}

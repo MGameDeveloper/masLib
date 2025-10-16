@@ -37,6 +37,10 @@ void Test1::Present()
 {
 	dx->ImmediateContext->OMSetRenderTargets(1, dx->RenderTargetView.GetAddressOf(), nullptr);
 	dx->ImmediateContext->ClearRenderTargetView(dx->RenderTargetView.Get(), ClearColor);
+
+	for (int32_t i = 0; i < Models.size(); ++i)
+		masModel_Draw(Models[i]);
+
 	dx->SwapChain->Present(0, 0);
 }
 
