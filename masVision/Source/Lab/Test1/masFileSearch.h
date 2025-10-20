@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-class masAssetSearch
+class masFileSearch
 {
 private:
 	std::string mPath;
@@ -19,10 +19,10 @@ private:
 	}
 
 public:
-	masAssetSearch(const std::string& FolderName, const std::string& FileName)
+	masFileSearch(const std::string& FolderName, const std::string& FileName)
 	{
 		std::string AssetDir = std::filesystem::current_path().string();
-		AssetDir.append("\\Assets\\");
+		//AssetDir.append("\\Assets\\");
 
 		for (const auto& Entry : std::filesystem::recursive_directory_iterator(AssetDir))
 		{

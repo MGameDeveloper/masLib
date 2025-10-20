@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Renderer/masRender.h"
 #include <vector>
 #include <memory>
 
@@ -51,12 +52,60 @@ struct masEntity
 ************************************************************************************/
 struct masScene
 {
+	masRender GRender;
+	
 	std::vector<std::unique_ptr<masEntity>> Models;
 	std::vector<std::unique_ptr<masEntity>> Lights;
+	std::vector<std::unique_ptr<masCamera>> Cameras;
+	std::vector<std::shared_ptr<masShader>> Shaders;
 
 	bool Init();
 	void Terminate();
 	void AddModel(masModel* Model);
 	void AddLight(masLight* Light);
 	void Render();
+};
+
+
+/*
+* A new way for creating the resouces
+*/
+template<typename T>
+class masAsset
+{
+private:
+	friend class masAssetCreator;
+
+	uint32_t Type;
+	int32_t  Id;
+
+public:
+	masAsset();
+	~masAsset();
+
+	const std::string& Name();
+	const T& Data();
+	uint64_t Size();
+};
+
+struct masAssetCreator
+{
+	masAsset<masEntity>* CreateEntity();
+	masAsset<masModel>*  CreateModel();
+	masAsset<masEntity>* CreateLight();
+	masAsset<masShader>* CreateShader();
+	masAsset<masCamera>* CreateCamera();
+	void CreateMesh();
+	void CreateTexture();
+	void CreateMaterial();
+};
+
+struct masAssetManager
+{
+	std::unordered_map<std::string, masAssetCreator> AssetCreatorMap;
+
+	const masAssetCreator& NewAssetCreator(const std::string& AssetCreatorName)
+	{
+		// find or create
+	}
 };

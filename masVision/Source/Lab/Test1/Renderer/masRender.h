@@ -15,6 +15,6 @@ struct masRender
 	void Terminate();
 	void Draw();
 
-	void SetCamera(const masCamera* Camera);
-	void SetShader(const masShader* Shader);
+	void SetCamera(const masCamera& Camera);
+	void SetShader(const masShader& Shader);
 };

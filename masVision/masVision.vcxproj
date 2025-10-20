@@ -160,13 +160,14 @@
     <ClInclude Include="Source\Lab\LabAPI.h" />
     <ClInclude Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_dx11.h" />
     <ClInclude Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_win32.h" />
-    <ClInclude Include="Source\Lab\Test1\masAssetSearch.h" />
+    <ClInclude Include="Source\Lab\Test1\masFileSearch.h" />
     <ClInclude Include="Source\Lab\Test1\masModel.h" />
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h" />
     <ClInclude Include="Source\Lab\Test1\masScene.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masCamera.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masRender.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masShader.h" />
+    <ClInclude Include="Source\Lab\Test1\Renderer\masTextureDefs.h" />
     <ClInclude Include="Source\Lab\Test1\Test1.h" />
     <ClInclude Include="Source\masCommon.h" />
     <ClInclude Include="Source\masVision.h" />

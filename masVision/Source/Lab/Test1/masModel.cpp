@@ -6,7 +6,7 @@
 #include "masModel.h"
 #include "Debug/Assert/masAssert.h"
 #include "Graphics/masGraphics.h"
-#include "masAssetSearch.h"
+#include "masFileSearch.h"
 #include "masResourceMap.h"
 
 
@@ -160,7 +160,7 @@ const char* AssimpTextureTypeName(aiTextureType Type)
 /***************************************************************************************************************************
 *
 ****************************************************************************************************************************/
-static masMesh* masModelInternal_LoadMesh_Geometry(const aiMesh* AIMesh, const masAssetSearch& ModelPath)
+static masMesh* masModelInternal_LoadMesh_Geometry(const aiMesh* AIMesh, const masFileSearch& ModelPath)
 {
 	masMesh* Mesh = MeshMap.Find(AIMesh->mName.C_Str());
 	if (Mesh)
@@ -236,7 +236,7 @@ static masTextureType masTextureTypeFromAssimp(aiTextureType Type)
 	
 	return MAS_TEXTURE_UNKNOWN;
 }
-static void masInternal_LoadTexture(const aiMaterial* AIMaterial, masMaterial* Material, const masAssetSearch& ModelPath, aiTextureType TextureType, uint32_t Index)
+static void masInternal_LoadTexture(const aiMaterial* AIMaterial, masMaterial* Material, const masFileSearch& ModelPath, aiTextureType TextureType, uint32_t Index)
 {
 	aiString Path;
 	if (aiReturn_FAILURE == AIMaterial->GetTexture(TextureType, Index, &Path))
@@ -260,7 +260,7 @@ static void masInternal_LoadTexture(const aiMaterial* AIMaterial, masMaterial* M
 
 	Material->Textures[masTextureTypeFromAssimp(TextureType)] = Texture;
 }
-static masMaterial* masModelInternal_LoadMesh_Material(const aiScene* AIScene, const aiMesh* AIMesh, const masAssetSearch& ModelPath)
+static masMaterial* masModelInternal_LoadMesh_Material(const aiScene* AIScene, const aiMesh* AIMesh, const masFileSearch& ModelPath)
 {
 	// get coeffecients & textures as single material
 	const aiMaterial* Material = AIScene->mMaterials[AIMesh->mMaterialIndex];
@@ -334,7 +334,7 @@ static masMaterial* masModelInternal_LoadMesh_Material(const aiScene* AIScene, c
 
 	return masMat;
 }
-static masMesh* masModelInternal_LoadMesh(const aiScene* AIScene, const aiMesh* AIMesh, const masAssetSearch& ModelPath)
+static masMesh* masModelInternal_LoadMesh(const aiScene* AIScene, const aiMesh* AIMesh, const masFileSearch& ModelPath)
 {
 	MAS_ASSERT((AIMesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE), "ImportMesh: Only support mesh created of triangles -> %s", ModelPath.Path().c_str());
 
@@ -356,7 +356,7 @@ masModel* masModel_Load(const char* Path)
 	
 	static Assimp::Importer Importer;
 
-	masAssetSearch ModelPath(Path, "scene.gltf");
+	masFileSearch ModelPath(Path, "scene.gltf");
 	MAS_ASSERT(ModelPath.IsValid(), "AssetSearch[ %s ]: Couldn't be found", Path);
 
 	uint32_t       ImportFlags = aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded;

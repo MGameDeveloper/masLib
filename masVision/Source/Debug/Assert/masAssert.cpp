@@ -9,7 +9,7 @@ void masAssert::Assert(bool Condition, const char* File, int Line, const char* D
 {
 	if (!Condition)
 	{
-		const uint64_t TempBufSize = 512;
+		const uint64_t TempBufSize = 4096;
 		char TempBuf[TempBufSize] = { 0 };
 
 		va_list Args;

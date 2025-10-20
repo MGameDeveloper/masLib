@@ -92,7 +92,7 @@
     <ClInclude Include="Source\Lab\Test1\masModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Lab\Test1\masAssetSearch.h">
+    <ClInclude Include="Source\Lab\Test1\masFileSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h">
@@ -114,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\Renderer\masRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\Renderer\masTextureDefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
