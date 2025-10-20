@@ -116,7 +116,6 @@ struct masModel : private masResource
 static masResourceMap<masModel> ModelMap;
 
 
-
 /*****************************************************************************************************
 * For Debugging
 ******************************************************************************************************/
@@ -374,11 +373,11 @@ masModel* masModel_Load(const char* Path)
 		if (Mesh)
 			Model->Meshes.push_back(Mesh);
 	}
-	Model->Name = AIScene->mName.C_Str();
+	Model->Name = Path;
 
 
 	Importer.FreeScene();
-	return nullptr;
+	return Model;
 }
 
 void masModel_UnLoad(masModel** Model)
@@ -386,23 +385,242 @@ void masModel_UnLoad(masModel** Model)
 
 }
 
+/***********************************************************************************
+* Prototyping
+************************************************************************************/
+struct masDrawMaterial
+{
+	std::vector<ComPtr<ID3D11ShaderResourceView>> Textures;
+	std::vector<ComPtr<ID3D11Buffer>>             ConstantBuffers;
+	uint32_t ShaderID;
+	uint8_t  SamplerID;
+};
+
+struct masDrawCmd
+{
+	ComPtr<ID3D11InputLayout>          InputLayout;
+	ComPtr<ID3D11Buffer>               Vertices;
+	ComPtr<ID3D11Buffer>               Indices;
+	masDrawMaterial                   *Material;
+	std::vector<ComPtr<ID3D11Buffer>>  ConstantBuffers;
+	D3D_PRIMITIVE_TOPOLOGY             TopologyType;
+	uint32_t                           IndexCount;
+};
+
+struct masGraphicPipeline
+{
+	std::vector<masDrawCmd> DrawCmds;
+
+	void Run()
+	{
+		ComPtr<ID3D11DeviceContext> Im = masGraphics_D3D11()->ImmediateContext;
+
+		for (const masDrawCmd& Cmd : DrawCmds)
+		{
+			uint32_t Stride = sizeof(masVertexFmt);
+			uint32_t Offset = 0;
+
+			// Input Assembler
+			Im->IASetPrimitiveTopology(Cmd.TopologyType);
+			Im->IASetInputLayout(Cmd.InputLayout.Get());
+			Im->IASetVertexBuffers(0, 1, Cmd.Vertices.GetAddressOf(), &Stride, &Offset);
+			Im->IASetIndexBuffer(Cmd.Indices.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			const masDrawMaterial* Mat = Cmd.Material;
+
+			// Vertex Shader
+			//Im->VSSetShader(ShaderPool[Mat->ShaderID].VSShader.Get(), nullptr, 0);
+			Im->VSSetConstantBuffers(0, Mat->ConstantBuffers.size(), Mat->ConstantBuffers[0].GetAddressOf());
+			//Im->VSSetSamplers();
+			//Im->VSSetShaderResources();
+
+			// Pixel Shader
+			//Im->PSSetShader(ShaderPool[Mat->ShaderID].PSShader.Get(), nullptr, 0);
+			Im->PSSetConstantBuffers(0, Cmd.ConstantBuffers.size(), Cmd.ConstantBuffers[0].GetAddressOf());
+			//Im->PSSetSamplers(0, SamplerPool[Mat->SamplerID].size(), &SamplerPool[Mat->SamplerID].data());
+			Im->PSSetShaderResources(0, Mat->Textures.size(), Mat->Textures[0].GetAddressOf());
+
+			// Issue Draw
+			Im->DrawIndexed(Cmd.IndexCount, 0, 0);
+		}
+	}
+};
+
 void masModel_Draw(masModel* Model)
 {
-	const masD3D11* x = masGraphics_D3D11();
+	masGraphicPipeline Pipeline;
+	for (const auto& Mesh : Model->Meshes)
+	{
+		if (!Mesh || Mesh->IndexCount == 0)
+			continue;
 
-	//masSetTopology(MasterTopology);
-	//masSetInputLayout(MasterInputLayout);
-	//masSetShader(MasterShader);
-	//masUpdateCameraData(CurrentCamera);
-	//masUpdateMaterial(MasterMaterial);
-	//
-	//for (auto& Mesh : Model->Meshes)
-	//{
-	//	if (!Mesh || Mesh->IndexCount == 0)
-	//		continue;
-	//
-	//	masBindVertexAndIndexBuffer(Mesh);	
-	//	masUpdateTextures(Mesh);
-	//	x->ImmediateContext->DrawIndexed(Mesh->IndexCount, 0, 0);
-	//}
+		masDrawCmd Cmd;
+
+		Cmd.Vertices     = Mesh->pVertices;
+		Cmd.Indices      =  Mesh->pIndices;
+		Cmd.IndexCount   = Mesh->IndexCount;
+		Cmd.TopologyType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+		for (int32_t T = 0; T < MAS_TEXTURE_COUNT; ++T)
+		{
+			masTexture* Texture = Mesh->Material->Textures[T];
+			if (Texture)
+				Cmd.Material->Textures.push_back(Texture->pSRV);
+		}
+
+		Pipeline.DrawCmds.push_back(Cmd);
+	}
+
+	Pipeline.Run();
 }
+
+
+/***********************************************************************************************************
+*
+************************************************************************************************************/
+class masVertexDef
+{
+public:
+	enum masAttributeType
+	{
+		FLOAT4,
+		FLOAT3,
+		FLOAT2,
+		FLOAT,
+
+		COUNT
+	};
+
+	struct masAttribute
+	{
+		std::string      Name;
+		uint32_t         Index;
+		masAttributeType Type;
+		uint32_t         InstanceCount;
+		bool             bPerInstance;
+
+		masAttribute(const std::string& Name, uint32_t Index, masAttributeType Type, uint32_t InstanceCount, bool bPerInstance) :
+			Name(Name), Index(Index), Type(Type), InstanceCount(InstanceCount), bPerInstance(bPerInstance)
+		{
+		}
+	};
+	
+	void Push(const std::string& Name, uint32_t Index, masAttributeType Type, uint32_t InstanceCount = 0, bool bPerInstance = false)
+	{
+		AttributeList.push_back(masAttribute(Name, Index, Type, InstanceCount, bPerInstance));
+	}
+
+	const std::vector<masAttribute>& GetAttributeList() const { return AttributeList;  }
+
+private:
+	std::vector<masAttribute> AttributeList;
+};
+
+struct masVertexFormat
+{
+	ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
+
+	/*
+	* Instance VertexFormat need to be examined and tested to crrectly create one for it
+	* * Need Shader Byte Code Signiture and its size in bytes
+	* * Packing of the structure 
+	*/
+	masVertexFormat(const masVertexDef& VertexDef)
+	{
+		uint32_t AttrOffset = 0;
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> ElementDescList;
+		for (const auto& Attr : VertexDef.GetAttributeList())
+		{
+			D3D11_INPUT_CLASSIFICATION Classification = (Attr.bPerInstance) ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
+			uint32_t                   InstanceCount  = (Attr.bPerInstance) ? Attr.InstanceCount : 0;
+			uint32_t                   BufferIndex    = 0;
+
+			uint32_t    FormatSize = 0;
+			DXGI_FORMAT Format     = DXGI_FORMAT_UNKNOWN;
+			switch (Attr.Type)
+			{
+			case masVertexDef::FLOAT4: Format = DXGI_FORMAT_R32G32B32A32_FLOAT; FormatSize = 16; break;
+			case masVertexDef::FLOAT3: Format = DXGI_FORMAT_R32G32B32_FLOAT;    FormatSize = 12; break;
+			case masVertexDef::FLOAT2: Format = DXGI_FORMAT_R32G32_FLOAT;       FormatSize =  8; break;
+			case masVertexDef::FLOAT:  Format = DXGI_FORMAT_R32_FLOAT;          FormatSize =  4; break;
+			}
+
+			D3D11_INPUT_ELEMENT_DESC Desc = { Attr.Name.c_str(), Attr.Index, Format, BufferIndex, AttrOffset, Classification, InstanceCount};
+			AttrOffset += FormatSize;
+		}
+
+		HRESULT hr = masGraphics_D3D11()->Device->CreateInputLayout(ElementDescList.data(), ElementDescList.size(), nullptr, 0, &pInputLayout);
+		MAS_ASSERT(SUCCEEDED(hr), "HRESULT[ %u ]: CREATE VERTEX FORMAT ( D3D11 INPUT LAYOUT )", hr);
+	}
+};
+
+void masVertexFormat_Test()
+{
+	masVertexDef VertexDef;
+	VertexDef.Push("Position", 0, masVertexDef::FLOAT3);
+	VertexDef.Push("Normal",   0, masVertexDef::FLOAT3);
+	VertexDef.Push("Tangent",  0, masVertexDef::FLOAT3);
+	VertexDef.Push("TexCoord", 0, masVertexDef::FLOAT3);
+	VertexDef.Push("Color",    0, masVertexDef::FLOAT4);
+
+	// should be added to a pool that material referes to it by index or name or handle so it can be shared effeciently
+	masVertexFormat VertexFormat(VertexDef);
+}
+
+
+/***********************************************************************************************************
+*
+************************************************************************************************************/
+
+
+
+/***********************************************************************************************************
+*
+************************************************************************************************************/
+struct masRenderTarget
+{
+	ComPtr<ID3D11Texture2D>        pRenderTargetImage;
+	ComPtr<ID3D11Texture2D>        pDepthStencilImage;
+	ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+	ComPtr<ID3D11DepthStencilView> pDepthStencilView;
+
+	masRenderTarget(uint32_t Width, uint32_t Height)
+	{
+		ComPtr<ID3D11Device> pDevice = masGraphics_D3D11()->Device;
+
+		/*
+		* Render Target Creation
+		*/
+		D3D11_TEXTURE2D_DESC ImageDesc = { };
+		ImageDesc.Width          = Width;
+		ImageDesc.Height         = Height;
+		ImageDesc.MipLevels      = 1;
+		ImageDesc.ArraySize      = 1;
+		ImageDesc.Format         = DXGI_FORMAT_R8G8B8A8_UNORM;
+		ImageDesc.SampleDesc     = { 1, 0 };
+		ImageDesc.Usage          = D3D11_USAGE_DEFAULT;
+		ImageDesc.BindFlags      = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		ImageDesc.CPUAccessFlags = 0;
+		ImageDesc.MiscFlags      = 0;
+
+		HRESULT hr = pDevice->CreateTexture2D(&ImageDesc, nullptr, &pRenderTargetImage);
+		MAS_ASSERT(SUCCEEDED(hr), "HRESULT[ %u ]: RENDER_TARGET_VIEW_TEXTURE2D_CREATION", hr);
+
+		hr = pDevice->CreateRenderTargetView(pRenderTargetImage.Get(), nullptr, &pRenderTargetView);
+		MAS_ASSERT(SUCCEEDED(hr), "HRESULT[ %u ]: RENDER_TARGET_VIEW_CREATION", hr);
+
+		 
+		/*
+		* Depth Stencil Creation
+		*/
+		// CHANGE IMAGE DESC VALUES TO SUIT DEPTH STENCIL IMAGE
+		ImageDesc.Format    = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		ImageDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		hr = pDevice->CreateTexture2D(&ImageDesc, nullptr, &pDepthStencilImage);
+		MAS_ASSERT(SUCCEEDED(hr), "HRESULT[ %u ]: DEPTH_STENCIL_VIEW_TEXTURE2D_CREATION", hr);
+
+		hr = pDevice->CreateDepthStencilView(pDepthStencilImage.Get(), nullptr, &pDepthStencilView);
+		MAS_ASSERT(SUCCEEDED(hr), "HRESULT[ %u ]: DEPTH_STENCIL_VIEW_CREATION", hr);
+	}
+};

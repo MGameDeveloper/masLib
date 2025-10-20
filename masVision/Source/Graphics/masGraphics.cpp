@@ -4,6 +4,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_dx11.h"
+#include "backends/imgui_impl_win32.h"
+
 #include <wrl/client.h>
 #include <d3d11_4.h>
 #include <dxgi1_6.h>
@@ -75,11 +79,24 @@ bool masGraphics_Init(const void* Window, uint32_t Width, uint32_t Height)
 	hr = pDevice->CreateRenderTargetView(pBackBuffer.Get(), NULL, &pRenderTargetView);
 	MAS_ASSERT(SUCCEEDED(hr), "DX11 Create Render Target View");
 
-
+	/*
+	* IMGUI
+	*/
 	D3D11.Device           = pDevice;
 	D3D11.ImmediateContext = pImmediateContext;
 	D3D11.SwapChain        = pSwapChain1;
 	D3D11.RenderTargetView = pRenderTargetView;
+
+	ImGui_ImplWin32_EnableDpiAwareness();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplWin32_Init((void*)Window);
+	ImGui_ImplDX11_Init(pDevice.Get(), pImmediateContext.Get());
 
 	return true;
 }
@@ -92,6 +109,24 @@ void masGraphics_Terminate()
 const masD3D11* masGraphics_D3D11()
 {
 	return &D3D11;
+}
+
+void masGraphicsUI_Prepare()
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+}
+
+void masGraphicsUI_Render()
+{
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
+void masGraphics_Present()
+{
+	D3D11.SwapChain->Present(0, 0);
 }
 
 ComPtr<ID3D11Buffer> masGraphics_CreateVertexBuffer(const void* Vertices, uint32_t VertexCount, uint64_t VertexSize)

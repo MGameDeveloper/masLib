@@ -21,6 +21,10 @@ void masGraphics_Terminate();
 const masD3D11* masGraphics_D3D11();
 
 
+void masGraphicsUI_Prepare();
+void masGraphicsUI_Render();
+void masGraphics_Present();
+
 ComPtr<ID3D11Buffer>             masGraphics_CreateVertexBuffer(const void* Vertices, uint32_t VertexCount, uint64_t VertexSize);
 ComPtr<ID3D11Buffer>             masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t IndexCount);
 ComPtr<ID3D11Texture2D>          masGraphics_CreateTexture2D(const char* Path);

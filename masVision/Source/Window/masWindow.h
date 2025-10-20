@@ -7,3 +7,4 @@ void masWindow_Terminate();
 bool masWindow_IsClosed();
 void masWindow_PeekMessages();
 const void* masWindow_NativeHandle();
+float masWindow_AspectRatio();

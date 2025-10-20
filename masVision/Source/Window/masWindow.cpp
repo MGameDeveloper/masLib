@@ -46,3 +46,14 @@ const void* masWindow_NativeHandle()
 		return nullptr;
 	return glfwGetWin32Window(GWindow);
 }
+
+float masWindow_AspectRatio()
+{
+	int w = 0;
+	int h = 0;
+	glfwGetWindowSize(GWindow, &w, &h);
+	if (h == 0)
+		return 0.f;
+
+	return (float(w) / float(h));
+}

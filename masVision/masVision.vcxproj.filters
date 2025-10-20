@@ -39,6 +39,30 @@
     <ClCompile Include="Source\Lab\Test1\masModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\masScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_dx11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -72,6 +96,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\masScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_dx11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\ImGuiSRC\imgui_impl_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\Renderer\masShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\Renderer\masCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\Renderer\masRender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
