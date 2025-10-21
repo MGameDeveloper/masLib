@@ -10,35 +10,6 @@
 /***********************************************************************************
 *
 ************************************************************************************/
-struct masDrawMaterial
-{
-	std::vector<ComPtr<ID3D11ShaderResourceView>> Textures;
-	std::vector<ComPtr<ID3D11Buffer>>             ConstantBuffers;
-	uint32_t ShaderID;
-	uint8_t  SamplerID;
-};
-
-struct masDrawCmd
-{
-	ComPtr<ID3D11InputLayout>          InputLayout;
-	ComPtr<ID3D11Buffer>               Vertices;
-	ComPtr<ID3D11Buffer>               Indices;
-	masDrawMaterial                   *Material;
-	std::vector<ComPtr<ID3D11Buffer>>  ConstantBuffers;
-	D3D_PRIMITIVE_TOPOLOGY             TopologyType;
-	uint32_t                           IndexCount;
-};
-
-struct masDrawCmdList
-{
-
-};
-
-
-
-/***********************************************************************************
-*
-************************************************************************************/
 bool masScene::Init()
 {
 	GRender.Init();
@@ -66,5 +37,5 @@ void masScene::AddLight(masLight* Light)
 
 void masScene::Render()
 {
-
+	GRender.Draw(this);
 }

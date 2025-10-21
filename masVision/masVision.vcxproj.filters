@@ -119,5 +119,11 @@
     <ClInclude Include="Source\Lab\Test1\Renderer\masTextureDefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\masAssetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\masRefactorCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

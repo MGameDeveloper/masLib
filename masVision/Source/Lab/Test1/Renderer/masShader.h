@@ -56,7 +56,6 @@ private:
 	ComPtr<ID3D11HullShader>       pHS;
 	ComPtr<ID3D11GeometryShader>   pGS;
 	ComPtr<ID3D11InputLayout>      pInputLayout; // should be in a resource pool to prevent duplication if 2 shaders expect the same input but do different job
-	masResourceMap<ComPtr<ID3D11Buffer>> CBMap;
 
 private:
 	ComPtr<ID3DBlob> LoadShader(const std::string& Path, const std::string& EntryPoint, const std::string& ShaderModel)

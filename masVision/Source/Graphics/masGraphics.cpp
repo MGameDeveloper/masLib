@@ -219,3 +219,114 @@ ComPtr<ID3D11ShaderResourceView> masGraphics_CreateShaderResourceView_Texture2D(
 
 	return pSRV;
 }
+
+ComPtr<ID3D11SamplerState> masGraphics_CreateSamplerState()
+{
+	const masD3D11* x = masGraphics_D3D11();
+
+	D3D11_SAMPLER_DESC SamplerDesc = { };
+	SamplerDesc.Filter         = D3D11_FILTER_ANISOTROPIC;
+	SamplerDesc.AddressU       = D3D11_TEXTURE_ADDRESS_WRAP;
+	SamplerDesc.AddressV       = D3D11_TEXTURE_ADDRESS_WRAP;
+	SamplerDesc.AddressW       = D3D11_TEXTURE_ADDRESS_WRAP;
+	SamplerDesc.MipLODBias     = 0.0f;
+	SamplerDesc.MaxAnisotropy  = 8; // or 16 for high-end
+	SamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	SamplerDesc.BorderColor[0] = 0.0f;
+	SamplerDesc.BorderColor[1] = 0.0f;
+	SamplerDesc.BorderColor[2] = 0.0f;
+	SamplerDesc.BorderColor[3] = 0.0f;
+	SamplerDesc.MinLOD         = 0;
+	SamplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
+
+
+	ComPtr<ID3D11SamplerState> pSampler = nullptr;
+	HRESULT hr = x->Device->CreateSamplerState(&SamplerDesc, &pSampler);
+	MAS_ASSERT(SUCCEEDED(hr), "CREATE_SAMPLER_STATE");
+
+	return pSampler;
+}
+
+VOID F()
+{
+	D3D11_SAMPLER_DESC WrapAniso = {};
+	WrapAniso.Filter = D3D11_FILTER_ANISOTROPIC;
+	WrapAniso.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	WrapAniso.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	WrapAniso.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	WrapAniso.MaxAnisotropy = 8; // or 16 for high-end
+	WrapAniso.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	WrapAniso.MinLOD = 0;
+	WrapAniso.MaxLOD = D3D11_FLOAT32_MAX;
+
+	D3D11_SAMPLER_DESC ClampLinear = {};
+	ClampLinear.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	ClampLinear.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ClampLinear.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ClampLinear.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ClampLinear.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	ClampLinear.MinLOD = 0;
+	ClampLinear.MaxLOD = D3D11_FLOAT32_MAX;
+
+	D3D11_SAMPLER_DESC ShadowCompare = {};
+	ShadowCompare.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	ShadowCompare.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	ShadowCompare.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	ShadowCompare.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	ShadowCompare.BorderColor[0] = 1.0f;
+	ShadowCompare.BorderColor[1] = 1.0f;
+	ShadowCompare.BorderColor[2] = 1.0f;
+	ShadowCompare.BorderColor[3] = 1.0f;
+	ShadowCompare.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	ShadowCompare.MinLOD = 0;
+	ShadowCompare.MaxLOD = D3D11_FLOAT32_MAX;
+
+	D3D11_SAMPLER_DESC PointClamp = {};
+	PointClamp.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	PointClamp.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	PointClamp.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	PointClamp.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	PointClamp.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	PointClamp.MinLOD = 0;
+	PointClamp.MaxLOD = D3D11_FLOAT32_MAX;
+}
+
+
+struct masMaterial
+{
+	ID3D11SamplerState**       Samplers; // MAS_SAMPLER_COUNT
+	ID3D11ShaderResourceView** Textures; // MAS_TEXTURE_COUNT
+	ID3D11VertexShader*        VertexShader;
+	ID3D11PixelShader*         PixelShader;
+};
+
+#define MAS_TEXTURE_COUNT 11
+#define MAS_SAMPLER_COUNT 4
+
+struct masMaterial
+{
+	int32_t Textures[MAS_TEXTURE_COUNT];
+	int32_t Samplers[MAS_TEXTURE_COUNT];
+	int32_t Shader;
+	float   BaseColor[4];
+	float   Roughness;
+	float   Metallic;
+	float   EmissiveIntensity;
+	float   Opacity;
+	float   Clearcoat;
+	float   ClearcoatRoughness;
+	float   Anisotropy;
+	float   Sheen;
+	// uint32_t PermutationHash;
+};
+
+template<typename T>
+struct masHandle
+{
+	int32_t  Idx;  // index into the pool
+	uint32_t Type; // direct you to the correct pool
+
+	const T& Data() { return T(); }
+};
+
+masHandle<masMaterial> masModel_Load("RotaryCannon");

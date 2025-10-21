@@ -18,7 +18,14 @@ struct masCamera
 	float    AspectRatio;
 	bool     bRecalculate;
 
-	masCamera() {}
+	masCamera() :
+		Fov(45), AspectRatio(1.5), NearZ(0.1f), FarZ(10000.f),
+		Pos(0.f, 0.f, -10.f), Rot(0.f, 0.f, 0.f), Projection(), View(),
+		bRecalculate(true), Target(0.f, 0.f, 0.f)
+	{
+		Init(Fov, AspectRatio);
+	}
+
 	~masCamera() {};
 
 	masCamera(float InFov, float InAspectRatio, float InNearZ = 0.1f, float InFarZ = 10000.f) :

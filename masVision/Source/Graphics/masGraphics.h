@@ -29,3 +29,4 @@ ComPtr<ID3D11Buffer>             masGraphics_CreateVertexBuffer(const void* Vert
 ComPtr<ID3D11Buffer>             masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t IndexCount);
 ComPtr<ID3D11Texture2D>          masGraphics_CreateTexture2D(const char* Path);
 ComPtr<ID3D11ShaderResourceView> masGraphics_CreateShaderResourceView_Texture2D(ComPtr<ID3D11Texture2D> pTexture2D);
+ComPtr<ID3D11SamplerState>       masGraphics_CreateSamplerState();

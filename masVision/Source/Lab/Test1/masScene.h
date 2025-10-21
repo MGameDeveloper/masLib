@@ -44,6 +44,15 @@ struct masEntity
 		Scale(1.f, 1.f, 1.f)
 	{
 	}
+
+	XMMATRIX GetWorldMatrix()
+	{
+		XMMATRIX World = XMMatrixIdentity();
+		World *= XMMatrixScalingFromVector(XMLoadFloat3((XMFLOAT3*)&Scale));
+		World *= XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3((XMFLOAT3*)&Rotation));
+		World *= XMMatrixTranslationFromVector(XMLoadFloat3((XMFLOAT3*)&Position));
+		return World;
+	}
 };
 
 
@@ -66,46 +75,3 @@ struct masScene
 	void Render();
 };
 
-
-/*
-* A new way for creating the resouces
-*/
-template<typename T>
-class masAsset
-{
-private:
-	friend class masAssetCreator;
-
-	uint32_t Type;
-	int32_t  Id;
-
-public:
-	masAsset();
-	~masAsset();
-
-	const std::string& Name();
-	const T& Data();
-	uint64_t Size();
-};
-
-struct masAssetCreator
-{
-	masAsset<masEntity>* CreateEntity();
-	masAsset<masModel>*  CreateModel();
-	masAsset<masEntity>* CreateLight();
-	masAsset<masShader>* CreateShader();
-	masAsset<masCamera>* CreateCamera();
-	void CreateMesh();
-	void CreateTexture();
-	void CreateMaterial();
-};
-
-struct masAssetManager
-{
-	std::unordered_map<std::string, masAssetCreator> AssetCreatorMap;
-
-	const masAssetCreator& NewAssetCreator(const std::string& AssetCreatorName)
-	{
-		// find or create
-	}
-};

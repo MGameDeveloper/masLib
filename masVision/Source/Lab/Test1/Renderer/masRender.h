@@ -6,15 +6,13 @@
 struct masRender
 {
 	masCamera Camera;
-	masShader Shader;
 
 	masRender()  {};
 	~masRender() {};
 
+	void SetCamera(const masCamera& Camera);
+
 	bool Init();
 	void Terminate();
-	void Draw();
-
-	void SetCamera(const masCamera& Camera);
-	void SetShader(const masShader& Shader);
+	void Draw(struct masScene* Scene);
 };

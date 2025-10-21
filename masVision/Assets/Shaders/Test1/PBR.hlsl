@@ -10,7 +10,12 @@ cbuffer Camera : register(b0)
     matrix View;
 };
 
-cbuffer Material : register(b1)
+cbuffer Transformation : register(b1)
+{
+    matrix World;
+};
+
+cbuffer Material : register(b2)
 {
     float4 BaseColor;
 	float  Roughness;
@@ -24,7 +29,7 @@ cbuffer Material : register(b1)
 };
 
 Texture2D    Textures[MAS_TEXTURE_COUNT] : register(t0);
-SamplerState Samplers[MAS_TEXTURE_COUNT] : register(s0);
+SamplerState Samplers[MAS_SAMPLER_COUNT] : register(s0);
 
 
 /**************************************************************************
@@ -48,7 +53,7 @@ struct VSOutput
 /**************************************************************************
 *
 ***************************************************************************/
-VSOutput Main(VSInput In)
+VSOutput VSMain(VSInput In)
 {
     VSOutput Out = (VSOutput)0;
     
@@ -57,5 +62,10 @@ VSOutput Main(VSInput In)
     Out.Position *= Sheen;
 
     return Out;
+}
+
+float4 PSMain(VSOutput In)
+{
+
 }
 
