@@ -147,6 +147,7 @@
     <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_tables.cpp" />
     <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_widgets.cpp" />
     <ClCompile Include="Source\Lab\Test1\masModel.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp" />
     <ClCompile Include="Source\Lab\Test1\Test1.cpp" />
@@ -163,9 +164,17 @@
     <ClInclude Include="Source\Lab\Test1\masAssetManager.h" />
     <ClInclude Include="Source\Lab\Test1\masFileSearch.h" />
     <ClInclude Include="Source\Lab\Test1\masModel.h" />
-    <ClInclude Include="Source\Lab\Test1\masRefactorCode.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\masScene.h" />
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h" />
     <ClInclude Include="Source\Lab\Test1\masScene.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masCamera.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masLight.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masMaterial.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masModel.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masResourceDef.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masShader.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masTextureDefs.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masTransform.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masCamera.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masRender.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masShader.h" />

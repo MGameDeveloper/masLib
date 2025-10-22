@@ -63,6 +63,9 @@
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -122,7 +125,31 @@
     <ClInclude Include="Source\Lab\Test1\masAssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Lab\Test1\masRefactorCode.h">
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\masScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masResourceDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masTextureDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
