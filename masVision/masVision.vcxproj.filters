@@ -66,6 +66,12 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\test\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -150,6 +156,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\test\test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

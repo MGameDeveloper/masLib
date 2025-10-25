@@ -291,7 +291,7 @@ VOID F()
 	PointClamp.MaxLOD = D3D11_FLOAT32_MAX;
 }
 
-
+#if 0
 struct masMaterial
 {
 	ID3D11SamplerState**       Samplers; // MAS_SAMPLER_COUNT
@@ -330,3 +330,4 @@ struct masHandle
 };
 
 masHandle<masMaterial> masModel_Load("RotaryCannon");
+#endif

@@ -144,3 +144,90 @@ static const XMMATRIX* masTransform_GetMatrix(masTransform* Transform)
 // 2. Add Quaternion Setter (Optional) -> be aware that in tick we generate quaternion from euler setting quaternion directly is buggy
 // 4. Add Directional Accessors(Optional)
 // 5. Optional: Dirty Flag Propagation -> inform all children to be updated to correctly follow their parent
+
+
+/*
+* Logic:
+*     Allocation
+*     Deallocation
+*     Lookup
+*     Compaction
+*     Serialization
+*     Validation
+*     Shared Ownership
+*     TypeMetaData
+*     RegionID or ChunkID for streaming
+*     Flags for dirty state, visibility, etc
+*/
+
+
+/*
+* POOL REGISTERY
+*/
+struct masPoolDef
+{
+	int32_t* Capacity;
+	int32_t* UsedCount;
+	int32_t  ElementSize;
+	int32_t  ID;
+	char     Name[64];
+};
+
+void masPoolBank_Register(const char* Name, int32_t ID, int32_t ElementSize, int32_t* Capacity, int32_t* UsedCount);
+void masPoolBank_UnRegister(const char* Name, int32_t ID);
+
+
+
+/*
+* POOL MODULE
+*/
+struct masPoolSlot
+{
+	int32_t Idx;
+	int32_t Gen;
+	int32_t RefCount;
+};
+
+// used in module .h
+#define MAS_DECLARE_HANDLE(Name)\
+    struct masH##Name           \
+    {                           \
+        int32_t Idx;            \
+        int32_t Gen;            \
+    }
+
+// used inside module .cpp
+#define MAS_DECLARE_POOL(Name, DataType)\
+    struct masPool##Name                \
+    {                                   \
+        DataType    *Data;              \
+        masPoolSlot *HandleToData;      \
+        int32_t     *FreeIndices;       \
+        int32_t      FreeCount;         \
+        int32_t      UsedCount;         \
+        int32_t      Capacity;          \
+    }
+
+
+
+/*
+* MODULE TRANSFORM
+*/
+MAS_DECLARE_HANDLE(Transform);
+
+MAS_DECLARE_POOL(Transform, masTransform);
+
+
+masHTransform       masTransform_Create();
+void                masTransform_Destroy(masHTransform* HTransform);
+void                masTransform_SetParent(masHTransform Child, masHTransform Parent);
+void                masTransform_SetPosition(masHTransform HTransform, const XMFLOAT3& Position);
+void                masTransform_SetRotation(masHTransform HTransform, const XMFLOAT3& Rotation);
+void                masTransform_SetScale(masHTransform HTransform, const XMFLOAT3& Scale);
+void                masTransform_Move(masHTransform HTransform, const XMFLOAT3& Velocity);
+void                masTransform_Rotate(masHTransform HTransform, const XMFLOAT3& Velocity);
+void                masTransform_Scale(masHTransform HTransform, const XMFLOAT3& Velocity);
+void                masTransform_SetType(masHTransform HTransform, masTransformType Type);
+const masTransform* masTransform_Data(masHTransform HTransform);
+
+

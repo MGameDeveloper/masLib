@@ -149,6 +149,8 @@
     <ClCompile Include="Source\Lab\Test1\masModel.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\masScene.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\test\test.cpp" />
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp" />
     <ClCompile Include="Source\Lab\Test1\Test1.cpp" />
     <ClCompile Include="Source\masVision.cpp" />
@@ -167,6 +169,11 @@
     <ClInclude Include="Source\Lab\Test1\RefactorCode\masScene.h" />
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h" />
     <ClInclude Include="Source\Lab\Test1\masScene.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masHandle.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masPool.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\test\test.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masCamera.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masLight.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masMaterial.h" />
