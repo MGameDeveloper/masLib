@@ -149,6 +149,8 @@
     <ClCompile Include="Source\Lab\Test1\masModel.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\masScene.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masHandle.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\test\test.cpp" />
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp" />

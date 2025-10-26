@@ -1,17 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-
+#include "masHandle.h"
 
 class masRawPool
 {
-protected:
-	struct masHandle
-	{
-		uint32_t SlotIdx;
-		uint32_t GenID;
-	};
-
 private:
 	struct masSlot
 	{
@@ -22,9 +14,9 @@ private:
 
 	struct masPoolData
 	{
-		uint8_t* Data;
-		uint32_t* FreeSlotIDs;
-		masSlot* Slots;       // TODO: CORRECTLY SET DATA IDX
+		uint8_t  *Data;
+		uint32_t *FreeSlotIDs;
+		masSlot  *Slots;       // TODO: CORRECTLY SET DATA IDX
 		uint32_t  Capacity;
 		uint32_t  FreeCount;
 		uint32_t  UsedCount;
@@ -33,6 +25,7 @@ private:
 	};
 
 	masPoolData* Pool;
+	uint8_t      ID;
 
 private:
 	masPoolData* Internal_Create(uint32_t ElementSize, uint32_t Capacity);
@@ -48,6 +41,11 @@ public:
 
 	void*     GetElement(masHandle Handle);
 	masHandle Alloc();
-	void      Free(masHandle* Handle);
-	bool      IsValidHandle(masHandle Handle);
+	void      Free(masHandle& Handle);
+	bool      IsValidHandle(const masHandle& Handle);
 };
+
+/*
+* TODO: ITERATOR TO ITERATE OVER ALL DATA
+*         - USEFUL FOR REGISTERY SYSTEM TO ITERATE OVER ITEMS
+*/

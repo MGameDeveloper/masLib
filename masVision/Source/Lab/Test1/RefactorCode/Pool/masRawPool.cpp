@@ -1,5 +1,6 @@
-#include "masRawPool.h"
+#include "masPoolRegistery.h"
 
+#include "masRawPool.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -66,12 +67,15 @@ masRawPool::masRawPool(const char* Name, uint32_t ElementSize) :
 	Pool(nullptr)
 {
 	Pool = Internal_Create(ElementSize, MAS_DEFAULT_POOL_SIZE);
-	// Use Name to register this pool
+	if (Pool)
+		masPoolRegistery::Add(Name, this);
 }
 
 masRawPool::~masRawPool()
 {
-
+	free(Pool);
+	Pool = nullptr;
+	masPoolRegistery::Remove(this->ID);
 }
 
 void* masRawPool::GetElement(masHandle Handle)
@@ -85,10 +89,10 @@ void* masRawPool::GetElement(masHandle Handle)
 	return Element;
 }
 
-masRawPool::masHandle masRawPool::Alloc()
+masHandle masRawPool::Alloc()
 {
 	if (!Pool)
-		return MAS_INVALID_HANDLE;
+		return masHandle();
 
 	masSlot     *Slot   = NULL;
 	uint32_t     SlotID = 0;
@@ -109,7 +113,7 @@ masRawPool::masHandle masRawPool::Alloc()
 	if (!Slot)
 	{
 		if (!Internal_Resize())
-			return MAS_INVALID_HANDLE;
+			return masHandle();
 
 		SlotID = Pool->AllocIdx++;
 		Slot   = &Pool->Slots[Pool->AllocIdx++];
@@ -128,24 +132,24 @@ masRawPool::masHandle masRawPool::Alloc()
 	return Handle;
 }
 
-void masRawPool::Free(masHandle* Handle)
+void masRawPool::Free(masHandle& Handle)
 {
-	if (!IsValidHandle(*Handle))
+	if (!IsValidHandle(Handle))
 		return;
 
-	masSlot* Slot = &Pool->Slots[Handle->SlotIdx];
+	masSlot* Slot = &Pool->Slots[Handle.SlotIdx];
 	Slot->RefCount--;
 	if (Slot->RefCount == 0)
 	{
 		Slot->GenID++;
-		Pool->FreeSlotIDs[Pool->FreeCount++] = Handle->SlotIdx;
+		Pool->FreeSlotIDs[Pool->FreeCount++] = Handle.SlotIdx;
 	}
 
-	Handle->SlotIdx = 0;
-	Handle->GenID = 0;
+	Handle.SlotIdx = 0;
+	Handle.GenID   = 0;
 }
 
-bool masRawPool::IsValidHandle(masHandle Handle)
+bool masRawPool::IsValidHandle(const masHandle& Handle)
 {
 	if (!Pool || (Handle.SlotIdx == 0 && Handle.GenID == 0) || (Handle.SlotIdx >= Pool->Capacity))
 		return false;

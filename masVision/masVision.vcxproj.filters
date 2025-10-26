@@ -72,6 +72,12 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
