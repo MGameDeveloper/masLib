@@ -16,14 +16,12 @@ private:
 	};
 
 public:
-	masHandle& operator=(const masHandle& Other) = delete; // Copy Semantic
-
-public:
 	masHandle();
-	~masHandle()                            = default;
-	masHandle(masHandle&& Other)            = default;
-	masHandle& operator=(masHandle&& Other) = default;
-	masHandle(const masHandle& Other)       = default; 
+	~masHandle()                               = default;
+	masHandle(const masHandle& Other)          = default; 
+	masHandle(masHandle&& Other)               = default;
+	masHandle& operator=(const masHandle& Rhs) = default;
+	masHandle& operator=(masHandle&& Rhs)      = default;
 
 	bool operator==(const masHandle& Rhs);
 };

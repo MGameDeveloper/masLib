@@ -16,7 +16,7 @@ private:
 	{
 		uint8_t  *Data;
 		uint32_t *FreeSlotIDs;
-		masSlot  *Slots;       // TODO: CORRECTLY SET DATA IDX
+		masSlot  *Slots;
 		uint32_t  Capacity;
 		uint32_t  FreeCount;
 		uint32_t  UsedCount;
@@ -25,11 +25,15 @@ private:
 	};
 
 	masPoolData* Pool;
-	uint8_t      ID;
+	uint8_t      PoolID;
 
 private:
 	masPoolData* Internal_Create(uint32_t ElementSize, uint32_t Capacity);
 	bool Internal_Resize();
+
+protected:
+	void*  GetElement(masHandle Handle);
+	bool   IsValidHandle(const masHandle& Handle);
 
 public:
 	masRawPool(const char* Name, uint32_t ElementSize);
@@ -39,13 +43,11 @@ public:
 	masRawPool(masRawPool&& Other)                 = delete; // Move Semantic
 	masRawPool& operator=(masRawPool&& Other)      = delete; // Move Semantic
 
-	void*     GetElement(masHandle Handle);
 	masHandle Alloc();
 	void      Free(masHandle& Handle);
-	bool      IsValidHandle(const masHandle& Handle);
+	void      AddRef(masHandle Handle);
+	bool      IsEmpty();
+	uint32_t  Capacity();
+	uint32_t  UsedCount();
+	void      Clear();
 };
-
-/*
-* TODO: ITERATOR TO ITERATE OVER ALL DATA
-*         - USEFUL FOR REGISTERY SYSTEM TO ITERATE OVER ITEMS
-*/

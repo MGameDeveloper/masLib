@@ -1,15 +1,15 @@
 #pragma once
 
 #include "../masHandle.h"
+#include "../../Resources/masTextureDefs.h"
 
-MAS_DECLARE_HANDLE(masShader);  // should be in its own api with all supported functions
-MAS_DECLARE_HANDLE(masTexture); // should be in its own api with all supported functions
-MAS_DECLARE_HANDLE(masSampler); // should be in its own api with all supported functions
 
 /**************************************************************************************************
 *
 ***************************************************************************************************/
-MAS_DECLARE_HANDLE(masMaterial);
+MAS_DECLARE_HANDLE(masShader);  // should be in its own api with all supported functions
+MAS_DECLARE_HANDLE(masTexture); // should be in its own api with all supported functions
+MAS_DECLARE_HANDLE(masSampler); // should be in its own api with all supported functions
 
 
 /**************************************************************************************************
@@ -28,20 +28,41 @@ struct masMaterialScalars
 	float Sheen;
 };
 
+struct masMaterialData
+{
+	masMaterialScalars Scalars;
+	masTexture         Textures[MAS_TEXTURE_COUNT];
+	masSampler         pSamplers[MAS_TEXTURE_COUNT];
+	masShader          Shader;
+};
+
 
 /**************************************************************************************************
 *
 ***************************************************************************************************/
-masMaterial masMaterial_Create      (const char* Name = nullptr);
-void        masMaterial_Destroy     (masMaterial* Material);
-void        masMaterial_SetShader   (masMaterial Material, masShader Shader);
-void        masMaterial_SetTexture  (masMaterial Material, int32_t TextureID, masTexture Texture);
-void        masMaterial_UnSetTexture(masMaterial Material, int32_t TextureID);
-void        masMaterial_SetScalar   (masMaterial Material, int32_t ScalarID, float Scalar);
-float       masMaterial_GetScalar   (masMaterial Material, int32_t ScalarID);
-masTexture  masMaterial_GetTexture  (masMaterial Material, int32_t TextureID);
-masShader   masMaterial_GetShader   (masMaterial Material); // should encapsulates the finding the equivalant shader or compile one based on its existing features
+class masMaterial
+{
+private:
+	masHandle Handle;
 
+public:
+	masMaterial(const char* Name);
+	~masMaterial();
+	masMaterial(const masMaterial& Other);
+	masMaterial& operator=(const masMaterial& Other);
+	masMaterial(masMaterial&& Other);
+	masMaterial& operator=(masMaterial&& Other);
+
+	void SetTexture  (int32_t TextureID, const masTexture& Texture);
+	void UnSetTexture(int32_t TextureID);
+	void SetScalar   (int32_t ScalarID, float Scalar);
+	void SetShader(masShader Shader);
+	
+	masTexture GetTexture(int32_t TextureID);
+	masShader  GetShader (int32_t Shader);
+	float      GetScalar (int32_t ScalarID);
+
+};
 
 
 /*

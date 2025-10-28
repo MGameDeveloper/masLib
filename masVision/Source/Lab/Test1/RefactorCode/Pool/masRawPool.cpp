@@ -68,14 +68,14 @@ masRawPool::masRawPool(const char* Name, uint32_t ElementSize) :
 {
 	Pool = Internal_Create(ElementSize, MAS_DEFAULT_POOL_SIZE);
 	if (Pool)
-		masPoolRegistery::Add(Name, this);
+		PoolID = masPoolRegistery::Add(Name, this);
 }
 
 masRawPool::~masRawPool()
 {
 	free(Pool);
 	Pool = nullptr;
-	masPoolRegistery::Remove(this->ID);
+	masPoolRegistery::Remove(PoolID);
 }
 
 void* masRawPool::GetElement(masHandle Handle)
@@ -116,16 +116,18 @@ masHandle masRawPool::Alloc()
 			return masHandle();
 
 		SlotID = Pool->AllocIdx++;
-		Slot   = &Pool->Slots[Pool->AllocIdx++];
+		Slot   = &Pool->Slots[SlotID];
 		Slot->DataIdx = SlotID;
 	}
 
-	Slot->GenID++;
-	Slot->RefCount++;
+	if (Slot->GenID == 0)
+		Slot->GenID = 1;
+	Slot->RefCount = 1;
 
 	masHandle Handle = { };
 	Handle.SlotIdx = SlotID;
 	Handle.GenID   = Slot->GenID;
+	Handle.PoolID  = PoolID;
 
 	Pool->UsedCount++;
 
@@ -142,16 +144,71 @@ void masRawPool::Free(masHandle& Handle)
 	if (Slot->RefCount == 0)
 	{
 		Slot->GenID++;
+		if (Slot->GenID == 0)
+			Slot->GenID = 1;
 		Pool->FreeSlotIDs[Pool->FreeCount++] = Handle.SlotIdx;
+		Pool->UsedCount--;
 	}
 
-	Handle.SlotIdx = 0;
-	Handle.GenID   = 0;
+	Handle.GenID = 0;
 }
 
 bool masRawPool::IsValidHandle(const masHandle& Handle)
 {
-	if (!Pool || (Handle.SlotIdx == 0 && Handle.GenID == 0) || (Handle.SlotIdx >= Pool->Capacity))
+	if (!Pool || Handle.GenID == 0 || Handle.SlotIdx > Pool->Capacity)
 		return false;
 	return (Handle.GenID == Pool->Slots[Handle.SlotIdx].GenID);
+}
+
+void masRawPool::AddRef(masHandle Handle)
+{
+	if (!IsValidHandle(Handle))
+		return;
+
+	Pool->Slots[Handle.SlotIdx].RefCount++;
+}
+
+bool masRawPool::IsEmpty()
+{
+	if (!Pool)
+		return true;
+
+	return (Pool->UsedCount == 0);
+}
+
+uint32_t masRawPool::Capacity()
+{
+	if (!Pool)
+		return 0;
+
+	return Pool->Capacity;
+}
+uint32_t masRawPool::UsedCount()
+{
+	if (!Pool)
+		return 0;
+
+	return Pool->UsedCount;
+}
+
+void masRawPool::Clear()
+{
+	if (!Pool)
+		return;
+
+	Pool->AllocIdx  = 0;
+	Pool->FreeCount = 0;
+	Pool->UsedCount = 0;
+	memset(Pool->FreeSlotIDs, 0, sizeof(uint32_t)  * Pool->Capacity);
+	memset(Pool->Data,        0, Pool->ElementSize * Pool->Capacity);
+	
+	masSlot* Slot = nullptr;
+	for (int32_t i = 0; i < Pool->Capacity; ++i)
+	{
+		Slot = &Pool->Slots[i];
+		Slot->RefCount = 0;
+		Slot->GenID++;
+		if (Slot->GenID == 0)
+			Slot->GenID = 1;
+	}
 }

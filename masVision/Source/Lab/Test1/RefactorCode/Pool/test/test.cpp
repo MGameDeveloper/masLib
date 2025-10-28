@@ -1,48 +1,122 @@
 #include "test.h"
 #include "../masPool.h"
-#include "../../Resources/masTextureDefs.h"
-
-/**************************************************************************************************
-*
-***************************************************************************************************/
-struct masMaterialData
-{
-	masMaterialScalars Scalars;
-	masTexture         Textures[MAS_TEXTURE_COUNT];
-	masSampler         pSamplers[MAS_TEXTURE_COUNT];
-	masShader          Shader;
-};
 
 
 /**************************************************************************************************
 *
 ***************************************************************************************************/
-static masPool<masMaterialData, masMaterial> GMaterials("Materials");
+static masPool<masMaterialData> GMaterials("Materials");
 
 
 /**************************************************************************************************
 *
 ***************************************************************************************************/
-masMaterial masMaterial_Create(const char* Name)
+
+masMaterial::masMaterial(const char* Name)
 {
-	return GMaterials.Alloc();
+	Handle = GMaterials.Alloc();
 }
 
-void masMaterial_Destroy(masMaterial* Material)
+masMaterial::~masMaterial()
 {
-	GMaterials.Free(Material);
+	GMaterials.Free(Handle);
 }
 
-void masMaterial_SetShader(masMaterial Material, masShader Shader)
+masMaterial::masMaterial(const masMaterial& Other)
 {
-	masMaterialData *Data = GMaterials.GetElement(Material);
-	if (Data)
-		Data->Shader = Shader;
+	Handle = Other.Handle;
+	GMaterials.AddRef(Handle);
 }
 
-void masMaterial_SetTexture(masMaterial Material, int32_t TextureID, masTexture Texture)
+masMaterial::masMaterial(masMaterial&& Other)
 {
-	masMaterialData *Data = GMaterials.GetElement(Material);
-	if (Data)
-		Data->Textures[TextureID] = Texture;
+	Handle = Other.Handle;
+	Other.Handle = {};
 }
+
+masMaterial& masMaterial::operator=(const masMaterial& Other)
+{
+	if (this != &Other)
+	{
+		GMaterials.Free(Handle);
+		Handle = Other.Handle;
+		GMaterials.AddRef(Handle);
+	}
+	
+	return *this;
+}
+
+masMaterial& masMaterial::operator=(masMaterial&& Other)
+{
+	if (this != &Other)
+	{
+		GMaterials.Free(Handle);
+		Handle = Other.Handle;
+		Other.Handle = {};
+	}
+
+	return *this;
+}
+
+
+
+
+void masMaterial::SetTexture(int32_t TextureID, const masTexture& Texture)
+{
+
+}
+
+void masMaterial::UnSetTexture(int32_t TextureID)
+{
+
+}
+
+void masMaterial::SetScalar(int32_t ScalarID, float Scalar)
+{
+
+}
+
+void masMaterial::SetShader(masShader Shader)
+{
+
+}
+
+masTexture masMaterial::GetTexture(int32_t TextureID)
+{
+
+}
+
+masShader masMaterial::GetShader(int32_t Shader)
+{
+
+}
+
+float masMaterial::GetScalar(int32_t ScalarID)
+{
+
+}
+
+//masMaterial masMaterial_Create(const char* Name)
+//{
+//	masMaterial Mat = GMaterials.Alloc();
+//	masMaterialData* Data = GMaterials.GetElement(Mat);
+//}
+//
+//void masMaterial_Destroy(masMaterial* Material)
+//{
+//	GMaterials.Free(Material);
+//}
+//
+//void masMaterial_SetShader(masMaterial Material, masShader Shader)
+//{
+//	masMaterialData *Data = GMaterials.GetElement(Material);
+//	if (Data)
+//		Data->Shader = Shader;
+//}
+//
+//void masMaterial_SetTexture(masMaterial Material, int32_t TextureID, masTexture Texture)
+//{
+//	masMaterialData *Data = GMaterials.GetElement(Material);
+//	if (Data)
+//		Data->Textures[TextureID] = Texture;
+//}
