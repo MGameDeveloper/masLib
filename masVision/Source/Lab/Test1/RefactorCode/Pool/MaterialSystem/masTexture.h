@@ -5,17 +5,21 @@
 class masTexture
 {
 private:
-	masHandle         Handle;
-	masTextureSampler Sampler;
+	masHandle Handle;
 
 public:
 	masTexture();
+	masTexture(const char* Path);
 	~masTexture();
 	masTexture(const masTexture& Other);
 	masTexture(masTexture&& Other);
 	masTexture& operator=(const masTexture& Rhs);
 	masTexture& operator=(masTexture&& Rhs);
 
-	masTextureSampler GetSampler();
-	void SetSampler(masTextureSampler Sampler);
+	void*            GetTexture();
+	void*            GetTextureView();
+	const char*      GetPath();
+	uint32_t         GetWidth();
+	uint32_t         GetHeight();
+	uint8_t          GetChannels();
 };

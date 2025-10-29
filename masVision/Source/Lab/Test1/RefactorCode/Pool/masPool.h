@@ -6,8 +6,8 @@ template<typename ELEMENT_TYPE>
 class masPool : public masRawPool
 {
 public:
-    masPool(const char* Name = nullptr) :
-        masRawPool(Name, sizeof(ELEMENT_TYPE))
+    masPool(const char* Name = nullptr, masPoolItemCleanFunc ItemCleanFunc = nullptr) :
+        masRawPool(Name, sizeof(ELEMENT_TYPE), ItemCleanFunc)
     { }
 
     ~masPool()

@@ -72,13 +72,22 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masRawPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masMaterialScalars.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masImageLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTextureSampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -189,6 +198,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTextureSampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masImageLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

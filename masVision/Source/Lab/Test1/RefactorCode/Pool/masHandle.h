@@ -16,14 +16,15 @@ private:
 	};
 
 public:
-	masHandle();
+	masHandle() : Sig(0) { };
 	~masHandle()                               = default;
 	masHandle(const masHandle& Other)          = default; 
 	masHandle(masHandle&& Other)               = default;
 	masHandle& operator=(const masHandle& Rhs) = default;
 	masHandle& operator=(masHandle&& Rhs)      = default;
 
-	bool operator==(const masHandle& Rhs);
+	bool operator==(const masHandle& Rhs) { return (Sig == Rhs.Sig); }
+	bool IsValid() { return (GenID != 0);}
 };
 
 #define MAS_DECLARE_HANDLE(Type)\

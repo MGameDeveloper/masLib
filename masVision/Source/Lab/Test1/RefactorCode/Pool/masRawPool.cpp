@@ -63,8 +63,8 @@ bool masRawPool::Internal_Resize()
 /**************************************************************************************************
 *
 ***************************************************************************************************/
-masRawPool::masRawPool(const char* Name, uint32_t ElementSize) :
-	Pool(nullptr)
+masRawPool::masRawPool(const char* Name, uint32_t ElementSize, masPoolItemCleanFunc ItemCleanFunc) :
+	Pool(nullptr), PoolID(0), ItemCleanFunc(ItemCleanFunc)
 {
 	Pool = Internal_Create(ElementSize, MAS_DEFAULT_POOL_SIZE);
 	if (Pool)
@@ -146,6 +146,10 @@ void masRawPool::Free(masHandle& Handle)
 		Slot->GenID++;
 		if (Slot->GenID == 0)
 			Slot->GenID = 1;
+
+		if (ItemCleanFunc)
+			ItemCleanFunc(&Pool->Data[Slot->DataIdx]);
+
 		Pool->FreeSlotIDs[Pool->FreeCount++] = Handle.SlotIdx;
 		Pool->UsedCount--;
 	}
@@ -211,4 +215,29 @@ void masRawPool::Clear()
 		if (Slot->GenID == 0)
 			Slot->GenID = 1;
 	}
+}
+
+masHandle masRawPool::Find(masPoolItemFindFunc ItemFindFunc, const void* Key)
+{
+	if (!ItemFindFunc)
+		return masHandle();
+
+	for (int32_t i = 0; i < Pool->Capacity; ++i)
+	{
+		masSlot* Slot = &Pool->Slots[i];
+		if (Slot->GenID == 0)
+			continue;
+
+		void* Data = MAS_PTR_OFFSET(void, Pool->Data, Pool->ElementSize * i);
+		if (ItemFindFunc(Data, Key))
+		{
+			masHandle Handle;
+			Handle.PoolID  = PoolID;
+			Handle.GenID   = Slot->GenID;
+			Handle.SlotIdx = i;
+			return Handle;
+		}
+	}
+
+	return masHandle();
 }

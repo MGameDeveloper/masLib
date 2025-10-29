@@ -2,6 +2,22 @@
 
 #include "masHandle.h"
 
+
+/**************************************************************************************************
+*
+***************************************************************************************************/
+typedef void(*masPoolItemCleanFunc)(void* Item);
+typedef bool(*masPoolItemFindFunc)(const void* Item, const void* Key);
+
+/**************************************************************************************************
+*
+***************************************************************************************************/
+#define MAS_POOL_ITEM_CLEAN_FUNC(Func) (masPoolItemCleanFunc)&Func
+#define MAS_POOL_ITEM_FIND_FUNC(Func)  (masPoolItemFindFunc)&Func
+
+/**************************************************************************************************
+*
+***************************************************************************************************/
 class masRawPool
 {
 private:
@@ -24,8 +40,9 @@ private:
 		uint32_t  ElementSize;
 	};
 
-	masPoolData* Pool;
-	uint8_t      PoolID;
+	masPoolItemCleanFunc  ItemCleanFunc;
+	masPoolData          *Pool;
+	uint8_t               PoolID;
 
 private:
 	masPoolData* Internal_Create(uint32_t ElementSize, uint32_t Capacity);
@@ -36,7 +53,7 @@ protected:
 	bool   IsValidHandle(const masHandle& Handle);
 
 public:
-	masRawPool(const char* Name, uint32_t ElementSize);
+	masRawPool(const char* Name, uint32_t ElementSize, masPoolItemCleanFunc ItemCleanFunc);
 	~masRawPool();
 	masRawPool(const masRawPool& Other)            = delete; // Copy Semantic
 	masRawPool& operator=(const masRawPool& Other) = delete; // Copy Semantic
@@ -50,4 +67,6 @@ public:
 	uint32_t  Capacity();
 	uint32_t  UsedCount();
 	void      Clear();
+
+	masHandle Find(masPoolItemFindFunc ItemFindFunc, const void* Key);
 };

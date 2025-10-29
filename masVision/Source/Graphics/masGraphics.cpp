@@ -129,7 +129,7 @@ void masGraphics_Present()
 	D3D11.SwapChain->Present(0, 0);
 }
 
-ComPtr<ID3D11Buffer> masGraphics_CreateVertexBuffer(const void* Vertices, uint32_t VertexCount, uint64_t VertexSize)
+ID3D11Buffer* masGraphics_CreateVertexBuffer(const void* Vertices, uint32_t VertexCount, uint64_t VertexSize)
 {
 	const masD3D11* x = &D3D11;
 
@@ -146,14 +146,14 @@ ComPtr<ID3D11Buffer> masGraphics_CreateVertexBuffer(const void* Vertices, uint32
 	Data.SysMemPitch      = 0;
 	Data.SysMemSlicePitch = 0;
 
-	ComPtr<ID3D11Buffer> pVertices = nullptr;
+	ID3D11Buffer *pVertices = nullptr;
 	HRESULT hr = x->Device->CreateBuffer(&Desc, &Data, &pVertices);
 	MAS_ASSERT(SUCCEEDED(hr), "GRAPHICS_CREATE_MESH_VERTICES: FAILED");
 
 	return pVertices;
 }
 
-ComPtr<ID3D11Buffer> masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t IndexCount)
+ID3D11Buffer* masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t IndexCount)
 {
 	const masD3D11* x = &D3D11;
 
@@ -170,23 +170,20 @@ ComPtr<ID3D11Buffer> masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint
 	Data.SysMemPitch      = 0;
 	Data.SysMemSlicePitch = 0;
 
-	ComPtr<ID3D11Buffer> pIndices = nullptr;
+	ID3D11Buffer *pIndices = nullptr;
 	HRESULT hr = x->Device->CreateBuffer(&Desc, &Data, &pIndices);
 	MAS_ASSERT(SUCCEEDED(hr), "GRAPHICS_CREATE_MESH_INDICES: FAILED");
 
 	return pIndices;
 }
 
-ComPtr<ID3D11Texture2D> masGraphics_CreateTexture2D(const char* Path)
+ID3D11Texture2D* masGraphics_CreateTexture2D(uint8_t* Data, uint32_t Width, uint32_t Height, uint32_t Channels)
 {
-	int32_t RequiredChannels = 4;
-	int32_t w, h, c;
-	uint8_t* Image = stbi_load(Path, &w, &h, &c, RequiredChannels);
-	MAS_ASSERT(Image, "STBI_LOAD: Image -> %s", Path);
+	MAS_ASSERT(Channels == 4, "DIRECTX 11: UNSUPPORTED_TEXTURE_FORMAT must be RGBA");
 
 	D3D11_TEXTURE2D_DESC ImageDesc = { };
-	ImageDesc.Width          = w;
-	ImageDesc.Height         = h;
+	ImageDesc.Width          = Width;
+	ImageDesc.Height         = Height;
 	ImageDesc.MipLevels      = 1;
 	ImageDesc.ArraySize      = 1;
 	ImageDesc.Format         = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -197,30 +194,26 @@ ComPtr<ID3D11Texture2D> masGraphics_CreateTexture2D(const char* Path)
 	ImageDesc.MiscFlags      = 0;
 
 	D3D11_SUBRESOURCE_DATA ImageData = { };
-	ImageData.pSysMem          = Image;
-	ImageData.SysMemPitch      = w * RequiredChannels;
+	ImageData.pSysMem          = Data;
+	ImageData.SysMemPitch      = Width * Channels;
 	ImageData.SysMemSlicePitch = 0;
 
-	ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
+	ID3D11Texture2D *pTexture2D = nullptr;
 	HRESULT hr = D3D11.Device->CreateTexture2D(&ImageDesc, &ImageData, &pTexture2D);
-	MAS_ASSERT(SUCCEEDED(hr), "Creating Texture2D: %s", Path);
-
-	stbi_image_free(Image);
-	Image = nullptr;
 
 	return pTexture2D;
 }
 
-ComPtr<ID3D11ShaderResourceView> masGraphics_CreateShaderResourceView_Texture2D(ComPtr<ID3D11Texture2D> pTexture2D)
+ID3D11ShaderResourceView* masGraphics_CreateShaderResourceView_Texture2D(ID3D11Texture2D* pTexture2D)
 {
-	ComPtr<ID3D11ShaderResourceView> pSRV = nullptr;
-	HRESULT hr = D3D11.Device->CreateShaderResourceView(pTexture2D.Get(), nullptr, &pSRV);
+	ID3D11ShaderResourceView* pSRV = nullptr;
+	HRESULT hr = D3D11.Device->CreateShaderResourceView(pTexture2D, nullptr, &pSRV);
 	MAS_ASSERT(SUCCEEDED(hr), "Create ResourceView");
 
 	return pSRV;
 }
 
-ComPtr<ID3D11SamplerState> masGraphics_CreateSamplerState()
+ID3D11SamplerState* masGraphics_CreateSamplerState()
 {
 	const masD3D11* x = masGraphics_D3D11();
 
@@ -240,7 +233,7 @@ ComPtr<ID3D11SamplerState> masGraphics_CreateSamplerState()
 	SamplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
 
 
-	ComPtr<ID3D11SamplerState> pSampler = nullptr;
+	ID3D11SamplerState* pSampler = nullptr;
 	HRESULT hr = x->Device->CreateSamplerState(&SamplerDesc, &pSampler);
 	MAS_ASSERT(SUCCEEDED(hr), "CREATE_SAMPLER_STATE");
 
