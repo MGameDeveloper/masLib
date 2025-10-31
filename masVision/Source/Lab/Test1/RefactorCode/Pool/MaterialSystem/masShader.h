@@ -5,7 +5,9 @@
 class masShader
 {
 private:
-	masHandle Handle;
+	masHandle VertexShader;
+	masHandle PixelShader;
+	masHandle InputLayout;
 
 public:
 	masShader();

@@ -27,6 +27,12 @@ public:
 	bool IsValid() { return (GenID != 0);}
 };
 
+struct masHandleNode
+{
+	masHandle Handle;
+	int32_t   NextNode;
+};
+
 #define MAS_DECLARE_HANDLE(Type)\
     class Type : masHandle      \
     {                           \

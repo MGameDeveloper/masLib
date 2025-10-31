@@ -31,4 +31,4 @@ ID3D11Buffer*             masGraphics_CreateIndexBuffer(const uint32_t* Indices,
 ID3D11ShaderResourceView* masGraphics_CreateShaderResourceView_Texture2D(ID3D11Texture2D* pTexture2D);
 ID3D11SamplerState*       masGraphics_CreateSamplerState();
 
-ID3D11Texture2D* masGraphics_CreateTexture2D(uint8_t* Data, uint32_t Width, uint32_t Height, uint32_t Channels);
+ID3D11Texture2D* masGraphics_CreateTexture2D(const uint8_t* Data, uint32_t Width, uint32_t Height, uint32_t Channels);

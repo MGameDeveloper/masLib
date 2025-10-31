@@ -177,7 +177,7 @@ ID3D11Buffer* masGraphics_CreateIndexBuffer(const uint32_t* Indices, uint32_t In
 	return pIndices;
 }
 
-ID3D11Texture2D* masGraphics_CreateTexture2D(uint8_t* Data, uint32_t Width, uint32_t Height, uint32_t Channels)
+ID3D11Texture2D* masGraphics_CreateTexture2D(const uint8_t* Data, uint32_t Width, uint32_t Height, uint32_t Channels)
 {
 	MAS_ASSERT(Channels == 4, "DIRECTX 11: UNSUPPORTED_TEXTURE_FORMAT must be RGBA");
 

@@ -156,6 +156,9 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masMaterialScalars.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTexture.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTextureSampler.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\masPool.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\MaterialSystem\masImageLoader.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\MaterialSystem\masTexture.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\test\test.cpp" />
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp" />
     <ClCompile Include="Source\Lab\Test1\Test1.cpp" />
@@ -172,6 +175,7 @@
     <ClInclude Include="Source\Lab\Test1\masAssetManager.h" />
     <ClInclude Include="Source\Lab\Test1\masFileSearch.h" />
     <ClInclude Include="Source\Lab\Test1\masModel.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masHandleList.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\masScene.h" />
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h" />
     <ClInclude Include="Source\Lab\Test1\masScene.h" />
@@ -185,6 +189,14 @@
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masShader.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTexture.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\MaterialSystem\masTextureSampler.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\ModelLoader\masModel.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\masHandle.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\masPool.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\masPoolRegistery.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\MaterialSystem\masImageLoader.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\MaterialSystem\masTexture.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\ModelSystem\masMesh.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\ModelSystem\masModel.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\test\test.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masCamera.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Resources\masLight.h" />
