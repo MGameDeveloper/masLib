@@ -147,6 +147,7 @@
     <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_tables.cpp" />
     <ClCompile Include="Source\Lab\Test1\ImGuiSRC\imgui_widgets.cpp" />
     <ClCompile Include="Source\Lab\Test1\masModel.cpp" />
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Array\masArray.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\masScene.cpp" />
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\masPoolRegistery.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Source\Lab\Test1\masAssetManager.h" />
     <ClInclude Include="Source\Lab\Test1\masFileSearch.h" />
     <ClInclude Include="Source\Lab\Test1\masModel.h" />
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masArray.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\masHandleList.h" />
     <ClInclude Include="Source\Lab\Test1\RefactorCode\masScene.h" />
     <ClInclude Include="Source\Lab\Test1\masResourceMap.h" />

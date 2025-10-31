@@ -99,6 +99,9 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\MaterialSystem\masImageLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test1\RefactorCode\Array\masArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -243,6 +246,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Pool\RefactorPool\ModelSystem\masMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
