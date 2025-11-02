@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "masHandle.h"
 
 struct masArray;
 
@@ -13,7 +13,13 @@ int32_t     masArray_ResizeCount(masArray* Array);
 int32_t     masArray_FreeCount(masArray* Array);
 int32_t     masArray_ElementSize(masArray* Array);
 const char* masArray_RegsiterName(masArray* Array);
-const void* masArray_Element(masArray* Array, int32_t Idx);
+const void* masArray_Element(masArray* Array, masHandle Handle);
+
+void* masArray_Alloc(masArray* Array, int32_t* OutIdx);
+void  masArray_Free(masArray* Array, int32_t Idx);
+
+#define MAS_ARRAY_ALLOC(Type, Array, OutIdx) (Type*)masArray_Alloc(Array, OutIdx)
+#define MAS_ARRAY_FREE(Array, Idx)                  masArray_Free(Array, Idx);
 
 // void masArray_CompactElements(masArray* Array);
 

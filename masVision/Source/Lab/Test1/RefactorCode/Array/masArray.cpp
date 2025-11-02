@@ -6,9 +6,17 @@
 #define MAS_REGISTER_NAME_SIZE 128
 #define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
 
+struct masSlot
+{
+	uint32_t DataIdx;
+	uint16_t Version;
+	uint16_t RefCount;
+};
+
 struct masArray
 {
 	uint8_t *Data;
+	masSlot *Slots;
 	int32_t *FreeIndices;
 	int32_t  FreeCount;
 	int32_t  AllocIdx;
@@ -26,6 +34,7 @@ masArray* masArray_Create(const char* RegisterName, int32_t ElementSize, int32_t
 		return NULL;
 
 	uint64_t  DataSize    = ElementSize     * Capacity;
+	uint64_t  SlotSize    = sizeof(masSlot) * Capacity;
 	uint64_t  IndicesSize = sizeof(int32_t) * Capacity;
 	uint64_t  MemorySize  = sizeof(masArray) + DataSize + IndicesSize;
 	masArray *Array       = (masArray*)malloc(MemorySize);
@@ -34,8 +43,9 @@ masArray* masArray_Create(const char* RegisterName, int32_t ElementSize, int32_t
 
 	memset(Array, 0, MemorySize);
 
-	Array->Data        = MAS_PTR_OFFSET(uint8_t, Array,       sizeof(masArray));
-	Array->FreeIndices = MAS_PTR_OFFSET(int32_t, Array->Data, DataSize);
+	Array->Data        = MAS_PTR_OFFSET(uint8_t, Array,        sizeof(masArray));
+	Array->Slots       = MAS_PTR_OFFSET(masSlot, Array->Data,  DataSize);
+	Array->FreeIndices = MAS_PTR_OFFSET(int32_t, Array->Slots, SlotSize);
 	Array->Capacity    = Capacity;
 	Array->ElementSize = ElementSize;
 	Array->AllocIdx    = 0;
@@ -120,10 +130,38 @@ const char* masArray_RegsiterName(masArray* Array)
 	return Array->RegisterName;
 }
 
-const void* masArray_Element(masArray* Array, int32_t Idx)
+const void* masArray_Element(masArray* Array, masHandle Handle)
 {
-	if (!Array || Idx < 0)
-		return NULL;
-	const void* Data = MAS_PTR_OFFSET(const void, Array->Data, Array->ElementSize * Idx);
-	return Data;
+
+}
+
+void* masArray_Alloc(masArray* Array, int32_t* OutIdx)
+{
+	if (!Array)
+		return { 0 };
+
+
+	int32_t DataIdx = -1;
+	if (Array->AllocIdx >= Array->Capacity)
+	{
+		if (Array->FreeCount <= 0)
+			masInternal_Resize();
+		else
+		{
+			DataIdx = Array->FreeIndices[--Array->FreeCount];
+			Array->FreeIndices[Array->FreeCount + 1] = -1;
+		}
+	}
+
+	if (DataIdx == -1)
+		DataIdx = Array->AllocIdx++;
+
+	masHandle Handle = masHandle_Alloc(Array, DataIdx);
+	
+	return Handle;
+}
+
+void masArray_Free(masArray* Array, int32_t Idx)
+{
+
 }
