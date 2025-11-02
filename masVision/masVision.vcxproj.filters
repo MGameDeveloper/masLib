@@ -251,5 +251,8 @@
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

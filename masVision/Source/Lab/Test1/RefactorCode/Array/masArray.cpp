@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAS_NAME_SIZE 128
+#define MAS_REGISTER_NAME_SIZE 128
 #define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
 
 struct masArray
@@ -17,10 +17,10 @@ struct masArray
 	int32_t  ElementSize;
 	int32_t  ResizeCounter;
 	int8_t   RegisterID;
-	char     Name[MAS_NAME_SIZE];
+	char     RegisterName[MAS_REGISTER_NAME_SIZE];
 };
 
-masArray* masArray_Create(const char* Name, int32_t ElementSize, int32_t Capacity)
+masArray* masArray_Create(const char* RegisterName, int32_t ElementSize, int32_t Capacity)
 {
 	if (ElementSize <= 0 || Capacity <= 0)
 		return NULL;
@@ -43,14 +43,14 @@ masArray* masArray_Create(const char* Name, int32_t ElementSize, int32_t Capacit
 	Array->UseCount    = 0;
 	Array->RegisterID  = -1;
 
-	if (Name)
+	if (RegisterName)
 	{
-		uint64_t NameLen = strlen(Name);
-		if (NameLen >= MAS_NAME_SIZE)
-			NameLen = MAS_NAME_SIZE - 1;
-		memcpy(Array->Name, Name, NameLen);
+		uint64_t NameLen = strlen(RegisterName);
+		if (NameLen >= MAS_REGISTER_NAME_SIZE)
+			NameLen = MAS_REGISTER_NAME_SIZE - 1;
+		memcpy(Array->RegisterName, RegisterName, NameLen);
 
-		//Array->RegisterID = masArrayRegistery_Add(Name, Array);
+		//Array->RegisterID = masArrayRegistery_Add(RegisterName, Array);
 	}
 
 
@@ -113,11 +113,11 @@ int32_t masArray_ElementSize(masArray* Array)
 	return Array->ElementSize;
 }
 
-const char* masArray_Name(masArray* Array)
+const char* masArray_RegsiterName(masArray* Array)
 {
 	if (!Array)
 		return NULL;
-	return Array->Name;
+	return Array->RegisterName;
 }
 
 const void* masArray_Element(masArray* Array, int32_t Idx)
