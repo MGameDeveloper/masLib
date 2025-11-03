@@ -102,9 +102,6 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Array\masArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Lab\Test1\RefactorCode\Array\masHandlePool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -255,9 +252,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masHandlePool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
