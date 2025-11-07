@@ -58,9 +58,9 @@ bool masInternal_Resize(masArray** ArrayPtr)
 
 	memset(LocalArray, 0, MemorySize);
 
-	LocalArray->Data        = MAS_PTR_OFFSET(uint8_t,   Array,          sizeof(masArray));
-	LocalArray->Mappers     = MAS_PTR_OFFSET(masMapper, Array->Data,    DataSize);
-	LocalArray->FreeIndices = MAS_PTR_OFFSET(int32_t,   Array->Mappers, MappersSize);
+	LocalArray->Data        = MAS_PTR_OFFSET(uint8_t,   LocalArray,          sizeof(masArray));
+	LocalArray->Mappers     = MAS_PTR_OFFSET(masMapper, LocalArray->Data,    DataSize);
+	LocalArray->FreeIndices = MAS_PTR_OFFSET(int32_t,   LocalArray->Mappers, MappersSize);
 	LocalArray->Capacity    = Capacity;
 	LocalArray->ElementSize = Array->ElementSize;
 	LocalArray->AllocIdx    = Array->AllocIdx;
