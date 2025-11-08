@@ -24,11 +24,10 @@ struct masMapper
 struct masNode
 {
 	masHandle Transform;
-	masHandle Parent;
-	masHandle Prev;
-	masHandle Next;
-	int32_t   ChildIdx;
-	int32_t   ChildCount;
+	masHandle Parent; // handles into scenegraph mapper
+	masHandle Prev;	  // handles into scenegraph mapper
+	masHandle Next;	  // handles into scenegraph mapper
+	masHandle Child;  // handles into scenegraph mapper
 };
 
 struct masSceneGraph
@@ -213,21 +212,49 @@ masHandle masSceneGraph_Alloc(masSceneGraph** SceneGraphPtr)
 
 	masNode* Node = &SceneGraph->Nodes[Mapper->DataIdx];
 	//Node->Transform = masTransform_Create();
-	Node->Parent     = { 0 };
-	Node->Prev       = { 0 };
-	Node->Next       = { 0 };
-	Node->ChildIdx   = -1;
-	Node->ChildCount = 0;
+	Node->Parent = { 0 };
+	Node->Prev   = { 0 };
+	Node->Next   = { 0 };
+	Node->Child  = { 0 };
 
 	return Handle;
 }
 
 void masSceneGraph_Free(masSceneGraph* SceneGraph, masHandle* Handle)
 {
-	// TODO
+	if (!SceneGraph || !Handle || Handle->Signiture == 0)
+		return;
+	if (SceneGraph->RegisterID != Handle->PoolID)
+		return;
+
+	masMapper* ParentMapper = &SceneGraph->Mappers[Handle->MapperIdx];
+	if (ParentMapper->Version != Handle->Version)
+		return;
+
+	ParentMapper->RefCount--;
+	if (ParentMapper->RefCount <= 0)
+	{
+		// free all children and dettach from prev next if exist and free it
+	}
+
+	*Handle = { 0 };
 }
 
-bool masSceneGraph_AllocChildren(masSceneGraph* SceneGraph, masHandle ParentNode, int32_t ChildrenCount)
+masHandle masSceneGraph_AddChild(masSceneGraph** SceneGraphPtr, masHandle ParentNode)
 {
+	if (!SceneGraphPtr || ParentNode.Signiture == 0)
+		return { 0 };
 
+	masSceneGraph* SceneGraph = *SceneGraphPtr;
+	if (SceneGraph->RegisterID != ParentNode.PoolID)
+		return { 0 };
+
+	masMapper* Mapper = &SceneGraph->Mappers[ParentNode.MapperIdx];
+	if (Mapper->Version != ParentNode.Version)
+		return { 0 };
+
+	masHandle ChildHandle;
+	// set childhandl up
+
+	return ChildHandle;
 }
