@@ -27,7 +27,10 @@ struct masNode
 	masHandle Parent; // handles into scenegraph mapper
 	masHandle Prev;	  // handles into scenegraph mapper
 	masHandle Next;	  // handles into scenegraph mapper
-	masHandle Child;  // handles into scenegraph mapper
+	masHandle ChildHead;  // handles into scenegraph mapper
+	masHandle ChildTail;
+	int32_t   ChildCount;
+	bool      IsDirty;
 };
 
 struct masSceneGraph
@@ -87,6 +90,64 @@ bool masInternal_Resize(masSceneGraph** SceneGraphPtr)
 
 	return true;
 }
+
+masNode* masInternal_GetNode(masSceneGraph* SceneGraph, masHandle NodeHandle)
+{
+	if (!SceneGraph || NodeHandle.Signiture == 0)
+		return NULL;
+	if (SceneGraph->RegisterID != NodeHandle.PoolID)
+		return NULL;
+
+	masMapper* Mapper = &SceneGraph->Mappers[NodeHandle.MapperIdx];
+	if (Mapper->Version != NodeHandle.Version)
+		return NULL;
+
+	masNode* Node = &SceneGraph->Nodes[Mapper->DataIdx];
+	return Node;
+}
+
+masHandle masInternal_Alloc(masSceneGraph** SceneGraphPtr)
+{
+	if (!SceneGraphPtr || !(*SceneGraphPtr))
+		return { 0 };
+
+	masSceneGraph* SceneGraph = *SceneGraphPtr;
+
+	int32_t MapperIdx = -1;
+	if (SceneGraph->AllocIdx >= SceneGraph->Capacity)
+	{
+		if (SceneGraph->FreeCount <= 0)
+		{
+			if (masInternal_Resize(SceneGraphPtr))
+				SceneGraph = *SceneGraphPtr;
+			else
+				return { 0 };
+		}
+		else
+		{
+			MapperIdx = SceneGraph->FreeIndices[--SceneGraph->FreeCount];
+			SceneGraph->FreeIndices[SceneGraph->FreeCount] = -1;
+		}
+	}
+
+	if (MapperIdx == -1)
+		MapperIdx = SceneGraph->AllocIdx++;
+
+	masMapper* Mapper = &SceneGraph->Mappers[MapperIdx];
+	Mapper->DataIdx = MapperIdx;
+	Mapper->RefCount = 1;
+	Mapper->Version++;
+	if (Mapper->Version == 0)
+		Mapper->Version = 1;
+
+	masHandle Handle = { 0 };
+	Handle.MapperIdx = MapperIdx;
+	Handle.PoolID = SceneGraph->RegisterID;
+	Handle.Version = Mapper->Version;
+
+	return Handle;
+}
+
 
 
 /*************************************************************************************************************
@@ -190,7 +251,7 @@ masHandle masSceneGraph_Alloc(masSceneGraph** SceneGraphPtr)
 		else
 		{
 			MapperIdx = SceneGraph->FreeIndices[--SceneGraph->FreeCount];
-			SceneGraph->FreeIndices[SceneGraph->FreeCount + 1] = -1;
+			SceneGraph->FreeIndices[SceneGraph->FreeCount] = -1;
 		}
 	}
 
@@ -212,10 +273,11 @@ masHandle masSceneGraph_Alloc(masSceneGraph** SceneGraphPtr)
 
 	masNode* Node = &SceneGraph->Nodes[Mapper->DataIdx];
 	//Node->Transform = masTransform_Create();
-	Node->Parent = { 0 };
-	Node->Prev   = { 0 };
-	Node->Next   = { 0 };
-	Node->Child  = { 0 };
+	Node->Parent    = { 0 };
+	Node->Prev      = { 0 };
+	Node->Next      = { 0 };
+	Node->ChildHead = { 0 };
+	Node->ChildTail = { 0 };
 
 	return Handle;
 }
@@ -240,21 +302,96 @@ void masSceneGraph_Free(masSceneGraph* SceneGraph, masHandle* Handle)
 	*Handle = { 0 };
 }
 
-masHandle masSceneGraph_AddChild(masSceneGraph** SceneGraphPtr, masHandle ParentNode)
+
+/************************************************************************************************************/
+
+masHandle masSceneGraph_AddChildFirst(masSceneGraph** SceneGraphPtr, masHandle ParentHandle)
 {
-	if (!SceneGraphPtr || ParentNode.Signiture == 0)
+	if (!SceneGraphPtr || ParentHandle.Signiture == 0)
 		return { 0 };
 
 	masSceneGraph* SceneGraph = *SceneGraphPtr;
-	if (SceneGraph->RegisterID != ParentNode.PoolID)
+	if (SceneGraph->RegisterID != ParentHandle.PoolID)
 		return { 0 };
 
-	masMapper* Mapper = &SceneGraph->Mappers[ParentNode.MapperIdx];
-	if (Mapper->Version != ParentNode.Version)
+	masNode* ParentNode = masInternal_GetNode(SceneGraph, ParentHandle);
+	if (!ParentNode)
 		return { 0 };
 
-	masHandle ChildHandle;
-	// set childhandl up
+	masHandle NewChildHandle = masInternal_Alloc(SceneGraphPtr);
+	if (NewChildHandle.Signiture == 0)
+		return { 0 };
 
-	return ChildHandle;
+	masNode* NewChildNode   = masInternal_GetNode(SceneGraph, NewChildHandle);
+	NewChildNode->Transform = { 0 }; // need to create transform component and return handle for this node
+	NewChildNode->Parent    = ParentHandle;
+	NewChildNode->Next      = { 0 };
+	NewChildNode->Prev      = { 0 };
+	NewChildNode->ChildHead = { 0 };
+	NewChildNode->ChildTail = { 0 };
+	NewChildNode->IsDirty   = false;
+
+	masHandle  HeadChildHandle = ParentNode->ChildHead;
+	masNode   *HeadChildNode   = masInternal_GetNode(SceneGraph, HeadChildHandle);
+	if (HeadChildNode)
+	{
+		ParentNode->ChildHead  = NewChildHandle;
+		NewChildNode->Next     = HeadChildHandle;
+		HeadChildNode->Prev    = NewChildHandle;
+		ParentNode->ChildCount++;
+	}
+	else
+	{
+		ParentNode->ChildHead = NewChildHandle;
+		ParentNode->ChildTail = NewChildHandle;
+		ParentNode->ChildCount = 1;
+	}
+
+	
+	return NewChildHandle;
+}
+
+masHandle masSceneGraph_AddChildLast(masSceneGraph** SceneGraphPtr, masHandle ParentHandle)
+{
+	if (!SceneGraphPtr || ParentHandle.Signiture == 0)
+		return { 0 };
+
+	masSceneGraph* SceneGraph = *SceneGraphPtr;
+	if (SceneGraph->RegisterID != ParentHandle.PoolID)
+		return { 0 };
+
+	masNode* ParentNode = masInternal_GetNode(SceneGraph, ParentHandle);
+	if (!ParentNode)
+		return { 0 };
+
+	masHandle NewChildHandle = masInternal_Alloc(SceneGraphPtr);
+	if (NewChildHandle.Signiture == 0)
+		return { 0 };
+
+	masNode* NewChildNode   = masInternal_GetNode(SceneGraph, NewChildHandle);
+	NewChildNode->Transform = { 0 }; // need to create transform component and return handle for this node
+	NewChildNode->Parent    = ParentHandle;
+	NewChildNode->Next      = { 0 };
+	NewChildNode->Prev      = { 0 };
+	NewChildNode->ChildHead = { 0 };
+	NewChildNode->ChildTail = { 0 };
+	NewChildNode->IsDirty   = false;
+
+	masHandle  ChildTailHandle = ParentNode->ChildTail;
+	masNode   *ChildTailNode   = masInternal_GetNode(SceneGraph, ChildTailHandle);
+	if (ChildTailNode)
+	{
+		ChildTailNode->Next   = NewChildHandle;
+		NewChildNode->Prev    = ChildTailHandle;
+		ParentNode->ChildTail = NewChildHandle;
+		ParentNode->ChildCount++;
+	}
+	else
+	{
+		ParentNode->ChildHead = NewChildHandle;
+		ParentNode->ChildTail = NewChildHandle;
+		ParentNode->ChildCount = 1;
+	}
+
+	return NewChildHandle;
 }
