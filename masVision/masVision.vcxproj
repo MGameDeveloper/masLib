@@ -164,6 +164,8 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Pool\test\test.cpp" />
     <ClCompile Include="Source\Lab\Test1\Renderer\masRender.cpp" />
     <ClCompile Include="Source\Lab\Test1\Test1.cpp" />
+    <ClCompile Include="Source\Lab\Test2\DataStructure\masSparseArray.cpp" />
+    <ClCompile Include="Source\Lab\Test2\ECSFrame\Prototype_V1.cpp" />
     <ClCompile Include="Source\masVision.cpp" />
     <ClCompile Include="Source\Time\masTime.cpp" />
     <ClCompile Include="Source\Window\masWindow.cpp" />
@@ -216,6 +218,8 @@
     <ClInclude Include="Source\Lab\Test1\Renderer\masShader.h" />
     <ClInclude Include="Source\Lab\Test1\Renderer\masTextureDefs.h" />
     <ClInclude Include="Source\Lab\Test1\Test1.h" />
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype.h" />
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype_V1.h" />
     <ClInclude Include="Source\masCommon.h" />
     <ClInclude Include="Source\masVision.h" />
     <ClInclude Include="Source\Time\masTime.h" />

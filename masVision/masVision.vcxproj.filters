@@ -105,6 +105,12 @@
     <ClCompile Include="Source\Lab\Test1\RefactorCode\Array\masSceneGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Lab\Test2\DataStructure\masSparseArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Lab\Test2\ECSFrame\Prototype_V1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window\masWindow.h">
@@ -258,6 +264,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test1\RefactorCode\Array\masSceneGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype_V1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

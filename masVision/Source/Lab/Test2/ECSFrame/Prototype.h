@@ -39,3 +39,27 @@ typedef struct _masEntityDesc
 
 
 // EntityID(idx) -> EntityDesc(size_in_memory + first component desc meta) -> ComponentDescMetaData(type + ID) -> Internal per component pool(meshcomp, scenecomp, transformcomp, ...)
+
+typedef uint8_t* masComponentArray;
+
+typedef struct _masArchType
+{
+    masEntity         *Entities;
+    masComponentArray *ComponentArrays;
+    uint32_t          *ComponentArraysType;
+    uint32_t           Capacity;
+    uint32_t           UsedCount;
+} masArchType;
+
+typedef struct _masArchTypeDesc
+{
+    masArchType *ArchType;
+    uint64_t     ArchTypeHash;
+    char         Name[128];
+} masArchTypeDesc;
+
+typedef struct _masArchTypeRegistery
+{
+    masArchTypeDesc **ArchTypes;
+    uint32_t          Count;
+} masArchTypeRegistery;

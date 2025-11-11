@@ -346,7 +346,6 @@ masHandle masSceneGraph_AddChildFirst(masSceneGraph** SceneGraphPtr, masHandle P
 		ParentNode->ChildTail = NewChildHandle;
 		ParentNode->ChildCount = 1;
 	}
-
 	
 	return NewChildHandle;
 }
