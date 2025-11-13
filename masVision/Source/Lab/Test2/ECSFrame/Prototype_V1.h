@@ -6,6 +6,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 // 
 ///////////////////////////////////////////////////////////////////////////////////////
+
+// actual handles generated for outer code and gameplay logic
 typedef union _masEntity
 {
 	uint64_t Signature;
@@ -16,6 +18,7 @@ typedef union _masEntity
 	};
 } masEntity;
 
+// For outer handles safty and validity
 typedef struct _masEntityMapper
 {
     uint32_t EntityID;
@@ -28,6 +31,8 @@ typedef struct _masEntityMapper
 ///////////////////////////////////////////////////////////////////////////////////////
 // 
 ///////////////////////////////////////////////////////////////////////////////////////
+
+// Represents a single page[ 16kb ] of entity with specific components combination
 typedef struct _masArchTypeChunk
 {
     uint8_t   **ComponentArrays;
@@ -36,6 +41,7 @@ typedef struct _masArchTypeChunk
     uint16_t    EntityUsedCount;
 } masArchTypeChunk;
 
+// Represents all pages for an entity type that has a specific combination of components
 typedef struct _masArchType
 {
     masArchTypeChunk **Chunks; // realloc to expand pointer list internal data stays in chunkpool
@@ -45,6 +51,7 @@ typedef struct _masArchType
     uint8_t            ComponentCount;
 } masArchType;
 
+// Describe an archtype that is registerd to be search for or filtered by systems of interest
 typedef struct _masArchTypeDesc
 {
     masArchType *ArchType;
@@ -52,6 +59,8 @@ typedef struct _masArchTypeDesc
     char         Name[128];
 } masArchTypeDesc;
 
+
+// The registery that hold all archtypes of the game
 typedef struct _masArchTypeRegistery
 {
     masArchTypeDesc **ArchTypes; // realloc to expand
@@ -77,13 +86,48 @@ typedef struct _masComponentRegistery
     // size and alignment
 } masComponentRegistery;
 
+// as per system request for components it need to work with
+typedef struct _masArchTypeFilterChunk
+{
+    masEntity  *Entities;
+    uint8_t   **Components; // all requested components' pointer collected from all archtypes that have the requested data
+    uint16_t    Count;
+} masArchTypeFilterChunk;
+
+typedef struct _masArchTypeFilter
+{
+    masArchTypeFilterChunk **FilterChunks;
+    uint16_t *ComponentStrides;
+    uint16_t *ComponentTypes;  
+    uint16_t  ComponentCount;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // FUNC PROTOTYPE
 ///////////////////////////////////////////////////////////////////////////////////////
 
-struct masTransformComponent { /*data*/ };
-struct masSceneComponent     { /*data*/ };
+#define MAS_PROFILE_BEGIN()
+#define MAS_PROFILE_END()
+
+struct masTransformComponent 
+{ 
+    float world[16];
+    float positoin[3];
+    float rotate[4];
+    float scale[3];
+};
+
+struct masSceneComponent     
+{ 
+    uint16_t CacheParentTransformIdx;
+    uint16_t CacheParentDepthIdx;
+    uint16_t ThisDepth;
+};
+
+// masArchType A = { masTransformComponent, masSceneComponent, masRigidBodyComponent }
+// masArchType B = { masTransformComponent, masSceneComponent, masAudioComponent }
+
 
 // example of system that target SceneComponent to transform entity and maintain hierarchy 
 // REQUIRES: Sorting by depth to ensure parent processed before children and so on
@@ -91,27 +135,107 @@ void masUpdateSceneTransformsB()
 {
     MAS_PROFILE_BEGIN();
 
-    masArchTypeArray ArchTypeArray = MAS_ECS_FIND_ARCHTYPE(masSceneComponent);
-    if (ArchTypeArray->Count == 0)
-        return;
-
-    for (int32_t ArchTypeIdx = 0; ArchTypeIdx < ArchTypeArray->Count; ++ArchTypeIdx)
-    {
-        masArchType* ArchType = ArchTypeArray.ArchTypes[ArchTypeIdx];
-
-        for (int32_t ChunkIdx = 0; ChunkIdx < ArchType->ChunkUsedCount; ++ChunkIdx)
-        {
-            masArchTypeChunk* Chunk = ArchType->Chunks[ChunkIdx];
-            for (int32_t EntityIdx = 0; EntityIdx < Chunk->EntityUsedCount; ++EntityIdx)
-            {
-                masEntity              Entity    = Chunk->Entities[EntityIdx];
-                masTransformComponent *Transform = MAS_ECS_GET_COMPONENT(masTransformComponent, EntityIdx, Chunk->ComponentArrays);
-                masSceneComponent     *Scene     = MAS_ECS_GET_COMPONENT(masSceneComponent,     EntityIdx, Chunk->ComponentArrays);
-
-                // logic
-            }
-        }
-    }
+    //masArchTypeArray ArchTypeArray = MAS_ECS_FIND_ARCHTYPE(masSceneComponent);
+    //if (ArchTypeArray->Count == 0)
+    //    return;
+    //
+    //for (int32_t ArchTypeIdx = 0; ArchTypeIdx < ArchTypeArray->Count; ++ArchTypeIdx)
+    //{
+    //    masArchType* ArchType = ArchTypeArray.ArchTypes[ArchTypeIdx];
+    //
+    //    for (int32_t ChunkIdx = 0; ChunkIdx < ArchType->ChunkUsedCount; ++ChunkIdx)
+    //    {
+    //        masArchTypeChunk* Chunk = ArchType->Chunks[ChunkIdx];
+    //        for (int32_t EntityIdx = 0; EntityIdx < Chunk->EntityUsedCount; ++EntityIdx)
+    //        {
+    //            masEntity              Entity    = Chunk->Entities[EntityIdx];
+    //            masTransformComponent *Transform = MAS_ECS_GET_COMPONENT(masTransformComponent, EntityIdx, Chunk->ComponentArrays);
+    //            masSceneComponent     *Scene     = MAS_ECS_GET_COMPONENT(masSceneComponent,     EntityIdx, Chunk->ComponentArrays);
+    //
+    //            // logic
+    //        }
+    //    }
+    //}
 
     MAS_PROFILE_END();
 }
+
+
+// lives in its own 16kb pages ownes by SceneHierarchyFlatteningSystem
+typedef struct _masFlatSceneHierarcy 
+{ 
+    /*Data*/ 
+} masFlatSceneHierarchy;
+
+masFlatSceneHierarchy* masFlattenSceneHierarchy()
+{
+    // Build Depth Sort Wavefront
+    // Owns Entity Relation Memory
+}
+
+void masPropagationSceneTransform(masFlatSceneHierarchy* FlatScene)
+{
+    // Travers FlatScene
+    // Calculate Transform
+    // Write to ECS chunk and Scratch Cache
+}
+
+void masUpdateSceneHierarchy()
+{
+    MAS_PROFILE_BEGIN();
+
+    masFlatSceneHierarchy* FlatScene = masFlattenSceneHierarchy();
+    masPropagationSceneTransform(FlatScene);
+    
+    MAS_PROFILE_END();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Persistent Components in every chunk
+///////////////////////////////////////////////////////////////////////////////////////
+typedef union _masEntity
+{
+    uint64_t Signature;
+    struct
+    {
+        uint32_t Idx;
+        uint16_t Generation;
+    };
+} masEntity;
+
+typedef struct _masLocalTransformComponent
+{
+    float Position[4];
+    float Rotation[4];
+    float Scale[4];
+} masLocalTransform;
+
+typedef struct _masWorldTransformComponent
+{
+    float mat[16];
+} masWorldTransform;
+
+typedef struct _masSceneComponent
+{
+    masEntity Parent;
+    masEntity FirstChild;
+    masEntity Next;
+    uint32_t  DepthLevel;
+} masSceneComponent;
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// A single chunk in an archtype
+///////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masArchTypeChunk
+{
+    masEntity          *Entities;
+    masLocalTransform  *LocalTransforms;
+    masWorldTransform  *WorldTransforms;
+    masSceneComponent  *EntitiesHierarchy;
+    uint8_t           **ComponentArrays;
+    uint32_t            EntityCapacity;
+    uint32_t            EntityUsedCount;
+    bool                IsHierarchyDirty;
+} masArchTypeChunk;
