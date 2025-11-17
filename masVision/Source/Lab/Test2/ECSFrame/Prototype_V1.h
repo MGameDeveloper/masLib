@@ -329,7 +329,7 @@ typedef struct _masParentComponent
     masEntity EntityHandle;
 } masParentComponent;
 
-typedef struct _masChildrenComponent
+typedef struct _masChildrenComponent // this is the main problem how to ensure contigouse memory of children
 {
     masEntity FirstChildHandle;
     uint32_t  Count;
