@@ -190,9 +190,10 @@ void masUpdateSceneHierarchy()
     MAS_PROFILE_END();
 }
 
+////////////////////////////////////////////// REFACTORY V2 //////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Persistent Components in every chunk
+// Entity handle used by outer system and gameplay logic
 ///////////////////////////////////////////////////////////////////////////////////////
 typedef union _masEntity
 {
@@ -201,9 +202,27 @@ typedef union _masEntity
     {
         uint32_t Idx;
         uint16_t Generation;
+        uint16_t UnUsed;
     };
 } masEntity;
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Entity Mapper used to validate handles used by systems and gameplay logic 
+//     to prevent any stale handle from being used
+///////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masEntityMapper
+{
+    uint32_t EntityID;
+    uint16_t Generation;
+    uint16_t ArchType;
+    uint16_t ChunkID;
+} masEntityMapper;
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Persistent Components for every entity
+///////////////////////////////////////////////////////////////////////////////////////
 typedef struct _masLocalTransformComponent
 {
     float Position[4];
@@ -226,6 +245,16 @@ typedef struct _masSceneComponent
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// used to offset for next component in uint8_t* to get next component correctly
+///////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masComponentInfo
+{
+    uint16_t Stride;
+    uint16_t Type;
+} masComponentInfo;
+
+
+///////////////////////////////////////////////////////////////////////////////////////
 // A single chunk in an archtype
 ///////////////////////////////////////////////////////////////////////////////////////
 typedef struct _masArchTypeChunk
@@ -237,5 +266,71 @@ typedef struct _masArchTypeChunk
     uint8_t           **ComponentArrays;
     uint32_t            EntityCapacity;
     uint32_t            EntityUsedCount;
-    bool                IsHierarchyDirty;
 } masArchTypeChunk;
+
+typedef struct _masArchType
+{
+    masArchTypeChunk **Chunks; //[ Pointers List ] to allocated pages each page is 16KB in size
+    masComponentInfo  *ComponentsInfo;
+    uint64_t ComponentsHash;
+    uint32_t ComponentCount;
+    uint32_t Capacity;
+    uint32_t Count;
+} masArchType;
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// if Scene hierarchy is changed add it here to get udpated 
+//     is there a better way to implement this effeciently
+///////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masUpdateSceneHierarchyCommand
+{
+    masEntity *Entities;
+    uint32_t   Capacity;
+    uint32_t   Count;
+} masUpdateSceneHierarchyCommand;
+
+// from copilot
+typedef struct _masWorkList
+{
+    masArchTypeChunk *Chunk;
+    uint32_t          Slot;
+} masWorkList;
+
+typedef struct _masArchTypeChunk
+{
+    uint8_t  *Block;
+    uint32_t  EntityOffset;
+    uint32_t  ComponentsTableOffset; // uint32_t *offsets = Block + ComponentTableOffset;
+    uint32_t  ComponentCount;
+    uint32_t  Capacity;
+    uint32_t  UsedCount;
+} masArchTypeChunk;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masLocalTransformComponent
+{
+    float Position[4];
+    float Rotation[4];
+    float Scale[4];
+} masLocalTransform;
+
+typedef struct _masWorldTransformComponent
+{
+    float matrix[16];
+} masWorldTransform;
+
+typedef struct _masParentComponent
+{
+    masEntity EntityHandle;
+} masParentComponent;
+
+typedef struct _masChildrenComponent
+{
+    masEntity FirstChildHandle;
+    uint32_t  Count;
+} masChildrenComponent;
