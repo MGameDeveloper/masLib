@@ -334,3 +334,32 @@ typedef struct _masChildrenComponent // this is the main problem how to ensure c
     masEntity FirstChildHandle;
     uint32_t  Count;
 } masChildrenComponent;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// To Defere Hierarchal changes 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef enum _masHierarchyChangeCommandType
+{
+     MAS_CMD_HIERARCHY_CHANGE_ATTACH_CHILD,
+     MAS_CMD_HIERARCHY_CHANGE_DETACH_CHILD,
+     MAS_CMD_HIERARCHY_CHANGE_CREATE_ENTITY,
+     MAS_CMD_HIERARCHY_CHANGE_DESTROY_ENTITY,
+
+    MAS_CMD_HIERARCHY_CHANGE_COUNT
+} masHierarchyChangeCommandType;
+
+typedef struct _masHierarchyChangeCommand
+{
+    masHierarchyChangeCommandType Type;
+    masEntity Parent;
+    masEntity Child;
+} masHierarchyChangeCommand;
+
+typedef struct _masHierarchyChangeCommandList
+{
+    masHierarchyChangeCommand *Commands;
+    uint32_t Capacity;
+    uint32_t Count;
+} masHierarchyChangeCommandList;
