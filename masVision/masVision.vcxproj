@@ -220,6 +220,7 @@
     <ClInclude Include="Source\Lab\Test1\Test1.h" />
     <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype.h" />
     <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype_V1.h" />
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototyp_V2.h" />
     <ClInclude Include="Source\masCommon.h" />
     <ClInclude Include="Source\masVision.h" />
     <ClInclude Include="Source\Time\masTime.h" />

@@ -272,5 +272,8 @@
     <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototype_V1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototyp_V2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
