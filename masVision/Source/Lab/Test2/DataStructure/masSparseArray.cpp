@@ -94,7 +94,7 @@ masSparseArray* masSparseArray_Create(const char* RegisterName, int32_t ElementS
 
 void masSparseArray_Destroy(masSparseArray** SparseArrayPtr)
 {
-    if (!SparseArrayPtr && !(*SparseArrayPtr))
+    if (!SparseArrayPtr || !(*SparseArrayPtr))
         return;
 
     masSparseArray* SparseArray = *SparseArrayPtr;
