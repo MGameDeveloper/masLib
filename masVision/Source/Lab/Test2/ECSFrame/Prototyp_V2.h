@@ -75,12 +75,6 @@ typedef struct _masArchTypeRegistery
 } masArchTypeRegistery;
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // Persistent Components for entity to be placed in the scene 
 //     -> [ masPositioni masScale, masEuler, masMatrix, masSceneNode ]
@@ -119,130 +113,237 @@ typedef struct _masSceneNode
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-masEntity masArchType_CreateEntity(masArchType* ArchType) 
-{ 
-	if (!ArchType)
-		return { 0 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Component Registery Prototype
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masComponent
+{
+	uint16_t Size;
+	char     Name[64];
+} masComponent;
 
-	return { 0 }; 
+typedef struct _masComponentRegistery
+{
+	masComponent *Components;
+	uint32_t      Capacity;
+	uint16_t      UsedCount;
+};
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void masComponent_RegisterA(uint32_t CompSize, const char* CompName)
+{
+	static uint32_t ComponentGUID = 1;
+	// hash compname
+	// access hash table using hash
+	// check if hashes matches
+	// already registered ignore/notify user to remove the duplicate registeration call
+	// not matches register since it would trigger error is used without being registered
 }
 
-typedef struct _masCompInfo
+#define MAS_COMPONENT_REGISTERA(Component) masComponent_RegisterA(sizeof(Component), #Component)
+void masRegisterCoreComponentsA()
+{
+	MAS_COMPONENT_REGISTERA(masVec3);
+	MAS_COMPONENT_REGISTERA(masPosition);
+	MAS_COMPONENT_REGISTERA(masScale);
+	MAS_COMPONENT_REGISTERA(masEuler);
+	MAS_COMPONENT_REGISTERA(masVec4);
+	MAS_COMPONENT_REGISTERA(masQuaternion);
+	MAS_COMPONENT_REGISTERA(masMatrix);
+	MAS_COMPONENT_REGISTERA(masSceneNode);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// B
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masComponent
+{
+	uint32_t ID;
+	uint32_t Size;
+	char     Name[32];
+} masComponent;
+
+static masComponent Components[masCoreComponentCount] = { };
+static uint32_t     LastCompIDGenerated = 0;
+
+
+#define MAS_COMPONENT_ENUM(Component) Component##ID
+typedef enum _masCoreComponentIDs
+{
+	MAS_COMPONENT_ENUM(masVec3),
+    MAS_COMPONENT_ENUM(masPosition),
+    MAS_COMPONENT_ENUM(masScale),
+    MAS_COMPONENT_ENUM(masEuler),
+    MAS_COMPONENT_ENUM(masVec4),
+    MAS_COMPONENT_ENUM(masQuaternion),
+    MAS_COMPONENT_ENUM(masMatrix),
+    MAS_COMPONENT_ENUM(masSceneNode),
+
+	masCoreComponentCount
+} masCoreComponentIDs;
+
+void masComponent_Register(uint32_t ComponentID, uint32_t ComponentSize, const char* ComponentName)
+{
+	if (ComponentID < LastCompIDGenerated)
+	{
+		masComponent* Comp = &Components[ComponentID];
+		if (Comp->ID != ComponentID)
+		{
+			Comp->ID   = ComponentID;
+			Comp->Size = ComponentSize;
+			
+			uint32_t NameLen = strlen(ComponentName);
+			if (NameLen >= 32)
+				NameLen = 32 - 1;
+			memcpy(Comp->Name, ComponentName, NameLen);
+		}
+		else
+		{
+			// raise warning and notify user of duplication registering
+		}
+	}
+}
+
+#define MAS_COMPONENT_REGISTER(Component) masComponent_Register(MAS_COMPONENT_ENUM(Component), sizeof(Component), #Component)
+void masRegisterCoreComponents(uint32_t ComponentID, uint32_t ComponentSize, const char* ComponentName)
+{
+	MAS_COMPONENT_REGISTER(masVec3);
+	MAS_COMPONENT_REGISTER(masPosition);
+	MAS_COMPONENT_REGISTER(masScale);
+	MAS_COMPONENT_REGISTER(masEuler);
+	MAS_COMPONENT_REGISTER(masVec4);
+	MAS_COMPONENT_REGISTER(masQuaternion);
+	MAS_COMPONENT_REGISTER(masMatrix);
+	MAS_COMPONENT_REGISTER(masSceneNode);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// C
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct _masComponent
+{
+	uint32_t ID;
+	uint32_t NameOffset;
+	uint16_t Size;
+	uint8_t  NameLen;
+} masComponent;
+
+typedef struct _masComponentEntry
+{
+	uint64_t Hash;
+	uint32_t Idx;
+} masComponentEntry;
+
+typedef struct _masComponentFileHeader
+{
+	uint32_t Tag;
+	uint32_t Version;
+	uint32_t ComponentListOffset;
+	uint32_t ComponentHashTableOffset;
+	uint32_t ComponentNameListOffset;
+	uint32_t HashTableSize;
+	uint32_t ComponentListSize;
+	uint32_t ComponentCount;
+	uint32_t ComponentGUID; // got increased every time we add to the db
+} masComponentFileHeader;
+
+typedef struct _masComponentDB
+{
+	FILE* FileHandle;
+	masComponentFileHeader GCompnentFileHeader;
+} masComponentDB;
+
+static masComponentDB GComponentDB = { }; // upon running create file if not exist or open one when already there
+
+
+typedef struct _masComponentDesc
 {
 	const char* Name;
-	uint64_t    Size;
-} masCompInfo;
+	uint32_t Size;
+	uint32_t ID; // got its data from the db 
+} masComponentDesc;
 
-masArchType* masArchType_FindOrCreate(masCompInfo* CompInfoList, uint32_t Count)
+void masEntity_AddComponents(masEntity Entity, masComponentDesc* CompDescList, uint32_t Count)
 {
-	//
+	uint64_t ArchTypeHash = 0;
+	for (int32_t i = 0; i < Count; ++i)
+	{
+		const char* CompName = CompDescList[i].Name;
+
+		// hash it to uint64_t
+		// check if it already added in GComponentDB File
+		// if yes get ID from there along with its metadata
+		// if not and mapped to already occupied slot resize DB and rehash all components name since names are db this would be easy
+		// if not and mapped to valid slot add along with required data and assign a new id for it based on db ComponentGUID from header
+		// acculamulate ids to calculate archtypehash
+	}
+
+
+	// find archtype by hash
+	// if not found create one with componentdesclist 
+	// add entity to it
+	// if found and entity lives in different archtype copy it to its new archtype
 }
 
-#define MAS_COMP(Comp) {#Comp, sizeof(Comp)}
-#define MAS_ARCHTYPE_GET(VarName, ...)\
-    masArchType *VarName = NULL;\
-    {\
-        masCompInfo VarName##List[] = { __VA_ARGS__ }; \
-        uint32_t    VarName##Count = sizeof(VarName##List) / sizeof(VarName##List[0]); \
-		VarName = masArchType_FindOrCreate(VarName##List, VarName##Count);\
-    }
+
+#define MAS_COMP(Component) {#Component, sizeof(Component)}
+#define MAS_ENTITY_ADD_COMPONENTS(Entity, ...)\
+    masComponentDesc Entity##CompList[] = { __VA_ARGS__ };\
+    uint32_t Entity##CompCount = sizeof(Entity##CompList) / sizeof(Entity##CompList[0]);\
+    masEntity_AddComponents(Entity, Entity##CompList, Entity##CompCount)
 
 masEntity masEntity_Create()
 {
-	// Persistent Components in order for any entity to be in the scene
-	MAS_ARCHTYPE_GET(ArchType,
-		MAS_COMP(masSceneNode),
+	masEntity Entity = masEntity_NewHandle(); // just to lay the prototype, but later this would get handle to sparse structure that prevent from stale handles
+	MAS_ENTITY_ADD_COMPONENTS(Entity,
 		MAS_COMP(masPosition),
 		MAS_COMP(masEuler),
 		MAS_COMP(masScale),
-		MAS_COMP(masMatrix));
-
-	// Its up to archtype internal code to either create from existing chunk or allocate new chunk and add
-	return masArchType_CreateEntity(ArchType);
+		MAS_COMP(masMatrix),
+		MAS_COMP(masSceneNode));
 }
 
 void masEntity_Attach(masEntity Parent, masEntity Child)
 {
-	// 
+	// code
 }
 
-void masEntity_AddComponents(masEntity Entity, masCompInfo* CompList, uint32_t CompCount)
+typedef struct _masPlayer 
 {
-	//
-}
-
-#define MAS_ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
-#define MAS_ENTITY_ADD_COMPONENTS(Entity, ...)\
-    masCompInfo Entity##CompList[] = {__VA_ARGS__};\
-    uint32_t    Entity##CompCount  = MAS_ARRAY_SIZE(Entity##CompList);\
-    masEntity_AddComponents(Entity, Entity##CompList, Entity##CompCount)
-
-
-#define MAS_DEFINE_TAG_COMPONENT(Name) typedef struct _Name {} Name
-
-MAS_DEFINE_TAG_COMPONENT(masPlayerTag);
-MAS_DEFINE_TAG_COMPONENT(masEnemy_Nightmare);
-MAS_DEFINE_TAG_COMPONENT(masEnemy_Goblin);
-MAS_DEFINE_TAG_COMPONENT(masHideElixer);
-MAS_DEFINE_TAG_COMPONENT(masExoticWeaponDrop);
-MAS_DEFINE_TAG_COMPONENT(masFinalLordQuestObjective);
-MAS_DEFINE_TAG_COMPONENT(masHideElixerUnlock);
-MAS_DEFINE_TAG_COMPONENT(masPlayerSlave);
+	// data
+} masPlayer;
 
 typedef struct _masStaticMesh
 {
-	uint32_t Verices;
-	uint32_t Indices;
-	uint32_t IndexCount;
+	// data
 } masStaticMesh;
 
-void Init()
+typedef struct _masCamera
 {
-	masEntity PlayerEnt = masEntity_Create();
-	MAS_ENTITY_ADD_COMPONENTS(PlayerEnt,
-		MAS_COMP(masPlayerTag),
-		MAS_COMP(masStaticMesh));
+	// data
+} masCamera;
 
-	masEntity EnemyEnt = masEntity_Create();
-	MAS_ENTITY_ADD_COMPONENTS(EnemyEnt,
-		MAS_COMP(masEnemy_Nightmare),
-		MAS_COMP(masEnemy_Goblin),
-		MAS_COMP(masHideElixer),
-		MAS_COMP(masExoticWeaponDrop),
-		MAS_COMP(masFinalLordQuestObjective),
-		MAS_COMP(masHideElixerUnlock));
+typedef struct _masSpringArm
+{
+	// data
+} masSpringArm;
 
-	// Upon Defeat become slave to the player
-	MAS_ENTITY_ADD_COMPONENTS(EnemyEnt, MAS_COMP(masPlayerSlave));
-	masEntity_Attach(PlayerEnt, EnemyEnt);
+void TestPrototype()
+{
+	masEntity PlayerMeshEnt = masEntity_Create();
+	MAS_ENTITY_ADD_COMPONENTS(PlayerMeshEnt, MAS_COMP(masStaticMesh));
 
-	// suppose we imported assimp scene and done the necessary parsing 
+	masEntity Player = masEntity_Create();
+	MAS_ENTITY_ADD_COMPONENTS(Player,
+		MAS_COMP(masPlayer),
+		MAS_COMP(masCamera),
+		MAS_COMP(masSpringArm));
 
-	masEntity AK47 = masEntity_Create();
-	for (int32_t i = 0; i < MeshCount; ++i)
-	{
-		masEntity WeaponPart = masEntity_Create();
-		MAS_ENTITY_ADD_COMPONENTS(WeaponPart, MAS_COMP(masStaticMesh));
-
-		masStaticMesh* Mesh = masEntity_GetComponent(MAS_COMP(masStaticMesh));
-		if (Mesh)
-		{
-			masMeshAsset *Asset = masLoadMesh(AK47AssimScene, i);
-			Mesh->Verices    = Asset->VerticesHandle;
-			Mesh->Indices    = Asset->IndicesHandle;
-			Mesh->IndexCount = Asset->IndexCount;
-			Mesh->Name       = Asset->NameHandle;
-			Mesh->Size       = Asset->Size;
-			Mesh->Material   = Asset->DefaultMaterial;
-		}
-		masEntity_Attach(AK47, WeaponPart);
-	}
-
-	masEntity PlayerMainWeaponSocket = masEntity_Create();
-	masEntity_Attach(PlayerEnt, PlayerMainWeaponSocket);
-	masEntity_Attach(PlayerMainWeaponSocket, AK47);
+	masEntity_Attach(Player, PlayerMeshEnt);
 }
