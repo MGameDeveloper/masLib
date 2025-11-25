@@ -249,7 +249,7 @@ static masComponentDB GComponentDB = { };
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// Internal Functions
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool masComponentDBInternal_Create()
 {
@@ -323,7 +323,7 @@ bool masComponentDBInternal_Load()
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// ComponentDB Api
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool masComponentDB_Create()
 {
@@ -344,50 +344,32 @@ bool masComponentDB_Load()
 	return true;
 }
 
-// NEED REFACTORY AND BETTER HANDLING THE PROBLEM
-// MAY NEED TO IMPLEMENT FILE I/O IN windows win32 api
 bool masComponentDB_Save()
 {
 	if (!masFileContent_IsValid(&GComponentDB.DBFile))
 		return false;
 
-	// check crc for current db with the one on disk if they are the same means no change return true
-	// if not craete temp file copy the data base to it and calculate the crc for it
-	// after complete write delete previouse and rename it
+	if (masFileContent_WriteToDisk(&GComponentDB.DBFile, MAS_COMPONENT_DB_TEMP_NAME))
+	{
+		if (masFile_Exists(MAS_COMPONENT_DB_BACKUP_NAME))
+			masFile_Remove(MAS_COMPONENT_DB_BACKUP_NAME);
 
-	if (!masFileContent_WriteToDisk(&GComponentDB.DBFile, MAS_COMPONENT_DB_TEMP_NAME))
-	{
-		if (masFile_Exists(MAS_COMPONENT_DB_TEMP_NAME))
-		{
-			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_CORRUPTED_NAME);
-		}
-		
-		return false;
-	}
-	
-	if (masFile_Exists(MAS_COMPONENT_DB_BACKUP_NAME))
-	{
-		if (!masFile_Remove(MAS_COMPONENT_DB_BACKUP_NAME))
-		{
-			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_CORRUPTED_NAME);
-			// raise error
-			return false;
-		}
-	}
-
-	if (masFile_Rename(MAS_COMPONENT_DB_NAME, MAS_COMPONENT_DB_BACKUP_NAME))
-	{
-		masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_NAME);
+		if (masFile_Rename(MAS_COMPONENT_DB_NAME, MAS_COMPONENT_DB_BACKUP_NAME))
+			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_NAME);
 	}
 	else
 	{
-		// rais error
+		if (masFile_Exists(MAS_COMPONENT_DB_TEMP_NAME))
+			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_CORRUPTED_NAME);
+		else
+		{
+			// raise error coulnt create temp file
+		}
 		return false;
 	}
 
 	return true;
 }
-
 
 void masComponentDB_Destroy()
 {
@@ -397,5 +379,91 @@ void masComponentDB_Destroy()
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct masComponentDesc
+{
+	const char *Name;
+	uint32_t    Size;
+	uint32_t    Alignment;
+};
+
+typedef struct masComponentDescList
+{
+	masComponentDesc* List;
+	uint32_t Count;
+};
+
+#define MAS_ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+#define MAS_COMP(Comp) { #Comp, sizeof(Comp), alignof(Comp)}
+#define MAS_ENTITY_ADD_COMPONENTS(NAME, ...)\
+    masComponentDesc Name##CompDescs[] = { __VA_ARGS__ };\
+    masComponentDescList Name = { Name##CompDescs, MAS_ARRAY_SIZE(Name##CompDescs)}
+
+bool masComponentDB_GetComponents(masComponentDescList* List)
+{
+	if (!masFileContent_IsValid(&GComponentDB.DBFile))
+		return false;
+
+	struct masScale { };
+	struct masPosition {};
+
+	uint32_t entity = {};
+	MAS_ENTITY_ADD_COMPONENTS(entity,
+		MAS_COMP(masPosition),
+		MAS_COMP(masScale));
+	// adding components would transfere entity to another archtype
+
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// JUST AN IDEA
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+typedef enum masFieldType
+{
+	MAS_BOOL,
+	MAS_CHAR,
+	MAS_INT8,
+	MAS_INT16,
+	MAS_INT32,
+	MAS_INT64,
+	MAS_UINT8,
+	MAS_UINT16,
+	MAS_UINT32,
+	MAS_UINT64,
+	MAS_FLOAT,
+	MAS_DOUBLE,
+	MAS_ENTITY,
+	MAS_ASSET,
+
+	MAS_FIELD_ENUM_COUNT
+};
+
+typedef enum masFieldFlag
+{
+	MAS_FIELD_FLAG_NONE   = 0,
+	MAS_FIELD_FLAG_PTR    = ( 1 << 0),
+	MAS_FIELD_FLAG_ARRAY  = ( 1 << 1),
+	MAS_FIELD_FLAG_STRING = ( 1 << 2),
+};
+
+
+typedef struct masField
+{
+	uint32_t NameIndex; // name index to a name table allocated seperately to save fields names
+	uint32_t Type;      // type used to decode the field from masFieldEnum
+	uint32_t Size;      // field size in memory of actual data that this describes
+	uint32_t Flags;     // PTR | STRING | ARRAY
+};
+
+typedef struct masStruct
+{
+	uint32_t MemorySize;      // size of struct in memory
+	uint32_t FieldIndex;      // offset into field table[] 
+	uint16_t FieldCount;      // count of all fields belong to this component they after each other
+	uint16_t MemoryAlignment; // alighnment of the component struct
+};
