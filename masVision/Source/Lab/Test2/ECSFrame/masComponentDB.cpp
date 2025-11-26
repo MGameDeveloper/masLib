@@ -7,19 +7,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAS_COMPONENT_DB_TAG              (('C' << 24) | ('M' << 16) | ('P' << 8) | ('S' << 0))
-#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
-
-#define MAS_COMPONENT_DB_NAME           "masComponent.masDB"
-#define MAS_COMPONENT_DB_BACKUP_NAME    "masComponent.masDB_Backup"
-#define MAS_COMPONENT_DB_TEMP_NAME      "masComponent.masDB_Temp"
-#define MAS_COMPONENT_DB_CORRUPTED_NAME "masComponent.masDB_Corrupted"
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// FILE CONTENT HELPER FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct masFileContent
 {
@@ -109,9 +97,19 @@ bool masFileContent_WriteToDisk(masFileContent* FileContent, const char* Path)
 	return true;
 }
 
+void* masFileContent_GetDataPtr(masFileContent* FileContent, size_t Offset)
+{
+	if (!masFileContent_IsValid(FileContent) || (Offset >= FileContent->Size))
+		return NULL;
+	void* DataPointer = (((uint8_t*)FileContent->Data) + Offset);
+	return DataPointer;
+}
+
+#define MAS_FILE_CONTENT_DATA_PTR(Type, FileContent, Offset) (Type*)masFileContent_GetDataPtr(FileContent, Offset)
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// FILE HELPER FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool masFile_Exists(const char* Path)
 {
@@ -138,255 +136,28 @@ bool masFile_Rename(const char* CurrentName, const char* NewName)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-* masComponent: Describe a component
-*
-* ID:   Unique ID of this component
-* Size: Memory required size for this component
-*
-* Name: Since names' length vary doing fixed size name would cause waste of memory OR limit some name's if fixed name size is smaller
-*       so all names live in a seperate block of memory where we only have:
-*       - Offset: Offset from the start of name's block memory
-*       - Length: Name's Length including NULL terminator
-*/
-typedef struct masComponent
-{
-	uint32_t ID;
-	uint32_t Size;
-
-	struct
-	{
-		uint32_t Offset;
-		uint32_t Length;
-	} Name;
-
-	struct
-	{
-		uint32_t Index;
-		uint32_t Count;
-	}Fields;
-};
-
-
-/*
-* masComponentEntry: Component's Name is hashed and truned to index to one of these
-*
-* Hash:    Result of hashing the component name USED to detect hashing collision
-* CompIdx: Index into masComponent array
-* _Pad:    Padding the structure manually
-*/
-typedef struct masComponentEntry
-{
-	uint64_t Hash;
-	uint32_t CompIdx;
-	uint32_t _Pad;
-};
-
-
-/*
-* masComponentDBHeader: Describe data base on disk and where the data can be found within the file
-*
-* Tag:                  Magic number to distinguish data base of component from other files
-* Version:              Has many use cases like detecting different implementation of the db[ currently not important ]
-* ComponentGUID:        Keeps increasing to give every add component a unique id so they can be the same across machines and on different runs
-* ComponentBlock:       Tells us where to find components' list on disk relative to the file
-* NameBlock:            Tells us where to find components' name buffer on disk relative to the file
-* ComponentEntryBlockc: Tells us where to find hash table for components on disk relative to the file
-*/
-typedef struct masComponentDBHeader
-{
-	uint32_t Tag;
-	uint32_t Version;
-	uint32_t ComponentGUID;
-	uint32_t FileSize;
-
-	struct
-	{
-		uint32_t Capacity;
-		uint32_t Count;
-		uint32_t DBOffset;
-		uint32_t MemSize;
-	} ComponentList;
-
-	struct
-	{
-		uint32_t Capacity;
-		uint32_t Count;
-		uint32_t DBOffset;
-		uint32_t MemSize;
-	} NameBuffer;
-
-	struct
-	{
-		uint32_t Capacity;
-		uint32_t Count;
-		uint32_t ResizeCounter;
-		uint32_t DBOffset;
-		uint32_t MemSize;
-		float    LoadRatio;
-	} ComponentEntryTable;
-};
-
-
-/*
-* masComponentDB: Loaded components' data base from disk
-*
-* Header:              Parsed header where it has all data required to create or find data in the db
-* ComponentList:       Pointer acquired after Mapping/Loading the data base from disk
-* ComponentEntryTable: Hash table to find components' by their names
-*/
-typedef struct masComponentDB
-{
-	masFileContent DBFile;
-
-	masComponentDBHeader* Header;
-	masComponent* ComponentList;
-	masComponentEntry* ComponentEntryTable;
-	char* NameBuffer;
-};
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static masComponentDB GComponentDB = { };
+#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
+#define MAS_TAG(c0, c1, c2, c3)           ((c0 << 24) | (c1 << 16) | (c2 << 8) | (c3 << 0))
+#define MAS_LONG_TAG(t0, t1)              ((t0 << 32) | (t1 << 0))
+#define MAS_STRUCTDB_TAG                   MAS_LONG_TAG(MAS_TAG('S', 'T', 'R', 'U'), MAS_TAG('C', 'T', 'D', 'B'))
+#define MAS_STRUCTDB_FILENAME              "masStructDB.masDB"
+#define MAS_STRUCTDB_BACKUP_FILENAME       "masStructDB.masDB_Backup"
+#define MAS_STRUCTDB_TEMP_FILENAME	       "masStructDB.masDB_Temporary"
+#define MAS_STRUCTDB_CORRUPTED_FILENAME    "masStructDB.masDB_Corrupted"
+#define MAS_FIELD_INIT_COUNT                500000
+#define MAS_STRUCT_INIT_COUNT               20000
+#define MAS_NAME_BUFFER_INIT_COUNT          20000
+#define MAS_HASH_ENTRY_INIT_COUNT           60000
+#define MAS_AVARAGE_NAME_LEN                32
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Internal Functions
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool masComponentDBInternal_Create()
-{
-	uint32_t InitCompCapacity = 256;
-	uint32_t InitNameBufferCapacity = 1024;
-	uint32_t InitCompEntryCapacity = 1024;
-
-	uint32_t DBFileSize =
-		sizeof(masComponentDBHeader) +
-		(sizeof(masComponent) * InitCompCapacity) +
-		(sizeof(masComponentEntry) * InitCompEntryCapacity) +
-		InitNameBufferCapacity;
-
-	void* DBData = malloc(DBFileSize);
-	if (!DBData)
-		return false;
-	memset(DBData, 0, DBFileSize);
-
-	masComponentDBHeader* Header = MAS_PTR_OFFSET(masComponentDBHeader, DBData, 0);
-	Header->Tag = MAS_COMPONENT_DB_TAG;
-	Header->Version = 1;
-	Header->ComponentGUID = 1;
-	Header->FileSize = DBFileSize;
-
-	Header->ComponentList.Capacity = InitCompCapacity;
-	Header->ComponentList.Count = 0;
-	Header->ComponentList.DBOffset = sizeof(masComponentDBHeader);
-	Header->ComponentList.MemSize = InitCompCapacity * sizeof(masComponent);
-
-	Header->NameBuffer.Capacity = InitNameBufferCapacity;
-	Header->NameBuffer.Count = 0;
-	Header->NameBuffer.DBOffset = Header->ComponentList.DBOffset + Header->ComponentList.MemSize;
-	Header->NameBuffer.MemSize = sizeof(char) * InitNameBufferCapacity;
-
-	Header->ComponentEntryTable.Capacity = InitCompEntryCapacity;
-	Header->ComponentEntryTable.Count = 0;
-	Header->ComponentEntryTable.DBOffset = Header->NameBuffer.DBOffset + Header->NameBuffer.MemSize;
-	Header->ComponentEntryTable.MemSize = sizeof(masComponentEntry) * InitCompEntryCapacity;
-
-	GComponentDB.DBFile.Data = DBData;
-	GComponentDB.DBFile.Size = DBFileSize;
-	GComponentDB.Header = MAS_PTR_OFFSET(masComponentDBHeader, GComponentDB.DBFile.Data, 0);
-	GComponentDB.ComponentList = MAS_PTR_OFFSET(masComponent, GComponentDB.DBFile.Data, Header->ComponentList.DBOffset);
-	GComponentDB.NameBuffer = MAS_PTR_OFFSET(char, GComponentDB.DBFile.Data, Header->NameBuffer.DBOffset);
-	GComponentDB.ComponentEntryTable = MAS_PTR_OFFSET(masComponentEntry, GComponentDB.DBFile.Data, Header->ComponentEntryTable.DBOffset);
-
-	return true;
-}
-
-bool masComponentDBInternal_Load()
-{
-	if (!masFileContent_IsValid(&GComponentDB.DBFile) || GComponentDB.DBFile.Size <= sizeof(masComponentDBHeader))
-		return false;
-
-	masComponentDBHeader* Header = MAS_PTR_OFFSET(masComponentDBHeader, GComponentDB.DBFile.Data, 0);
-	if (Header->Tag != MAS_COMPONENT_DB_TAG)
-	{
-		// raise an error file is not component data base
-		return false;
-	}
-
-	// Header.Version; // use version if needed
-
-	GComponentDB.Header = MAS_PTR_OFFSET(masComponentDBHeader, GComponentDB.DBFile.Data, 0);
-	GComponentDB.ComponentList = MAS_PTR_OFFSET(masComponent, GComponentDB.DBFile.Data, Header->ComponentList.DBOffset);
-	GComponentDB.NameBuffer = MAS_PTR_OFFSET(char, GComponentDB.DBFile.Data, Header->NameBuffer.DBOffset);
-	GComponentDB.ComponentEntryTable = MAS_PTR_OFFSET(masComponentEntry, GComponentDB.DBFile.Data, Header->ComponentEntryTable.DBOffset);
-
-	return true;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ComponentDB Api
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool masComponentDB_Create()
-{
-	return masComponentDBInternal_Create();
-}
-
-bool masComponentDB_Load()
-{
-	if (!masFileContent_Load(&GComponentDB.DBFile, MAS_COMPONENT_DB_NAME))
-		return false;
-
-	if (!masComponentDBInternal_Load())
-	{
-		masFileContent_UnLoad(&GComponentDB.DBFile);
-		return false;
-	}
-
-	return true;
-}
-
-bool masComponentDB_Save()
-{
-	if (!masFileContent_IsValid(&GComponentDB.DBFile))
-		return false;
-
-	if (masFileContent_WriteToDisk(&GComponentDB.DBFile, MAS_COMPONENT_DB_TEMP_NAME))
-	{
-		if (masFile_Exists(MAS_COMPONENT_DB_BACKUP_NAME))
-			masFile_Remove(MAS_COMPONENT_DB_BACKUP_NAME);
-
-		if (masFile_Rename(MAS_COMPONENT_DB_NAME, MAS_COMPONENT_DB_BACKUP_NAME))
-			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_NAME);
-	}
-	else
-	{
-		if (masFile_Exists(MAS_COMPONENT_DB_TEMP_NAME))
-			masFile_Rename(MAS_COMPONENT_DB_TEMP_NAME, MAS_COMPONENT_DB_CORRUPTED_NAME);
-		else
-		{
-			// raise error coulnt create temp file
-		}
-		return false;
-	}
-
-	return true;
-}
-
-void masComponentDB_Destroy()
-{
-	masFileContent_UnLoad(&GComponentDB.DBFile);
-	memset(&GComponentDB, 0, sizeof(masComponentDB));
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Structs Reflection Data: NEW DESIGN OF THE ABOVE DB
+// STRUCT RELFECTION DATA
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef enum masFieldType
 {
@@ -422,7 +193,6 @@ typedef struct masDataRange
 
 typedef struct masField
 {
-	uint32_t     UniqueID;
 	masFieldType Type;
 	masFieldFlag Flags;
 	uint32_t     Size;
@@ -431,6 +201,7 @@ typedef struct masField
 
 typedef struct masStruct
 {
+	uint32_t     UniqueID;
 	uint32_t     Size;
 	uint32_t     Alignment;
 	masDataRange Name;
@@ -443,39 +214,184 @@ typedef struct masHashEntry
 	uint64_t StructIdx;
 };
 
-#define MAS_FIELD_INIT_COUNT       500000
-#define MAS_STRUCT_INIT_COUNT      20000
-#define MAS_HASH_ENTRY_INIT_COUNT  60000
-#define MAS_NAME_BUFFER_INIT_COUNT 20000
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Structs Reflection DB
+// STRUCT DATA BASE
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 typedef enum masChunkType
 {
 	masChunkType_StructList,
 	masChunkType_FieldList,
 	masChunkType_NameBuffer,
 	masChunkType_HashTable,
+
+	masChunkType_Count
 };
 
-typedef struct masContentTableEntry
+typedef struct masChunkEntry
 {
-	uint64_t Offset;
-	uint32_t Type;
-	uint32_t ElementSize;
-	uint32_t ElementCount;
-	uint32_t _Pad;
+	uint32_t Offset;
+	uint32_t Size;
+};
+
+typedef struct masStructDBHeader
+{
+	uint32_t Tag;
 };
 
 typedef struct masStructDB
 {
-	uint64_t Magic;
-	uint64_t FileSize;
-	uint64_t ContentTableOffset;
-	uint32_t ContentTableSize;
-	uint32_t Version;
-	uint32_t _Pad[2];
+	masStructDBHeader *Header;
+	masChunkEntry     *ChunkEntryList;
+	masStruct         *StructList;
+	masField          *FieldList;
+	char              *NameBuffer;
+	masHashEntry      *HashTable;
+	masFileContent     File;
+	bool               bUpdateDiskContent;
 };
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static masStructDB GStructDB = { };
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// INTERNAL HELPER FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static bool masStructDBInternal_Load()
+{
+	masFileContent* DBFile = &GStructDB.File;
+
+	masStructDBHeader* Header = MAS_FILE_CONTENT_DATA_PTR(masStructDBHeader, DBFile, 0);
+	if (!Header || Header->Tag != MAS_STRUCTDB_TAG)
+		return false;
+
+	masChunkEntry *ChunkEntryList = MAS_FILE_CONTENT_DATA_PTR(masChunkEntry, DBFile, sizeof(masStructDBHeader));
+	masStruct     *StructList     = MAS_FILE_CONTENT_DATA_PTR(masStruct,     DBFile, ChunkEntryList[masChunkType_StructList].Offset);
+	masField      *FieldList      = MAS_FILE_CONTENT_DATA_PTR(masField,      DBFile, ChunkEntryList[masChunkType_FieldList].Offset);
+	char          *NameBuffer     = MAS_FILE_CONTENT_DATA_PTR(char,          DBFile, ChunkEntryList[masChunkType_NameBuffer].Offset);
+	masHashEntry  *HashTable      = MAS_FILE_CONTENT_DATA_PTR(masHashEntry,  DBFile, ChunkEntryList[masChunkType_HashTable].Offset);
+
+	if (!ChunkEntryList || !StructList || !FieldList || !NameBuffer || !HashTable)
+		return false;
+
+	GStructDB.Header         = Header;
+	GStructDB.ChunkEntryList = ChunkEntryList;
+	GStructDB.StructList     = StructList;
+	GStructDB.FieldList      = FieldList;
+	GStructDB.NameBuffer     = NameBuffer;
+	GStructDB.HashTable      = HashTable;
+	GStructDB.bUpdateDiskContent = false;
+
+	return true;
+}
+
+static bool masStructDBInternal_Create()
+{
+	size_t ChunkEntrySizeList[masChunkType_Count] = { };
+	ChunkEntrySizeList[masChunkType_StructList]   = MAS_STRUCT_INIT_COUNT      * sizeof(masStruct);
+	ChunkEntrySizeList[masChunkType_FieldList]    = MAS_FIELD_INIT_COUNT       * sizeof(masField);
+	ChunkEntrySizeList[masChunkType_NameBuffer]   = MAS_NAME_BUFFER_INIT_COUNT * MAS_AVARAGE_NAME_LEN;
+	ChunkEntrySizeList[masChunkType_HashTable]    = MAS_HASH_ENTRY_INIT_COUNT  * sizeof(masHashEntry);
+
+	size_t FileSize = sizeof(masStructDBHeader) + (masChunkType_Count * sizeof(masChunkEntry));
+	for (int32_t i = 0; i < masChunkType_Count; ++i)
+		FileSize += ChunkEntrySizeList[i];
+
+	void* FileData = malloc(FileSize);
+	if (!FileData)
+		return false;
+	memset(FileData, 0, FileSize);
+
+	masStructDBHeader *Header = MAS_PTR_OFFSET(masStructDBHeader, FileData, 0);
+	Header->Tag = MAS_STRUCTDB_TAG;
+
+	uint32_t       ChunkDataOffset = sizeof(masStructDBHeader) + (masChunkType_Count * sizeof(masChunkEntry));
+	masChunkEntry *ChunkEntryList  = MAS_PTR_OFFSET(masChunkEntry, FileData, sizeof(masStructDBHeader));
+	for (int32_t i = 0; i < masChunkType_Count; ++i)
+	{
+		ChunkEntryList[i].Offset = ChunkDataOffset;
+		ChunkEntryList[i].Size   = ChunkEntrySizeList[i];
+
+		ChunkDataOffset += ChunkEntrySizeList[i];
+	}
+
+	masStruct    *StructList = MAS_PTR_OFFSET(masStruct,    FileData, ChunkEntryList[masChunkType_StructList].Offset);
+	masField     *FieldList  = MAS_PTR_OFFSET(masField,     FileData, ChunkEntryList[masChunkType_FieldList].Offset);
+	char         *NameBuffer = MAS_PTR_OFFSET(char,         FileData, ChunkEntryList[masChunkType_NameBuffer].Offset);
+	masHashEntry *HashTable  = MAS_PTR_OFFSET(masHashEntry, FileData, ChunkEntryList[masChunkType_HashTable].Offset);
+
+	GStructDB.File.Data      = FileData;
+	GStructDB.File.Size      = FileSize;
+	GStructDB.Header         = Header;
+	GStructDB.ChunkEntryList = ChunkEntryList;
+	GStructDB.StructList     = StructList;
+	GStructDB.FieldList      = FieldList;
+	GStructDB.NameBuffer     = NameBuffer;
+	GStructDB.HashTable      = HashTable;
+	GStructDB.bUpdateDiskContent = false;
+
+	return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DATA BASE API
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool masStructDB_Init()
+{
+	if (masFileContent_IsValid(&GStructDB.File))
+		return true;
+
+	if (!masFileContent_Load(&GStructDB.File, MAS_STRUCTDB_FILENAME))
+		return false;
+
+	if (!masStructDBInternal_Load())
+	{
+		if (!masStructDBInternal_Create())
+		{
+			masFileContent_UnLoad(&GStructDB.File);
+			memset(&GStructDB, 0, sizeof(masStructDB));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool masStructDB_DeInit()
+{
+	masStructDB_Save();
+	masFileContent_UnLoad(&GStructDB.File);
+	memset(&GStructDB, 0, sizeof(masStructDB));
+}
+
+bool masStructDB_Save()
+{
+	if (!masFileContent_IsValid(&GStructDB.File))
+		return false;
+
+	if (masFileContent_WriteToDisk(&GStructDB.File, MAS_STRUCTDB_TEMP_FILENAME))
+	{
+		if (masFile_Exists(MAS_STRUCTDB_BACKUP_FILENAME))
+			masFile_Remove(MAS_STRUCTDB_BACKUP_FILENAME);
+
+		if (masFile_Rename(MAS_STRUCTDB_FILENAME, MAS_STRUCTDB_BACKUP_FILENAME))
+			masFile_Rename(MAS_STRUCTDB_TEMP_FILENAME, MAS_STRUCTDB_FILENAME);
+	}
+	else
+	{
+		if (masFile_Exists(MAS_STRUCTDB_TEMP_FILENAME))
+			masFile_Rename(MAS_STRUCTDB_TEMP_FILENAME, MAS_STRUCTDB_CORRUPTED_FILENAME);
+		else
+		{
+			// raise error coulnt create temp file
+		}
+		return false;
+	}
+
+	return true;
+}
