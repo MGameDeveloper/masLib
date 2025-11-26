@@ -20,7 +20,7 @@ struct masStructField
 	size_t      Offset;
 };
 
-void masStructDB_RegisterStruct(const char* Name, masStructField* Fields, size_t Count);
+void masStructDB_RegisterStruct(const char* Name, size_t Size, masStructField* Fields, size_t Count);
 void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, size_t Count); // if name has not been registered ignore and return aliases
 
 
@@ -28,12 +28,12 @@ void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, s
 #define MAS_ARRAY_SIZE(a)            (sizeof(a)/sizeof(a[0]))
 #define MAS_STRUCT_ALIAS(type)       #type
 
-#define MAS_REGISTER_STRUCT(Type, ...)                             \
-    do                                                             \
-	{                                                              \
-        masStructField Fields[] = { __VA_ARGS__ };                 \
-        size_t         Count    = sizeof(Fields)/sizeof(Fields[0]);\
-        masStructDB_RegisterStruct(#Type, Fields, Count);          \
+#define MAS_REGISTER_STRUCT(Type, ...)                                 \
+    do                                                                 \
+	{                                                                  \
+        masStructField Fields[] = { __VA_ARGS__ };                     \
+        size_t         Count    = sizeof(Fields)/sizeof(Fields[0]);    \
+        masStructDB_RegisterStruct(#Type, sizeof(Type), Fields, Count);\
 	}while(0)
 
 #define MAS_REGISTER_STRUCT_ALIAS(Type, ...)                       \

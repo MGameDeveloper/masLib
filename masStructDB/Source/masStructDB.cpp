@@ -237,6 +237,7 @@ typedef struct masChunkEntry
 typedef struct masStructDBHeader
 {
 	uint32_t Tag;
+	uint32_t NextUniqueID;
 };
 
 typedef struct masStructDB
@@ -307,7 +308,8 @@ static bool masStructDBInternal_Create()
 	memset(FileData, 0, FileSize);
 
 	masStructDBHeader *Header = MAS_PTR_OFFSET(masStructDBHeader, FileData, 0);
-	Header->Tag = MAS_STRUCTDB_TAG;
+	Header->Tag          = MAS_STRUCTDB_TAG;
+	Header->NextUniqueID = 1;
 
 	uint32_t       ChunkDataOffset = sizeof(masStructDBHeader) + (masChunkType_Count * sizeof(masChunkEntry));
 	masChunkEntry *ChunkEntryList  = MAS_PTR_OFFSET(masChunkEntry, FileData, sizeof(masStructDBHeader));

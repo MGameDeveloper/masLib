@@ -43,28 +43,3 @@ void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, s
         size_t      Count     = sizeof(Aliases)/sizeof(Aliases[0]);\
         masStructDB_RegisterStructAliases(#Type, Aliases, Count);  \
     }while(0)
-
-typedef union masVec3
-{
-	float xyz[3];
-	struct
-	{
-		float x, y, z;
-	};
-} masPosition, masScale, masRotation, masVelociy;
-
-void j()
-{
-	MAS_REGISTER_STRUCT(masVec3,
-		MAS_STRUCT_FIELD(float, x),
-		MAS_STRUCT_FIELD(float, y),
-		MAS_STRUCT_FIELD(float, z));
-
-	MAS_REGISTER_STRUCT_ALIAS(masVec3,
-		MAS_STRUCT_ALIAS(masPosition),
-		MAS_STRUCT_ALIAS(masScale),
-		MAS_STRUCT_ALIAS(masRotation),
-		MAS_STRUCT_ALIAS(masVelociy));
-}
-
-
