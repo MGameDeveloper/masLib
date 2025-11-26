@@ -244,8 +244,8 @@ typedef struct masStructDB
 {
 	masStructDBHeader *Header;
 	masChunkEntry     *ChunkEntryList;
-	masStruct         *StructList;
-	masField          *FieldList;
+	masStruct      *StructList;
+	masField       *FieldList;
 	char              *NameBuffer;
 	masHashEntry      *HashTable;
 	masFileContent     File;
@@ -271,8 +271,8 @@ static bool masStructDBInternal_Load()
 		return false;
 
 	masChunkEntry *ChunkEntryList = MAS_FILE_CONTENT_DATA_PTR(masChunkEntry, DBFile, sizeof(masStructDBHeader));
-	masStruct     *StructList     = MAS_FILE_CONTENT_DATA_PTR(masStruct,     DBFile, ChunkEntryList[masChunkType_StructList].Offset);
-	masField      *FieldList      = MAS_FILE_CONTENT_DATA_PTR(masField,      DBFile, ChunkEntryList[masChunkType_FieldList].Offset);
+	masStruct  *StructList     = MAS_FILE_CONTENT_DATA_PTR(masStruct,  DBFile, ChunkEntryList[masChunkType_StructList].Offset);
+	masField   *FieldList      = MAS_FILE_CONTENT_DATA_PTR(masField,   DBFile, ChunkEntryList[masChunkType_FieldList].Offset);
 	char          *NameBuffer     = MAS_FILE_CONTENT_DATA_PTR(char,          DBFile, ChunkEntryList[masChunkType_NameBuffer].Offset);
 	masHashEntry  *HashTable      = MAS_FILE_CONTENT_DATA_PTR(masHashEntry,  DBFile, ChunkEntryList[masChunkType_HashTable].Offset);
 
@@ -321,8 +321,8 @@ static bool masStructDBInternal_Create()
 		ChunkDataOffset += ChunkEntrySizeList[i];
 	}
 
-	masStruct    *StructList = MAS_PTR_OFFSET(masStruct,    FileData, ChunkEntryList[masChunkType_StructList].Offset);
-	masField     *FieldList  = MAS_PTR_OFFSET(masField,     FileData, ChunkEntryList[masChunkType_FieldList].Offset);
+	masStruct *StructList = MAS_PTR_OFFSET(masStruct, FileData, ChunkEntryList[masChunkType_StructList].Offset);
+	masField  *FieldList  = MAS_PTR_OFFSET(masField,  FileData, ChunkEntryList[masChunkType_FieldList].Offset);
 	char         *NameBuffer = MAS_PTR_OFFSET(char,         FileData, ChunkEntryList[masChunkType_NameBuffer].Offset);
 	masHashEntry *HashTable  = MAS_PTR_OFFSET(masHashEntry, FileData, ChunkEntryList[masChunkType_HashTable].Offset);
 

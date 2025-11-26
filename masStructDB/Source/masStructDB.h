@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 
 bool masStructDB_Init();
 void masStructDB_DeInit();
@@ -14,7 +16,7 @@ bool masStructDB_Save();
 
 struct masStructField
 {
-	const char *Type;
+	const char *TypeName;
 	const char *Name;
 	size_t      Size;
 	size_t      Offset;
@@ -22,7 +24,6 @@ struct masStructField
 
 void masStructDB_RegisterStruct(const char* Name, size_t Size, masStructField* Fields, size_t Count);
 void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, size_t Count); // if name has not been registered ignore and return aliases
-
 
 #define MAS_STRUCT_FIELD(type, name) {#type, #name, sizeof(type), 0}
 #define MAS_ARRAY_SIZE(a)            (sizeof(a)/sizeof(a[0]))
@@ -44,27 +45,38 @@ void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, s
         masStructDB_RegisterStructAliases(#Type, Aliases, Count);  \
     }while(0)
 
-typedef union masVec3
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct masFieldQuery
 {
-	float xyz[3];
-	struct
-	{
-		float x, y, z;
-	};
-} masPosition, masScale, masRotation, masVelociy;
+    const char* VarName;
+    const char* TypeName;
+    uint32_t    TypeID;
+    uint32_t    Size;
+    uint32_t    Alignment;
+    uint32_t    Offset;
+    uint32_t    Flags;
+};
 
-void j()
+typedef struct masStructQuery
 {
-	MAS_REGISTER_STRUCT(masVec3,
-		MAS_STRUCT_FIELD(float, x),
-		MAS_STRUCT_FIELD(float, y),
-		MAS_STRUCT_FIELD(float, z));
+    masFieldQuery *FieldList;
+    const char    *Name;
+    uint32_t       UniqueID;
+    uint32_t       Size;
+    uint32_t       Alignment;
+    uint32_t       FieldCount;
+};
 
-	MAS_REGISTER_STRUCT_ALIAS(masVec3,
-		MAS_STRUCT_ALIAS(masPosition),
-		MAS_STRUCT_ALIAS(masScale),
-		MAS_STRUCT_ALIAS(masRotation),
-		MAS_STRUCT_ALIAS(masVelociy));
-}
+typedef struct masStructQueryHeader
+{
+    uint32_t *OffsetList;
+    uint32_t  Count;
+};
 
-
+// Query Result lives on temporary memory that got zeroed every frame when it's dirty
+masStructQueryHeader* masStructDB_Query(const char** Structs, uint32_t Count);
+masStructQuery*       masStructDB_QueryResult(masStructQueryHeader* QueryHeader, uint32_t Idx);
