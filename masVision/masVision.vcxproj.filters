@@ -111,7 +111,7 @@
     <ClCompile Include="Source\Lab\Test2\ECSFrame\Prototype_V1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Lab\Test2\ECSFrame\masComponentDB.cpp">
+    <ClCompile Include="Source\Lab\Test2\ECSFrame\masStructDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,7 +278,7 @@
     <ClInclude Include="Source\Lab\Test2\ECSFrame\Prototyp_V2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Lab\Test2\ECSFrame\masComponentDB.h">
+    <ClInclude Include="Source\Lab\Test2\ECSFrame\masStructDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Lab\Test2\ECSFrame\masEntity.h">

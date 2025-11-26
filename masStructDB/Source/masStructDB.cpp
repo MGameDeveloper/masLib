@@ -362,7 +362,7 @@ bool masStructDB_Init()
 	return true;
 }
 
-bool masStructDB_DeInit()
+void masStructDB_DeInit()
 {
 	masStructDB_Save();
 	masFileContent_UnLoad(&GStructDB.File);
