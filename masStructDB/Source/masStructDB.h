@@ -8,12 +8,9 @@ void masStructDB_DeInit();
 bool masStructDB_Save();
 
 
-/*
-* FOR TESTING WILL IMPLEMENT MANUAL REGISTERATION 
-*     - LATER WRITE A SCANNER AS PRECOMPILE BUILD STEP THAT SCAN
-*       SOURCES & HEADERS AND POPULATE THE DATA BASE
-*/
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Register API
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct masStructField
 {
 	const char *TypeName;
@@ -23,7 +20,7 @@ struct masStructField
 };
 
 void masStructDB_RegisterStruct(const char* Name, size_t Size, masStructField* Fields, size_t Count);
-void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, size_t Count); // if name has not been registered ignore and return aliases
+void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, size_t Count);
 
 #define MAS_STRUCT_FIELD(type, name) {#type, #name, sizeof(type), 0}
 #define MAS_ARRAY_SIZE(a)            (sizeof(a)/sizeof(a[0]))
@@ -45,10 +42,12 @@ void masStructDB_RegisterStructAliases(const char* Name, const char** Aliases, s
         masStructDB_RegisterStructAliases(#Type, Aliases, Count);  \
     }while(0)
 
+#define MAS_REGISTER_TAG(Tag)\
+    masStructDB_RegisterStruct(#Tag, sizeof(Tag), NULL, 0)
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// Query API
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct masFieldQuery
 {

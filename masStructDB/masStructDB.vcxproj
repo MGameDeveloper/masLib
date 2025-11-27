@@ -132,6 +132,8 @@
     <ClInclude Include="Source\masStructDB.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\masECS.cpp" />
     <ClCompile Include="Source\masECSMemory.cpp" />
     <ClCompile Include="Source\masStructDB.cpp" />
     <ClCompile Include="Source\masStructDBMain.cpp" />

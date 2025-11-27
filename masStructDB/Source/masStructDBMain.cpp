@@ -44,9 +44,19 @@ typedef struct masMatrix
 	float m16[16];
 };
 
+MAS_COMPONENT()
+typedef struct masStaticTag
+{
+};
+
 
 void register_structs()
 {
+	MAS_REGISTER_TAG(masStaticTag);
+
+	MAS_REGISTER_STRUCT(masMatrix,
+		MAS_STRUCT_FIELD(float, m16));
+
 	MAS_REGISTER_STRUCT(masVec4,
 		MAS_STRUCT_FIELD(float, x),
 		MAS_STRUCT_FIELD(float, y),
@@ -60,7 +70,7 @@ void register_structs()
 
 	MAS_REGISTER_STRUCT(masVec2,
 		MAS_STRUCT_FIELD(float, x),
-		MAS_STRUCT_FIELD(float, y), );
+		MAS_STRUCT_FIELD(float, y));
 }
 
 void register_structs_aliases()
@@ -205,6 +215,11 @@ bool mas_object_add_structs(uint64_t obj, const char** Structs, uint32_t Count)
 }
 
 
+struct ts
+{
+	const int j;
+	int f;
+};
 
 void test()
 {
