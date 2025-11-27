@@ -38,6 +38,12 @@ typedef union masVec4
 	};
 } masQuaternion;
 
+MAS_COMPONENT()
+typedef struct masMatrix
+{
+	float m16[16];
+};
+
 
 void register_structs()
 {
@@ -171,53 +177,34 @@ void* mas_frame_malloc(size_t size)
 #define MAS_FRAME_MALLOC(type, count) (type*)mas_frame_malloc(sizeof(type) * count)
 
 
+bool mas_object_has_structs(uint64_t obj, masStructQueryHeader* QueryHeader)
+{
+
+}
+
 bool mas_object_add_structs(uint64_t obj, const char** Structs, uint32_t Count)
 {
 	masStructQueryHeader* QueryHeader = masStructDB_Query(Structs, Count);
 	if (!QueryHeader)
 		return false;
 
-	masBlockType* BlockType = mas_block_type_find(QueryHeader);
+	if (mas_object_has_structs(obj, QueryHeader))
+		return false;
+
+	masBlockType* BlockType = mas_archtype_find(QueryHeader);
 	if (!BlockType)
 	{
-		BlockType = mas_block_type_create(QueryHeader);
+		BlockType = mas_archtype_create(QueryHeader);
 		if (!BlockType)
 			return false;
 	}
 
-	mas_block_type_move_object(BlockType, obj);
-
-#if 0
-	for (int32_t StructIdx = 0; StructIdx < Count; ++StructIdx)
-	{
-		masStructQuery* Struct = masStructDB_QueryResult(QueryHeader, StructIdx);
-		if (!Struct)
-			return false;
-
-		Struct->Name;
-		Struct->UniqueID;
-		Struct->Size;
-		Struct->Alignment;
-
-		for (int32_t FieldIdx = 0; FieldIdx < Struct->FieldCount; ++FieldIdx)
-		{
-			masFieldQuery* Field = &Struct->FieldList[FieldIdx];
-			if (!Field)
-				return false;
-
-			Field->TypeID;
-			Field->TypeName;
-			Field->VarName;
-			Field->Size;
-			Field->Alignment;
-			Field->Offset;
-			Field->Flags;
-		}
-	}
-#endif
+	mas_archtype_move_object(BlockType, obj);
 
 	return true;
 }
+
+
 
 void test()
 {

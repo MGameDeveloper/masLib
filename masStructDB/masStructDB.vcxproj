@@ -127,9 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\masECS.h" />
+    <ClInclude Include="Source\masECSMemory.h" />
     <ClInclude Include="Source\masStructDB.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\masECSMemory.cpp" />
     <ClCompile Include="Source\masStructDB.cpp" />
     <ClCompile Include="Source\masStructDBMain.cpp" />
   </ItemGroup>

@@ -18,12 +18,21 @@
     <ClInclude Include="Source\masStructDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\masECSMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\masECS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\masStructDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\masStructDBMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\masECSMemory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
