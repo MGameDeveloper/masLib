@@ -27,12 +27,15 @@ typedef struct masStructRecord
 typedef struct masRecord
 {
 	uint32_t size;
-	uint32_t number;
-	uint32_t next_record;
 	uint32_t crc;
 	char     data[];
 };
 
+typedef struct masRecordHeader
+{
+	uint32_t tag;
+	uint32_t unique_id_gen;
+};
 
 typedef union masVec3
 {
@@ -55,9 +58,7 @@ void w()
 	bufptr += sizeof(masRecord);
 
 	rec->crc         = 0;
-	rec->number      = 0;
 	rec->size        = 0;
-	rec->next_record = 0;
 
 	masStructRecord* srec = (masStructRecord*)rec->data;
 	srec->unique_id    = 0;
@@ -94,6 +95,7 @@ typedef struct masStructDesc
 {
 	const char    *name;
 	masMemberDesc *members;
+	uint32_t       alignment;
 	uint32_t       size;
 	uint32_t       member_count;
 };
@@ -138,16 +140,12 @@ void mas_register_struct(masStructDesc* desc)
 
 
 	masRecord* rec = (masRecord*)bufptr;
+	rec->size = record_size;
+
 	bufptr += sizeof(masRecord);
-
-	rec->crc         = 0;
-	rec->number      = 0;
-	rec->size        = 0;
-	rec->next_record = 0;
-
 	masStructRecord* srec = (masStructRecord*)rec->data;
 	srec->unique_id    = 0;
-	srec->alignment    = 0;
+	srec->alignment    = desc->alignment;
 	srec->size         = desc->size;
 	srec->name_len     = strlen(desc->name);
 	srec->name_hash    = 0;
@@ -155,7 +153,6 @@ void mas_register_struct(masStructDesc* desc)
 	memcpy(srec->name, desc->name, srec->name_len);
 
 	bufptr += (sizeof(masStructRecord) + srec->name_len + 1);
-
 	for (int32_t i = 0; i < srec->member_count; ++i)
 	{
 		masMemberDesc   *mdesc = desc->members + i;
@@ -170,5 +167,6 @@ void mas_register_struct(masStructDesc* desc)
 		bufptr += (sizeof(masMemberRecord) + mrec->name_len + 1);
 	}
 
+	rec->crc = 0;
 	// mas_structdb_add_record(rec);
 }
