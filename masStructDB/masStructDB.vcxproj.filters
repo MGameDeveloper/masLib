@@ -24,6 +24,9 @@
     <ClInclude Include="Source\masECS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\dbv2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\masStructDB.cpp">

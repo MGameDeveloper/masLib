@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\dbv2.h" />
     <ClInclude Include="Source\masECS.h" />
     <ClInclude Include="Source\masECSMemory.h" />
     <ClInclude Include="Source\masStructDB.h" />
