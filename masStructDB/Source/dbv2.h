@@ -101,6 +101,8 @@ typedef struct masStructDesc
 };
 
 void mas_register_struct(masStructDesc* desc);
+void mas_internal_hash(const void* data, size_t size);
+uint32_t mas_internal_calc_crc32(const void* data, size_t size);
 
 #define mas_array_size(a) (sizeof(a)/sizeof(a[0]))
 #define mas_member(t, n)\
@@ -169,4 +171,22 @@ void mas_register_struct(masStructDesc* desc)
 
 	rec->crc = 0;
 	// mas_structdb_add_record(rec);
+}
+
+void mas_internal_hash(const void* data, size_t size)
+{
+	const uint8_t* bytes = data;
+	uint64_t h = 0xcbf29ce484222325ULL; // offset basis
+	const uint64_t prime = 0x100000001b3ULL;
+	for (size_t i = 0; i < len; ++i) {
+		h ^= bytes[i];
+		h *= prime;
+	}
+	return h;
+
+}
+
+uint32_t mas_internal_calc_crc32(const void* data, size_t size)
+{
+
 }
