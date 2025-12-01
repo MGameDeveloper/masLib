@@ -27,6 +27,18 @@
     <ClInclude Include="Source\dbv2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="prototype_v1\struct_registery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v1\struct_record_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v1\file_mapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v1\mas_mmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\masStructDB.cpp">
@@ -42,6 +54,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v1\struct_registery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v1\struct_record_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v1\file_mapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
