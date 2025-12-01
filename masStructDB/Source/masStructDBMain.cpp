@@ -1,3 +1,4 @@
+#if 0
 #include "masStructDB.h"
 
 #include <stdint.h>
@@ -231,3 +232,4 @@ void test()
 		MAS_STRUCT(masScale));
 	mas_object_add_structs(ent_node, MAS_STRUCT_LIST(Transform));
 }
+#endif

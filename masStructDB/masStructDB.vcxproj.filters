@@ -27,16 +27,19 @@
     <ClInclude Include="Source\dbv2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="prototype_v1\struct_registery.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\struct_record_file.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\file_mapper.h">
+    <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prototype_v1\mas_mmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v1\mas_ecs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v1\mas_ecs_memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mas_ecs_main.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,13 +59,16 @@
     <ClCompile Include="Source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="prototype_v1\struct_registery.cpp">
+    <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="prototype_v1\struct_record_file.cpp">
+    <ClCompile Include="prototype_v1\mas_mmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="prototype_v1\file_mapper.cpp">
+    <ClCompile Include="prototype_v1\mas_ecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v1\mas_ecs_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -116,7 +116,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -127,19 +127,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="prototype_v1\file_mapper.h" />
+    <ClInclude Include="prototype_v1\mas_ecs.h" />
+    <ClInclude Include="mas_ecs_main.cpp" />
+    <ClInclude Include="prototype_v1\mas_ecs_memory.h" />
     <ClInclude Include="prototype_v1\mas_mmap.h" />
-    <ClInclude Include="prototype_v1\struct_record_file.h" />
-    <ClInclude Include="prototype_v1\struct_registery.h" />
+    <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h" />
     <ClInclude Include="Source\dbv2.h" />
     <ClInclude Include="Source\masECS.h" />
     <ClInclude Include="Source\masECSMemory.h" />
     <ClInclude Include="Source\masStructDB.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="prototype_v1\file_mapper.cpp" />
-    <ClCompile Include="prototype_v1\struct_record_file.cpp" />
-    <ClCompile Include="prototype_v1\struct_registery.cpp" />
+    <ClCompile Include="prototype_v1\mas_ecs.cpp" />
+    <ClCompile Include="prototype_v1\mas_ecs_memory.cpp" />
+    <ClCompile Include="prototype_v1\mas_mmap.cpp" />
+    <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\masECS.cpp" />
     <ClCompile Include="Source\masECSMemory.cpp" />

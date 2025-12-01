@@ -1,3 +1,4 @@
+#if 0
 #include "masECS.h"
 
 
@@ -125,3 +126,4 @@ void CreatePlayer()
 	mas_object_add_structs(ent_node, MAS_STRUCT_LIST(PlayerTemplate));
 #endif
 }
+#endif

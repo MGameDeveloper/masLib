@@ -1,7 +1,15 @@
-#include "struct_registery.h"
-#include "../Source/masECSMemory.h"
 #include <stdio.h>
 #include <string.h>
+
+#include "mas_ecs_struct_registery.h"
+#include "mas_ecs_memory.h"
+#include "mas_mmap.h"
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MAS_RECORD_TAG (( 'r' << 24) | ( 'e' << 16) | ( 'c' << 8) | ( 'd' << 0))
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,10 +67,12 @@ typedef struct masRecordHeader
 	uint32_t unique_id_gen;
 };
 
-typedef struct masRecordFile
-{
-	
-};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+static mas_mmap_t       g_rec_file = { };
+static masRecordHeader *g_rec_hdr  = NULL;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +89,6 @@ uint64_t mas_internal_hash(const void* data, size_t size)
 	}
 	return h;
 }
-
 uint32_t mas_internal_calc_crc32(const void* data, size_t size)
 {
 	const uint8_t* buf = (const uint8_t*)data;
@@ -95,7 +104,6 @@ uint32_t mas_internal_calc_crc32(const void* data, size_t size)
 	}
 	return crc ^ 0xFFFFFFFFu;               // final XOR
 }
-
 masDataType mas_internal_convert_typename(const char* type)
 {
 #define eq(t, n) (strcmp(t, #n) == 0)
@@ -133,41 +141,34 @@ masDataType mas_internal_convert_typename(const char* type)
 	return masData_Unknown;
 }
 
-bool mas_record_file_add(masRecord* rec)
-{
-	const char* file_path = "";
-
-	FILE* file = fopen(file_path, "wb");
-	if (!file)
-		return false;
-
-	size_t byte = fwrite(rec, 1, rec->size, file);
-	if (byte != rec->size)
-		return false;
-
-	// mas_commit_record(rec);
-
-	return true;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 bool mas_struct_registery_init()
 {
+	if (!mas_mmap(&g_rec_file, "mas_struct_records.masDBRec"))
+		return false;
 
+	g_rec_hdr = (masRecordHeader*)mas_mmap_read(&g_rec_file, 0, sizeof(masRecordHeader));
+	if (!g_rec_hdr || g_rec_hdr->tag != MAS_RECORD_TAG)
+	{
+		mas_unmmap(&g_rec_file);
+		return false;
+	}
+
+	return true;
 }
 
 void mas_struct_registery_deinit()
 {
-
+	mas_unmmap(&g_rec_file);
 }
 
-void mas_sttrct_registery_add(masStructDesc* desc)
+bool mas_sttrct_registery_add(mas_struct_desc* desc)
 {
 	if (!desc)
-		return;
+		return false;
 
 	// calculate entire record size including header + struct + members
 	uint32_t record_size = sizeof(masRecord);
@@ -176,9 +177,9 @@ void mas_sttrct_registery_add(masStructDesc* desc)
 		record_size += sizeof(masMemberRecord) + (strlen(desc->members[i].name) + 1);
 
 	// alloc using frame allocator 
-	char* buf = MAS_ECS_FRAME_MALLOC(char, record_size);
+	char* buf = MAS_ECS_MEMORY_FRAME_MALLOC(char, record_size);
 	if (!buf)
-		return;
+		return false;
 	char* bufptr = buf;
 
 
@@ -187,11 +188,11 @@ void mas_sttrct_registery_add(masStructDesc* desc)
 
 	bufptr += sizeof(masRecord);
 	masStructRecord* srec = (masStructRecord*)rec->data;
-	srec->unique_id = 0;
-	srec->alignment = desc->alignment;
-	srec->size = desc->size;
-	srec->name_len = strlen(desc->name);
-	srec->name_hash = mas_internal_hash(desc->name, srec->name_len);
+	srec->unique_id    = g_rec_hdr->unique_id_gen++;
+	srec->alignment    = desc->alignment;
+	srec->size         = desc->size;
+	srec->name_len     = strlen(desc->name);
+	srec->name_hash    = mas_internal_hash(desc->name, srec->name_len);
 	srec->member_count = desc->member_count;
 	memcpy(srec->name, desc->name, srec->name_len);
 
@@ -199,12 +200,12 @@ void mas_sttrct_registery_add(masStructDesc* desc)
 	uint32_t member_offset = 0;
 	for (int32_t i = 0; i < srec->member_count; ++i)
 	{
-		masMemberDesc* mdesc = desc->members + i;
+		mas_struct_member_desc* mdesc = desc->members + i;
 		masMemberRecord* mrec = (masMemberRecord*)bufptr;
 
-		mrec->type = mas_internal_convert_typename(mdesc->name);
-		mrec->size = mdesc->size;
-		mrec->offset = member_offset;
+		mrec->type     = mas_internal_convert_typename(mdesc->name);
+		mrec->size     = mdesc->size;
+		mrec->offset   = member_offset;
 		mrec->name_len = strlen(mdesc->name);
 		memcpy(mrec->name, mdesc->name, mrec->name_len);
 
@@ -214,8 +215,12 @@ void mas_sttrct_registery_add(masStructDesc* desc)
 
 	rec->crc = mas_internal_calc_crc32(rec, rec->size);
 	
-	if (!mas_record_file_add(rec))
+	if (!mas_mmap_write(&g_rec_file, rec, rec->size))
 	{
+		g_rec_hdr->unique_id_gen--;
 		// log error
+		return false;
 	}
+
+	return true;
 }

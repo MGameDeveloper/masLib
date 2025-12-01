@@ -62,7 +62,7 @@ typedef struct masMemberDesc
 	const char *name;
 	uint32_t    size;
 };
-typedef struct masStructDesc
+typedef struct mas_struct_desc
 {
 	const char    *name;
 	masMemberDesc *members;
@@ -138,96 +138,3 @@ masDataType mas_internal_convert_typename(const char* type)
 #undef eq
 	return masData_Unknown;
 }
-
-
-void mas_structdb_add_record(masRecord* rec)
-{
-	// access mapped file
-	// write rec with rec ith rec->size
-	// apply it to the db
-}
-
-void mas_register_struct(masStructDesc* desc)
-{
-	if (!desc)
-		return;
-
-	// calculate entire record size including header + struct + members
-	uint32_t record_size = sizeof(masRecord);
-	record_size += sizeof(masStructRecord) + strlen(desc->name) + 1;
-	for (int32_t i = 0; i < desc->member_count; ++i)
-		record_size += sizeof(masMemberRecord) + (strlen(desc->members[i].name) + 1);
-
-	// alloc using frame allocator 
-	char* buf = mas_ecs_frame_malloc(char, record_size);
-	if (!buf)
-		return;
-	char* bufptr = buf;
-
-
-	masRecord* rec = (masRecord*)bufptr;
-	rec->size = record_size;
-
-	bufptr += sizeof(masRecord);
-	masStructRecord* srec = (masStructRecord*)rec->data;
-	srec->unique_id    = 0;
-	srec->alignment    = desc->alignment;
-	srec->size         = desc->size;
-	srec->name_len     = strlen(desc->name);
-	srec->name_hash    = mas_internal_hash(desc->name, srec->name_len);
-	srec->member_count = desc->member_count;
-	memcpy(srec->name, desc->name, srec->name_len);
-
-	bufptr += (sizeof(masStructRecord) + srec->name_len + 1);
-	uint32_t member_offset = 0;
-	for (int32_t i = 0; i < srec->member_count; ++i)
-	{
-		masMemberDesc* mdesc = desc->members + i;
-		masMemberRecord* mrec = (masMemberRecord*)bufptr;
-
-		mrec->type     = mas_internal_convert_typename(mdesc->name);
-		mrec->size     = mdesc->size;
-		mrec->offset   = member_offset;
-		mrec->name_len = strlen(mdesc->name);
-		memcpy(mrec->name, mdesc->name, mrec->name_len);
-
-		bufptr += (sizeof(masMemberRecord) + mrec->name_len + 1);
-		member_offset += mrec->size;
-	}
-
-	rec->crc = mas_internal_calc_crc32(rec, rec->size);
-	mas_structdb_add_record(rec);
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-#define mas_array_size(a) (sizeof(a)/sizeof(a[0]))
-#define mas_member(t, n)\
-    {#t, #n, sizeof(t)}    
-#define mas_struct(t, ...)\
-    masMemberDesc t##members_desc[] = { __VA_ARGS__ };\
-    masStructDesc t##struct_desc    = { #t, t##members_desc, sizeof(t), mas_array_size(t##members_desc)};\
-    mas_register_struct(&t##struct_desc);
-
-
-typedef union masVec3
-{
-	float xyz[3];
-	struct
-	{
-		float x, y, z;
-	};
-};
-void test()
-{
-	mas_struct(masVec3,
-		mas_member(float, x),
-		mas_member(float, y),
-		mas_member(float, z));
-}
-
-

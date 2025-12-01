@@ -3,21 +3,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct _mas_mmap
-{
-    void   *handle;
-    void   *map_handle;
-    void   *view_base;
-    size_t  view_size;
-    size_t  write_offset;
-} mas_mmap_t;
+bool  mas_ecs_memory_init();
+void  mas_ecs_memory_deinit();
+void *mas_ecs_memory_frame_malloc(size_t size);
+void  mas_ecs_memory_frame_reset();
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool  mas_mmap(mas_mmap_t* file, const char* path);
-void  mas_unmmap(mas_mmap_t* file);
-bool  mas_mmap_write(mas_mmap_t* file, const void* data, size_t size);
-void* mas_mmap_read(mas_mmap_t* file, size_t offset, size_t size);
-bool  mas_mmap_is_valid(mas_mmap_t* file);
+#define MAS_ECS_MEMORY_FRAME_MALLOC(type, size) (type*)mas_ecs_memory_frame_malloc(size)
