@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "prototype_v1/mas_ecs.h"
+#include "mas_ecs.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,6 +14,11 @@ typedef union mas_vec3
 	{
 		float x, y, z;
 	};
+} mas_velocity, mas_position, mas_rotation, mas_scale;
+
+typedef union mas_matrix
+{
+	float m16[16];
 };
 
 
@@ -26,6 +31,29 @@ void mas_register_structs()
 		mas_member(float, x),
 		mas_member(float, y),
 		mas_member(float, z));
+
+	mas_struct(mas_velocity,
+		mas_member(float, x),
+		mas_member(float, y),
+		mas_member(float, z));
+
+	mas_struct(mas_position,
+		mas_member(float, x),
+		mas_member(float, y),
+		mas_member(float, z));
+
+	mas_struct(mas_rotation,
+		mas_member(float, x),
+		mas_member(float, y),
+		mas_member(float, z));
+
+	mas_struct(mas_scale,
+		mas_member(float, x),
+		mas_member(float, y),
+		mas_member(float, z));
+
+	mas_struct(mas_matrix,
+		mas_member(float, m16[16]));
 }
 
 
@@ -38,6 +66,9 @@ int main(int argc, const char* argv[])
 		return -1;
 
 	mas_register_structs();
+
+	// test the above function
+	mas_struct_registery_print();
 
 	while (1)
 	{

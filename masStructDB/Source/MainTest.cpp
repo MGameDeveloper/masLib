@@ -47,7 +47,7 @@ void CreatePlayer();
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-int main(int argc, const char** argv)
+int main_test(int argc, const char** argv)
 {
 	if (!masECS_Init())
 		return -1;

@@ -39,9 +39,6 @@
     <ClInclude Include="prototype_v1\mas_ecs_memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mas_ecs_main.cpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\masStructDB.cpp">
@@ -56,7 +53,7 @@
     <ClCompile Include="Source\masECS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Main.cpp">
+    <ClCompile Include="Source\MainTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp">
@@ -69,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="prototype_v1\mas_ecs_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v1\mas_ecs_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

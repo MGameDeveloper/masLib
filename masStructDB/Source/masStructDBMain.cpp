@@ -89,7 +89,7 @@ void register_structs_aliases()
 		MAS_STRUCT_ALIAS(masPoint));
 }
 
-int main(int argc, const char** argv)
+int test_main_l(int argc, const char** argv)
 {
 	if (!masStructDB_Init())
 		return -1;

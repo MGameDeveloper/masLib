@@ -3,21 +3,27 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef enum _mas_mmap_ret
+{
+    mas_mmap_ret_created,
+    mas_mmap_ret_opened,
+    mas_mmap_ret_error,
+} mas_mmap_ret_t;
+
 typedef struct _mas_mmap
 {
     void   *handle;
     void   *map_handle;
     void   *view_base;
     size_t  view_size;
-    size_t  write_offset;
 } mas_mmap_t;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool  mas_mmap(mas_mmap_t* file, const char* path);
-void  mas_unmmap(mas_mmap_t* file);
-bool  mas_mmap_write(mas_mmap_t* file, const void* data, size_t size);
-void* mas_mmap_read(mas_mmap_t* file, size_t offset, size_t size);
-bool  mas_mmap_is_valid(mas_mmap_t* file);
+mas_mmap_ret_t mas_mmap         (mas_mmap_t* file, const char* path);
+void           mas_unmmap       (mas_mmap_t* file);
+size_t         mas_mmap_write   (mas_mmap_t* file, size_t write_offset, const void* data, size_t size);
+void*          mas_mmap_read    (mas_mmap_t* file, size_t offset, size_t size);
+bool           mas_mmap_is_valid(mas_mmap_t* file);

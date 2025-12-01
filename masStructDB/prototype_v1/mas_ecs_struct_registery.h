@@ -24,8 +24,11 @@ typedef struct mas_struct_desc
 #define mas_struct(t, ...)\
     mas_struct_member_desc t##members_desc[] = { __VA_ARGS__ };\
     mas_struct_desc        t##struct_desc    = {t##members_desc, #t, alignof(t), sizeof(t), mas_array_size(t##members_desc)};\
-    mas_sttrct_registery_add(&t##struct_desc);
+    mas_struct_registery_add(&t##struct_desc);
 
 bool mas_struct_registery_init();
 void mas_struct_registery_deinit();
-bool mas_sttrct_registery_add(mas_struct_desc* desc);
+bool mas_struct_registery_add(mas_struct_desc* desc);
+
+// only for debug/test the implementation
+void mas_struct_registery_print();

@@ -67,10 +67,10 @@ bool mas_internal_resize_mmap_view(mas_mmap_t* file)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IMPLEMENTATION MUST GO INTO .C OR .CPP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool  mas_mmap(mas_mmap_t* file, const char* path)
+mas_mmap_ret_t mas_mmap(mas_mmap_t* file, const char* path)
 {
-    if (!mas_internal_is_mmap_valid(file))
-        return false;
+    if (mas_internal_is_mmap_valid(file))
+        return mas_mmap_ret_error;
 
     // check file if already created
     bool file_found = false;
@@ -79,9 +79,9 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
         file_found = true;
 
     // this would open or create if not existed
-    HANDLE file_handle = CreateFileA(path, GENERIC_READ || GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE file_handle = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (file_handle == INVALID_HANDLE_VALUE)
-        return false;
+        return mas_mmap_ret_error;
 
     // extract size or set if not found
     LARGE_INTEGER file_size = { };
@@ -91,13 +91,14 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
         if (!SetFilePointerEx(file_handle, file_size, NULL, FILE_BEGIN))
         {
             CloseHandle(file_handle);
-            return false;
+            return mas_mmap_ret_error;
         }
 
         if (!SetEndOfFile(file_handle))
         {
+            DWORD err = GetLastError();
             CloseHandle(file_handle);
-            return false;
+            return mas_mmap_ret_error;
         }
     }
     else
@@ -105,7 +106,7 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
         if (!GetFileSizeEx(file_handle, &file_size))
         {
             CloseHandle(file_handle);
-            return false;
+            return mas_mmap_ret_error;
         }
     }
 
@@ -113,7 +114,7 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
     if (file_map_handle == INVALID_HANDLE_VALUE)
     {
         CloseHandle(file_handle);
-        return false;
+        return mas_mmap_ret_error;
     }
 
     void* file_view_base = MapViewOfFile(file_map_handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
@@ -121,7 +122,7 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
     {
         CloseHandle(file_map_handle);
         CloseHandle(file_handle);
-        return false;
+        return mas_mmap_ret_error;
     }
 
     file->handle = file_handle;
@@ -129,7 +130,8 @@ bool  mas_mmap(mas_mmap_t* file, const char* path)
     file->view_base = file_view_base;
     file->view_size = file_size.QuadPart;
 
-    return true;
+
+    return (file_found) ? mas_mmap_ret_opened : mas_mmap_ret_created;
 }
 
 void mas_unmmap(mas_mmap_t* file)
@@ -150,27 +152,26 @@ void mas_unmmap(mas_mmap_t* file)
 
 }
 
-bool mas_mmap_write(mas_mmap_t* file, const void* data, size_t size)
+size_t mas_mmap_write(mas_mmap_t* file, size_t write_offset, const void* data, size_t size)
 {
     if (!mas_internal_is_mmap_valid(file) || !data || size == 0)
-        return false;
+        return 0;
 
     void* write_boundry = MAS_PTR_OFFSET(void, file->view_base, file->view_size);
-    void* write_request = MAS_PTR_OFFSET(void, file->view_base, file->write_offset + size);
+    void* write_request = MAS_PTR_OFFSET(void, file->view_base, write_offset + size);
     if (write_request > write_boundry)
     {
         if (!mas_internal_resize_mmap_view(file))
         {
             // log error
-            return false;
+            return 0;
         }
     }
 
-    void* write_location = MAS_PTR_OFFSET(void, file->view_base, file->write_offset);
+    void* write_location = MAS_PTR_OFFSET(void, file->view_base, write_offset);
     memcpy(write_location, data, size);
-    file->write_offset += size;
 
-    return true;
+    return size;
 }
 
 void* mas_mmap_read(mas_mmap_t* file, size_t offset, size_t size)

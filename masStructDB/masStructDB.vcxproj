@@ -108,6 +108,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,11 +126,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="prototype_v1\mas_ecs.h" />
-    <ClInclude Include="mas_ecs_main.cpp" />
     <ClInclude Include="prototype_v1\mas_ecs_memory.h" />
     <ClInclude Include="prototype_v1\mas_mmap.h" />
     <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h" />
@@ -138,11 +141,12 @@
     <ClInclude Include="Source\masStructDB.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="prototype_v1\mas_ecs_main.cpp" />
     <ClCompile Include="prototype_v1\mas_ecs.cpp" />
     <ClCompile Include="prototype_v1\mas_ecs_memory.cpp" />
     <ClCompile Include="prototype_v1\mas_mmap.cpp" />
     <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\MainTest.cpp" />
     <ClCompile Include="Source\masECS.cpp" />
     <ClCompile Include="Source\masECSMemory.cpp" />
     <ClCompile Include="Source\masStructDB.cpp" />
