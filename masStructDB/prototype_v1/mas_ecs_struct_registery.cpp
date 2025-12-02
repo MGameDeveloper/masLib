@@ -9,8 +9,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAS_RECORD_TAG (( 'r' << 24) | ( 'e' << 16) | ( 'c' << 8) | ( 'd' << 0))
-#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
+#define MAS_RECORD_TAG (( 'R' << 24) | ( 'E' << 16) | ( 'C' << 8) | ( 'D' << 0))
+#define MAS_HASH_TABLE_TAG (( 'H' << 24) | ( 'S' << 16) | ( 'H' << 8) | ( 'T' << 0))
+#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + (offset))
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,12 +71,23 @@ typedef struct masRecordHeader
 	uint32_t write_offset;
 };
 
+typedef struct masHashTableHeader
+{
+	uint32_t tag;
+	uint32_t capacity;
+	uint32_t count;
+	float    load_factor;
+};
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-static mas_mmap_t       g_rec_file = { };
-static masRecordHeader *g_rec_hdr  = NULL;
+static mas_mmap_t       g_rec_file   = { };
+static mas_mmap_t       g_hash_table = { };
+static masRecordHeader *g_rec_hdr    = NULL;
+static masHashTableHeader* g_hash_table_hdr = NULL;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,10 +178,7 @@ const char* mas_internal_convert_type_to_name(masDataType type)
 	return "MAS_DATA_UNKNOWN_TYPE";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-bool mas_struct_registery_init()
+bool mas_internal_map_record_file()
 {
 	mas_mmap_ret_t mmap_ret = mas_mmap(&g_rec_file, "mas_struct_records.masDBRec");
 	if (mmap_ret == mas_mmap_ret_error)
@@ -184,7 +193,7 @@ bool mas_struct_registery_init()
 
 	if (mmap_ret == mas_mmap_ret_created)
 	{
-		g_rec_hdr->tag           = MAS_RECORD_TAG;
+		g_rec_hdr->tag = MAS_RECORD_TAG;
 		g_rec_hdr->unique_id_gen = 1;
 		g_rec_hdr->write_offset += sizeof(masRecordHeader);
 	}
@@ -201,6 +210,38 @@ bool mas_struct_registery_init()
 	return true;
 }
 
+const masStructRecord* mas_internal_find_struct(uint64_t name_hash)
+{
+	if (!mas_mmap_is_valid(&g_rec_file))
+		return NULL;
+
+	uint32_t read_offset = sizeof(masRecordHeader);
+	for (int32_t i = 0; i < g_rec_hdr->record_count; ++i)
+	{
+		masRecord       *rec  = (masRecord*)mas_mmap_read(&g_rec_file, read_offset, sizeof(masRecord));
+		masStructRecord *srec = (masStructRecord*)rec->data;
+		if (srec->name_hash == name_hash)
+			return srec;
+
+		read_offset += rec->size;
+	}
+
+	return NULL;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+bool mas_struct_registery_init()
+{
+	if (!mas_internal_map_record_file())
+		return false;
+
+	return true;
+}
+
 void mas_struct_registery_deinit()
 {
 	mas_unmmap(&g_rec_file);
@@ -211,8 +252,11 @@ bool mas_struct_registery_add(mas_struct_desc* desc)
 	if (!desc)
 		return false;
 
-	// TODO: check if desc has not beed added
-	
+	size_t   name_len  = strlen(desc->name);
+	uint64_t name_hash = mas_internal_hash(desc->name, name_len);
+	if (mas_internal_find_struct(name_hash))
+		return true;
+
 	// calculate entire record size including header + struct + members
 	uint32_t record_size = sizeof(masRecord);
 	record_size += sizeof(masStructRecord) + strlen(desc->name) + 1;
@@ -234,8 +278,8 @@ bool mas_struct_registery_add(mas_struct_desc* desc)
 	srec->unique_id    = g_rec_hdr->unique_id_gen;
 	srec->alignment    = desc->alignment;
 	srec->size         = desc->size;
-	srec->name_len     = strlen(desc->name);
-	srec->name_hash    = mas_internal_hash(desc->name, srec->name_len);
+	srec->name_len     = name_len;
+	srec->name_hash    = name_hash;
 	srec->member_count = desc->member_count;
 	memcpy(srec->name, desc->name, srec->name_len);
 
@@ -246,10 +290,10 @@ bool mas_struct_registery_add(mas_struct_desc* desc)
 		mas_struct_member_desc* mdesc = desc->members + i;
 		masMemberRecord* mrec = (masMemberRecord*)bufptr;
 
-		mrec->type     = mas_internal_convert_typename(mdesc->type);
-		mrec->size     = mdesc->size;
-		mrec->offset   = member_offset;
-		mrec->name_len = strlen(mdesc->name);
+		mrec->type        = mas_internal_convert_typename(mdesc->type);
+		mrec->size        = mdesc->size;
+		mrec->offset      = member_offset;
+		mrec->name_len    = strlen(mdesc->name);
 		memcpy(mrec->name, mdesc->name, mrec->name_len);
 
 		bufptr += (sizeof(masMemberRecord) + mrec->name_len + 1);
@@ -272,7 +316,6 @@ bool mas_struct_registery_add(mas_struct_desc* desc)
 
 	return true;
 }
-
 
 void mas_struct_registery_print()
 {
@@ -307,11 +350,32 @@ void mas_struct_registery_print()
 		for (int32_t m = 0; m < srec->member_count; ++m)
 		{
 			masMemberRecord* mrec = MAS_PTR_OFFSET(masMemberRecord, srec, member_read_offset);
-			printf("            - %s %s; [ %u | %u ]\n", 
-				mas_internal_convert_type_to_name((masDataType)mrec->type), mrec->name, mrec->size, mrec->offset);
+			printf("            - %s %s; [ %u | %u ]\n",
+				mas_internal_convert_type_to_name((masDataType)mrec->type),
+				mrec->name,
+				mrec->size, 
+				mrec->offset);
+
 			member_read_offset += sizeof(masMemberRecord) + (mrec->name_len + 1);
 		}
 
 		read_offset += rec->size;
 	}
+}
+
+bool mas_struct_find_structs(const char** names, uint32_t* out_ids, uint32_t count)
+{
+	if (!names || !(*names) || !out_ids || count == 0)
+		return false;
+
+	for (int32_t i = 0; i < count; ++i)
+	{
+		uint64_t struct_hash = mas_internal_hash(names[i], strlen(names[i]));
+		const masStructRecord* srec = mas_internal_find_struct(struct_hash);
+		if (!srec)
+			return false;
+		out_ids[i] = srec->unique_id;
+	}
+
+	return true;
 }

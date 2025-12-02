@@ -25,6 +25,8 @@ typedef union mas_matrix
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <string.h>
+
 void mas_register_structs()
 {
 	mas_struct(mas_vec3,
@@ -54,6 +56,18 @@ void mas_register_structs()
 
 	mas_struct(mas_matrix,
 		mas_member(float, m16[16]));
+
+
+	mas_struct_registery_print();
+	// mas_struct_commit_records(); REQUIRE: db_file
+
+	const char* nlist[] = { "mas_position", "mas_rotation", "mas_scale", "mas_matrix" };
+	const uint32_t nlist_count = sizeof(nlist) / sizeof(nlist[0]);
+	uint32_t nids[nlist_count] = { };
+	if (!mas_struct_find_structs(nlist, nids, nlist_count))
+	{
+		int w = 0;
+	}
 }
 
 
@@ -66,9 +80,6 @@ int main(int argc, const char* argv[])
 		return -1;
 
 	mas_register_structs();
-
-	// test the above function
-	mas_struct_registery_print();
 
 	while (1)
 	{
