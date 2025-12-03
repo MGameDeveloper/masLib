@@ -51,6 +51,18 @@
     <ClInclude Include="prototype_v2\mas_mmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_entity.cpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_core_components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_archtype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\masStructDB.cpp">
@@ -96,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="prototype_v2\mas_mmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

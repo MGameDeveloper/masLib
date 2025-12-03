@@ -13,6 +13,7 @@ bool mas_ecs_init()
         return false;
     if(!mas_ecs_components_init())
         return false;
+    mas_ecs_core_components_register();
 
     return true;
 }
