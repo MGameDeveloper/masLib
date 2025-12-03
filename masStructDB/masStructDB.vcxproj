@@ -135,6 +135,10 @@
     <ClInclude Include="prototype_v1\mas_ecs_memory.h" />
     <ClInclude Include="prototype_v1\mas_mmap.h" />
     <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h" />
+    <ClInclude Include="prototype_v2\mas_ecs.h" />
+    <ClInclude Include="prototype_v2\mas_ecs_components.h" />
+    <ClInclude Include="prototype_v2\mas_ecs_memory.h" />
+    <ClInclude Include="prototype_v2\mas_mmap.h" />
     <ClInclude Include="Source\dbv2.h" />
     <ClInclude Include="Source\masECS.h" />
     <ClInclude Include="Source\masECSMemory.h" />
@@ -146,6 +150,11 @@
     <ClCompile Include="prototype_v1\mas_ecs_memory.cpp" />
     <ClCompile Include="prototype_v1\mas_mmap.cpp" />
     <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_components.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_memory.cpp" />
+    <ClCompile Include="prototype_v2\mas_main.cpp" />
+    <ClCompile Include="prototype_v2\mas_mmap.cpp" />
     <ClCompile Include="Source\MainTest.cpp" />
     <ClCompile Include="Source\masECS.cpp" />
     <ClCompile Include="Source\masECSMemory.cpp" />
