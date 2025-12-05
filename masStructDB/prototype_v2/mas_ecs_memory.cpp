@@ -12,7 +12,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 #define MAS_DEFAULT_FRAME_MEMORY_SIZE     (1024llu * 16llu)
-#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + offset)
+#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + (offset))
 #define MAS_MALLOC(type, size)            (type*)malloc(size)
 #define MAS_FREE(ptr)                            free(ptr)
 
@@ -156,6 +156,44 @@ static bool mas_internal_resize_array_list()
 
 }
 
+static mas_ecs_memory_page* mas_internal_get_page(mas_ecs_memory_handle mem_handle)
+{
+    if (!g_mem || (mem_handle.type != mas_ecs_memory_type_page))
+        return NULL;
+
+    mas_ecs_memory_page_list* pages_mem = &g_mem->pages;
+    if (!pages_mem->list)
+        return NULL;
+
+    if (mem_handle.gen == 0 || mem_handle.idx >= pages_mem->capacity)
+        return NULL;
+
+    mas_ecs_memory_page* page = &pages_mem->list[mem_handle.idx];
+    if (page->gen != mem_handle.gen)
+        return NULL;
+
+    return page;
+}
+
+static mas_ecs_memory_array* mas_internal_get_array(mas_ecs_memory_handle mem_handle)
+{
+    if (!g_mem || (mem_handle.type != mas_ecs_memory_type_array))
+        return NULL;
+
+    mas_ecs_memory_array_list* arrays_mem = &g_mem->arrays;
+    if (!arrays_mem->list)
+        return NULL;
+
+    if (mem_handle.gen == 0 || (mem_handle.idx >= arrays_mem->capacity))
+        return NULL;
+
+    mas_ecs_memory_array* array = &arrays_mem->list[mem_handle.idx];
+    if (array->gen != mem_handle.gen)
+        return NULL;
+
+    return array;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
@@ -257,6 +295,8 @@ mas_ecs_memory_page_id mas_ecs_memory_page_create()
         {
             if (!mas_internal_resize_page_list())
                 return { 0 };
+            else
+                page_idx = pages_mem->count++;
         }
         else
         {
@@ -273,14 +313,11 @@ mas_ecs_memory_page_id mas_ecs_memory_page_create()
         return { 0 };
 
     mas_ecs_memory_page* page = &pages_mem->list[page_idx];
-    if(page)
-    {
-        if(page->gen == 0)
-            page->gen = 1;
-        mem_handle.idx  = page_idx;
-        mem_handle.gen  = page->gen;
-        mem_handle.type = mas_ecs_memory_type_page;
-    }
+    if (page->gen == 0)
+        page->gen = 1;
+    mem_handle.idx  = page_idx;
+    mem_handle.gen  = page->gen;
+    mem_handle.type = mas_ecs_memory_type_page;
 
     return { mem_handle.handle };
 }
@@ -288,19 +325,8 @@ mas_ecs_memory_page_id mas_ecs_memory_page_create()
 void  mas_ecs_memory_page_free(mas_ecs_memory_page_id page_id)
 {
     mas_ecs_memory_handle mem_handle = { page_id.id };
-
-    if (!g_mem || (mem_handle.type != mas_ecs_memory_type_page))
-        return;
-
-    mas_ecs_memory_page_list* pages_mem = &g_mem->pages;
-    if (!pages_mem->list)
-        return;
-
-    if (mem_handle.gen == 0 || mem_handle.idx >= pages_mem->capacity)
-        return;
-
-    mas_ecs_memory_page* page = &pages_mem->list[mem_handle.idx];
-    if(page->gen != mem_handle.gen)
+    mas_ecs_memory_page* page = mas_internal_get_page(mem_handle);
+    if (!page)
         return;
 
     page->gen++;
@@ -309,50 +335,137 @@ void  mas_ecs_memory_page_free(mas_ecs_memory_page_id page_id)
 
     memset(page->data, 0, page->size);
 
-    pages_mem->free_indices[pages_mem->free_count++] = mem_handle.idx;
+   g_mem->pages.free_indices[g_mem->pages.free_count++] = mem_handle.idx;
 }
 
 void* mas_ecs_memory_page_data(mas_ecs_memory_page_id page_id)
 {
     mas_ecs_memory_handle mem_handle = { page_id.id };
-
-    if (!g_mem || (mem_handle.type != mas_ecs_memory_type_page))
+    mas_ecs_memory_page* page = mas_internal_get_page(mem_handle);
+    if (!page)
         return NULL;
-
-    mas_ecs_memory_page_list* pages_mem = &g_mem->pages;
-    if (!pages_mem->list)
-        return NULL;
-
-    if (mem_handle.gen == 0 || mem_handle.idx >= pages_mem->capacity)
-        return NULL;
-
-    mas_ecs_memory_page* page = &pages_mem->list[mem_handle.idx];
-    if (page->gen != mem_handle.gen)
-        return NULL;
-
     return page->data;
 }
 
 size_t mas_ecs_memory_page_size(mas_ecs_memory_page_id page_id)
 {
     mas_ecs_memory_handle mem_handle = { page_id.id };
-
-    if (!g_mem || (mem_handle.type != mas_ecs_memory_type_page))
+    mas_ecs_memory_page* page = mas_internal_get_page(mem_handle);
+    if (!page)
         return NULL;
-
-    mas_ecs_memory_page_list* pages_mem = &g_mem->pages;
-    if (!pages_mem->list)
-        return NULL;
-
-    if (mem_handle.gen == 0 || mem_handle.idx >= pages_mem->capacity)
-        return NULL;
-
-    mas_ecs_memory_page* page = &pages_mem->list[mem_handle.idx];
-    if (page->gen != mem_handle.gen)
-        return NULL;
-
     return page->size;
 }
 
 
 // ARRAY ALLOCATION API
+mas_ecs_memory_array_id mas_ecs_memory_array_create(size_t element_size)
+{
+    mas_ecs_memory_handle mem_handle = { 0 };
+
+    if (!g_mem)
+        return { 0 };
+
+    mas_ecs_memory_array_list* arrays_mem = &g_mem->arrays;
+    if (!arrays_mem->list)
+        return { 0 };
+
+    int32_t array_idx = -1;
+    if (arrays_mem->count + 1 >= arrays_mem->capacity)
+    {
+        if (arrays_mem->free_count <= 0)
+        {
+            if (!mas_internal_resize_array_list())
+                return { 0 };
+            else
+                array_idx = arrays_mem->count++;
+        }
+        else
+        {
+            array_idx = arrays_mem->free_indices[--arrays_mem->free_count];
+            arrays_mem->free_indices[arrays_mem->free_count] = -1;
+
+            // EXPERMENT:
+            // reclaculate the capacity if previouse array has 4 elements with every element being 32 byte 
+            //   and now the array is used for an element of 4 byte -> ( 4 * 32 ) / 4 = new capacity
+            //   this would tread the current array from beign 4 element of 32 byte as 32 element of 4 byte
+            //   without additional allocation just using previous freed arrays
+            mas_ecs_memory_array* local_array = &arrays_mem->list[array_idx];
+            size_t total_byte   = local_array->element_size * local_array->capacity;
+            size_t new_capacity = total_byte / element_size;
+            if (new_capacity == 0)
+            {
+                // would left it to the add function to resize it
+            }
+        }
+    }
+    else
+    {
+        array_idx = arrays_mem->count++;
+    }
+
+    if (array_idx == -1)
+        return { 0 };
+
+    mas_ecs_memory_array* array = &arrays_mem->list[array_idx];
+    array->element_size = element_size;
+    array->count        = 0;
+    if (array->gen == 0)
+        array->gen = 1;
+    mem_handle.idx  = array_idx;
+    mem_handle.gen  = array->gen;
+    mem_handle.type = mas_ecs_memory_type_array;
+    
+    return { mem_handle.handle };
+}
+
+void mas_ecs_memory_array_free(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle mem_handle = { array_id.id };  
+    mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
+    if (!array)
+        return;
+
+    array->gen++;
+    if (array->gen == 0)
+        array->gen = 1;
+    memset(array->array, 0, array->element_size * array->capacity);
+
+    g_mem->arrays.free_indices[g_mem->arrays.free_count++] = mem_handle.idx;
+}
+
+void mas_ecs_memory_array_clear(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle mem_handle = { array_id.id };
+    mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
+    memset(array->array, 0, array->element_size * array->capacity);
+}
+
+void* mas_ecs_memory_array_add(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle mem_handle = { array_id.id };
+    mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
+    if (!array)
+        return NULL;
+
+    // do the magic here
+}
+
+void* mas_ecs_memory_array_get(mas_ecs_memory_array_id array_id, size_t idx)
+{
+    mas_ecs_memory_handle mem_handle = { array_id.id };
+    mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
+    if (!array || (idx >= array->capacity))
+        return NULL;
+
+    void* element = MAS_PTR_OFFSET(void, array->array, array->element_size * idx);
+    return element;
+}
+
+size_t mas_ecs_memory_array_size(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle mem_handle = { array_id.id };
+    mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
+    if (!array)
+        return 0;
+    return array->count;
+}

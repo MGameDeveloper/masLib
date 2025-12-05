@@ -35,8 +35,13 @@ void*                  mas_ecs_memory_page_data(mas_ecs_memory_page_id page_id);
 size_t                 mas_ecs_memory_page_size(mas_ecs_memory_page_id page_id);
 
 // ARRAY ALLOCATION API
-mas_ecs_memory_array_id mas_ecs_memory_array_create();
+mas_ecs_memory_array_id mas_ecs_memory_array_create(size_t element_size);
 void                    mas_ecs_memory_array_free(mas_ecs_memory_array_id array_id);
+void                    mas_ecs_memory_array_clear(mas_ecs_memory_array_id array_id);
+void*                   mas_ecs_memory_array_add(mas_ecs_memory_array_id);
+void*                   mas_ecs_memory_array_get(mas_ecs_memory_array_id, size_t idx);
+size_t                  mas_ecs_memory_array_size(mas_ecs_memory_array_id);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
