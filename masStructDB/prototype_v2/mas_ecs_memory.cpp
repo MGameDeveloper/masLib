@@ -25,6 +25,7 @@ enum mas_ecs_memory_type
     mas_ecs_memory_type_unknown,
     mas_ecs_memory_type_page,
     mas_ecs_memory_type_array,
+    mas_ecs_memory_type_stack
 
 };
 
@@ -40,6 +41,8 @@ union mas_ecs_memory_handle
     };
 };
 
+//////////////////////////////////
+// DATA STRUCTURE DEFEINITIONS
 struct mas_ecs_memory_page 
 {
     void     *data;
@@ -56,6 +59,17 @@ struct mas_ecs_memory_array
     uint16_t  gen;
 };
 
+struct mas_ecs_memory_stack
+{
+    void     *data;
+    uint32_t  element_size;
+    uint32_t  capacity;
+    uint32_t  count;
+    uint32_t  gen;
+};
+
+///////////////////////////////////
+// LISTS DEFINITIONS
 struct mas_ecs_memory_array_list
 {
     mas_ecs_memory_array *list;
@@ -74,6 +88,15 @@ struct mas_ecs_memory_page_list
     int32_t              capacity;
 };
 
+struct mas_ecs_memory_stack_list
+{
+    mas_ecs_memory_stack *list;
+    int32_t              *free_indices;
+    int32_t               free_count;
+    int32_t               count;
+    int32_t               capacity;
+};
+
 struct mas_ecs_memory_frame_scope
 {
     uint8_t* data;
@@ -81,6 +104,8 @@ struct mas_ecs_memory_frame_scope
     uint32_t alloc_idx;
 };
 
+////////////////////////////////////////////////
+// ECS MEMORY OWNER
 struct mas_ecs_memory
 {
     mas_ecs_memory_frame_scope frame;
@@ -376,6 +401,15 @@ size_t mas_ecs_memory_page_size(mas_ecs_memory_page_id page_id)
     return page->size;
 }
 
+bool mas_ecs_memory_page_is_valid(mas_ecs_memory_page_id page_id)
+{
+    mas_ecs_memory_handle  page_handle = { page_id.id };
+    mas_ecs_memory_page   *page        = mas_internal_get_page(page_handle);
+    if (!page)
+        return false;
+    return true;
+}
+
 
 // ARRAY ALLOCATION API
 mas_ecs_memory_array_id mas_ecs_memory_array_create(size_t element_size)
@@ -460,47 +494,23 @@ void mas_ecs_memory_array_clear(mas_ecs_memory_array_id array_id)
     memset(array->array, 0, array->element_size * array->capacity);
 }
 
-void* mas_ecs_memory_array_add(mas_ecs_memory_array_id array_id)
+void* mas_ecs_memory_array_new_element(mas_ecs_memory_array_id array_id)
 {
     mas_ecs_memory_handle mem_handle = { array_id.id };
     mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
     if (!array)
         return NULL;
-
-    int32_t element_idx = -1;
+   
     if (array->count + 1 >= array->capacity)
-    {
-        if (array->capacity == 0)
-            array->capacity = 1;
-
-        uint32_t  new_capacity   = array->capacity * 2;
-        uint32_t  new_array_size = new_capacity * array->element_size;
-        void     *new_array      = MAS_MALLOC(void, new_array_size);
-        if (!new_array)
-            return NULL;
-        memset(new_array, 0, new_array_size);
-  
-        if (array->array)
-        {
-            memcpy(new_array, array->array, array->element_size * array->capacity);
-            free(array->array);
-            array->array = NULL;
-        }
-        
-        array->array    = new_array;
-        array->capacity = new_capacity;
-
-        element_idx = array->count++;
-    }
-
-    if (element_idx == -1)
         return NULL;
+
+    int32_t element_idx = array->count++;
 
     void* element = MAS_PTR_OFFSET(void, array->array, array->element_size * element_idx);
     return element;
 }
 
-void* mas_ecs_memory_array_get(mas_ecs_memory_array_id array_id, size_t idx)
+void* mas_ecs_memory_array_get_element(mas_ecs_memory_array_id array_id, size_t idx)
 {
     mas_ecs_memory_handle mem_handle = { array_id.id };
     mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
@@ -511,7 +521,7 @@ void* mas_ecs_memory_array_get(mas_ecs_memory_array_id array_id, size_t idx)
     return element;
 }
 
-size_t mas_ecs_memory_array_size(mas_ecs_memory_array_id array_id)
+size_t mas_ecs_memory_array_element_count(mas_ecs_memory_array_id array_id)
 {
     mas_ecs_memory_handle mem_handle = { array_id.id };
     mas_ecs_memory_array* array = mas_internal_get_array(mem_handle);
@@ -519,3 +529,61 @@ size_t mas_ecs_memory_array_size(mas_ecs_memory_array_id array_id)
         return 0;
     return array->count;
 }
+
+size_t mas_ecs_memory_array_capacity(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle array_handle = { array_id.id };
+    mas_ecs_memory_array* array = mas_internal_get_array(array_handle);
+    if (!array)
+        return 0;
+    return array->capacity;
+}
+
+bool mas_ecs_memory_array_resize(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle  array_handle = { array_id.id };
+    mas_ecs_memory_array  *array        = mas_internal_get_array(array_handle);
+    if (!array)
+        return false;
+
+    if (array->capacity == 0)
+        array->capacity = 1;
+
+    uint32_t  new_capacity   = array->capacity * 2;
+    uint32_t  new_array_size = new_capacity * array->element_size;
+    void* new_array = MAS_MALLOC(void, new_array_size);
+    if (!new_array)
+        return false;
+    memset(new_array, 0, new_array_size);
+
+    if (array->array)
+    {
+        memcpy(new_array, array->array, array->element_size * array->capacity);
+        free(array->array);
+        array->array = NULL;
+    }
+
+    array->array    = new_array;
+    array->capacity = new_capacity;
+
+    return true;
+}
+
+bool mas_ecs_memory_array_is_valid(mas_ecs_memory_array_id array_id)
+{
+    mas_ecs_memory_handle  array_handle = { array_id.id };
+    mas_ecs_memory_array  *array        = mas_internal_get_array(array_handle);
+    if (!array)
+        return false;
+    return true;
+}
+
+
+// STACK ALLOCATION API
+mas_ecs_memory_stack_id mas_ecs_memory_stack_create(size_t element_size);
+void                    mas_ecs_memory_stack_free(mas_ecs_memory_stack_id stack_id);
+void*                   mas_ecs_memory_stack_top_element(mas_ecs_memory_stack_id stack_id);
+void                    mas_ecs_memory_stack_pop_element(mas_ecs_memory_stack_id stack_id);
+void                    mas_ecs_memory_stack_push_element(mas_ecs_memory_stack_id stack_id, const void* element, size_t element_size);
+bool                    mas_ecs_memory_stack_is_empty(mas_ecs_memory_stack_id stack_id);
+bool                    mas_ecs_memory_stack_is_valid(mas_ecs_memory_stack_id stack_id);
