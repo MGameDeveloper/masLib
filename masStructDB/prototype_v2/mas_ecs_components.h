@@ -9,16 +9,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-struct mas_component_desc
+struct mas_component_query_desc
 {
-    const char *name;
-    uint32_t    size;
+    uint64_t name_hash;
+    uint32_t size;
+    uint32_t unique_id;
+    uint32_t offset;
 };
 
 struct mas_component_query
 {
-    uint32_t *ids;
-    uint32_t  count;
+    mas_component_query_desc *comps;
+    uint32_t                  count;
 };
 
 
@@ -27,7 +29,7 @@ struct mas_component_query
 ///////////////////////////////////////////////////////////////////////////////////////
 bool mas_ecs_components_init();
 void mas_ecs_components_deinit();
-void mas_ecs_components_register(mas_component_desc* comp_desc);
+void mas_ecs_components_register(const char* name, size_t size);
 mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint32_t count);
 
 // FOR DEBUG
@@ -37,12 +39,12 @@ void mas_ecs_comonents_print();
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-#define MAS_COMPONENT_REGISTER(comp)                         \
-    mas_component_desc comp##_desc = { #comp, sizeof(comp) };\
-    mas_ecs_components_register(&comp##_desc)
+#define MAS_COMPONENT_REGISTER(comp)\
+    mas_ecs_components_register(#comp, sizeof(comp))
 
 #define MAS_ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
-#define MAS_COMP(c) #c
+#define MAS_COMP(c)        #c
+
 #define MAS_COMPONENT_QUERY_LIST(name, ...)           \
     const char* name##_query_list[] = { __VA_ARGS__ };\
     mas_component_query* name = mas_ecs_components_query(name##_query_list, MAS_ARRAY_SIZE(name##_query_list))

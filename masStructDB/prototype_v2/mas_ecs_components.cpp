@@ -103,21 +103,21 @@ static uint64_t mas_internal_hash_name(const char* data, size_t len)
     return hash;
 }
 
-static bool mas_internal_register_comp(mas_component_desc* comp_desc)
+static bool mas_internal_register_comp(const char* name, size_t size)
 {
-    if(!comp_desc)
+    if(!name || size == 0)
         return false;
     
     // check name len
-    size_t name_len = strlen(comp_desc->name);
+    size_t name_len = strlen(name);
     if(name_len >= 64)
         return false;
 
     // setup component data
     mas_component comp = { };
-    memcpy(comp.name, comp_desc->name, name_len);
+    memcpy(comp.name, name, name_len);
     comp.unique_id = ghdr->unique_id_gen;
-    comp.size      = comp_desc->size;
+    comp.size      = size;
     comp.name_len  = name_len;
     comp.crc64     = 0;
     comp.name_hash = mas_internal_hash_name(comp.name, comp.name_len);
@@ -128,7 +128,7 @@ static bool mas_internal_register_comp(mas_component_desc* comp_desc)
     if(byte != sizeof(mas_component))
     {
         // log error
-        printf("ERROR[ REGISTER_COMPONENT ]: component %s\n", comp_desc->name);
+        printf("ERROR[ REGISTER_COMPONENT ]: component %s\n", name);
         return false;
     }
 
@@ -189,14 +189,14 @@ void mas_ecs_components_deinit()
     ghdr = NULL;
 }
 
-void mas_ecs_components_register(mas_component_desc* comp_desc)
+void mas_ecs_components_register(const char* name, size_t size)
 {
     if(!mas_mmap_is_valid(&gfile))
         return;
 
-    mas_component* comp = mas_internal_find_comp(comp_desc->name);
+    mas_component* comp = mas_internal_find_comp(name);
     if(!comp)
-        mas_internal_register_comp(comp_desc);
+        mas_internal_register_comp(name, size);
 }
 
 mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint32_t count)
@@ -204,13 +204,14 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
     if(!comp_name_list || count == 0)
         return NULL;
 
-    uint32_t             query_size = sizeof(mas_component_query) + (sizeof(uint32_t) * count);
+    uint32_t             query_size = sizeof(mas_component_query) + (sizeof(mas_component_query_desc) * count);
     mas_component_query *query      = MAS_ECS_MEMORY_FRAME_MALLOC(mas_component_query, query_size);
     if(!query)
         return NULL;
-    query->ids   = MAS_PTR_OFFSET(uint32_t, query, sizeof(mas_component_query));
+    query->comps   = MAS_PTR_OFFSET(mas_component_query_desc, query, sizeof(mas_component_query));
     query->count = 0;
 
+    size_t component_offset = 0;
     for(int32_t i = 0; i < count; ++i)
     {
         mas_component* comp = mas_internal_find_comp(comp_name_list[i]);
@@ -221,8 +222,15 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
             return NULL;
         }
 
-        query->ids[i] = comp->unique_id;
+        mas_component_query_desc* comp_desc = &query->comps[i];
+        comp_desc->offset    = component_offset;
+        comp_desc->size      = comp->size;
+        comp_desc->unique_id = comp->unique_id;
+        comp_desc->name_hash = comp->name_hash;
+
         query->count++;
+
+        component_offset += comp->size;
     }
 
     return query;
@@ -238,7 +246,7 @@ void mas_ecs_comonents_print()
     }
 
     printf("REGISTERED_COMPONENTS:\n");
-    printf("    - TAG:      %u\n",    ghdr->tag);
+    printf("    - TAG:      %llu\n",  ghdr->tag);
     printf("    - COUNT:    %u\n",    ghdr->comp_count);
     printf("    - GUID_GEN: %u\n",    ghdr->unique_id_gen);
     printf("    - COMPONENTS[%u]:\n", ghdr->comp_count);

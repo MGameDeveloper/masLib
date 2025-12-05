@@ -1,29 +1,27 @@
 #pragma once
 
-#include <stdint.h>
+#include "mas_ecs_memory.h"
+#include "mas_ecs_components.h"
 
-typedef struct mas_ecs_archtype;
-
-
-bool mas_ecs_archtype_init();
-void mas_ecs_archtype_deinit();
-
-
-mas_ecs_archtype* mas_ecs_archtype_find(const char** comp_list, size_t comp_count);
-mas_ecs_archtype* mas_ecs_archtype_get(uint32_t archtype_idx);
-
-int32_t mas_ecs_archtype_add_entity(mas_ecs_archtype* archtype);
-void    mas_ecs_archtype_remove_entity(mas_ecs_archtype* archtype, int32_t entity_idx);
-int32_t mas_ecs_archtype_move_entity(mas_ecs_archtype* from, mas_ecs_archtype* to, int32_t entity_idx);
-
-void f()
+struct mas_archtype_chunk
 {
-	mas_archtype_query_compes(mas_position, mas_scale, mas_rotation, mas_matrix, mas_scene_node);
+	mas_ecs_memory_t page;
+	uint32_t         ent_count;
+};
 
-	for (int32_t i = 0; i < query_result->count; ++i)
-	{
-		archtype_query* query = query_result->queries[i];
+struct mas_archtype
+{
+	mas_archtype_chunk  *chunks;
+	mas_component_query *layout;
+	uint64_t             unique_id;
+	uint32_t             current_chunk;
+	uint32_t             max_ent_count;
+};
 
-		mas_position* pos = mas_archtype_query_get(mas_position);
-	}
-}
+struct mas_archtype_registery
+{
+	mas_archtype *archtypes;
+	uint32_t      count;
+};
+
+

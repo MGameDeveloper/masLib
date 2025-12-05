@@ -9,21 +9,34 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-typedef uint32_t mas_ecs_memory_t;
+#define MAS_DEFINE_MEMORY_HANDLE(n) struct n { uint64_t id; }
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////////////
+MAS_DEFINE_MEMORY_HANDLE(mas_ecs_memory_page_id);
+MAS_DEFINE_MEMORY_HANDLE(mas_ecs_memory_array_id);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-bool              mas_ecs_memory_init();
-void              mas_ecs_memory_deinit();
-void*             mas_ecs_memory_frame_malloc(size_t size);
-void              mas_ecs_memory_frame_reset();
-mas_ecs_memory_t  mas_ecs_memory_malloc_page();
-void              mas_ecs_memory_free_page(mas_ecs_memory_t page_id);
-void*             mas_ecs_memory_page_data(mas_ecs_memory_t  page_id);
-size_t            mas_ecs_memory_page_size(mas_ecs_memory_t page_id);
+bool                   mas_ecs_memory_init();
+void                   mas_ecs_memory_deinit();
 
+// FRAME SCOPE ALLOCATION API
+void*                  mas_ecs_memory_frame_malloc(size_t size);
+void                   mas_ecs_memory_frame_reset();
+
+// PAGE ALLOCATION API
+mas_ecs_memory_page_id mas_ecs_memory_page_create();
+void                   mas_ecs_memory_page_free(mas_ecs_memory_page_id page_id);
+void*                  mas_ecs_memory_page_data(mas_ecs_memory_page_id page_id);
+size_t                 mas_ecs_memory_page_size(mas_ecs_memory_page_id page_id);
+
+// ARRAY ALLOCATION API
+mas_ecs_memory_array_id mas_ecs_memory_array_create();
+void                    mas_ecs_memory_array_free(mas_ecs_memory_array_id array_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
