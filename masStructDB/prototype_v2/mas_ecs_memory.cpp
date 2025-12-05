@@ -104,56 +104,74 @@ static bool mas_internal_resize_page_list()
         return false;
     
     mas_ecs_memory_page_list* pages_mem = &g_mem->pages;
-    if (!pages_mem->list)
+
+    if (pages_mem->capacity == 0)
+        pages_mem->capacity = 1;
+
+    uint32_t new_capacity      = pages_mem->capacity         * 2;
+    uint32_t page_entries_size = sizeof(mas_ecs_memory_page) * new_capacity;
+    uint32_t free_indices_size = sizeof(int32_t)             * new_capacity;
+    uint32_t mem_size          = page_entries_size + free_indices_size;
+
+    void* mem = MAS_MALLOC(void, mem_size);
+    if (!mem)
+        return false;
+    memset(mem, 0, mem_size);
+
+    mas_ecs_memory_page *new_pages        = MAS_PTR_OFFSET(mas_ecs_memory_page, mem, 0);
+    int32_t             *new_free_indices = MAS_PTR_OFFSET(int32_t,             mem, page_entries_size);
+
+    if (pages_mem->list)
     {
-        uint32_t  new_capacity      = 2;
-        uint32_t  pages_entry_size  = sizeof(mas_ecs_memory_page) * new_capacity;
-        uint32_t  free_indices_size = sizeof(int32_t)             * new_capacity;
-        uint64_t  mem_size          = (pages_entry_size + free_indices_size);
-        void     *mem               = MAS_MALLOC(void, mem_size);
-        if (!mem)
-            return false;
-
-        pages_mem->list         = MAS_PTR_OFFSET(mas_ecs_memory_page, mem, 0);
-        pages_mem->free_indices = MAS_PTR_OFFSET(int32_t,             mem, pages_entry_size);
-        pages_mem->capacity     = new_capacity;
-        pages_mem->count        = 0;
-        pages_mem->free_count   = 0;
-    }
-    else
-    {
-        // allocate new memory
-        uint32_t  new_capacity      = pages_mem->capacity * 2;
-        uint32_t  pages_entry_size  = sizeof(mas_ecs_memory_page) * new_capacity;
-        uint32_t  free_indices_size = sizeof(int32_t)             * new_capacity;
-        uint64_t  mem_size          = (pages_entry_size + free_indices_size);
-        void     *mem               = MAS_MALLOC(void, mem_size);
-        if (!mem)
-            return false;
-
-        // Copy old data into the new allocated memory
-        uint32_t             old_pages_entry_size  = sizeof(mas_ecs_memory_page) * pages_mem->capacity;
-        uint32_t             old_free_indices_size = sizeof(int32_t) * pages_mem->capacity;
-        mas_ecs_memory_page *new_list              = MAS_PTR_OFFSET(mas_ecs_memory_page, mem, 0);
-        int32_t             *new_free_indices      = MAS_PTR_OFFSET(int32_t, mem, pages_entry_size);
-        memcpy(new_list,         pages_mem->list,         old_pages_entry_size);
-        memcpy(new_free_indices, pages_mem->free_indices, old_free_indices_size);
-
-        // free old memory and point it to the new allocated memory
+        memcpy(new_pages,        pages_mem->list,         pages_mem->capacity * sizeof(mas_ecs_memory_page));
+        memcpy(new_free_indices, pages_mem->free_indices, pages_mem->capacity * sizeof(int32_t));
         free(pages_mem->list);
-        pages_mem->list         = new_list;
-        pages_mem->free_indices = new_free_indices;
-        pages_mem->capacity     = new_capacity;
-
-        // TODO: check after resizing that page entries still valid and point to their data correctly
+        pages_mem->list         = NULL;
+        pages_mem->free_indices = NULL;
     }
+
+    pages_mem->list         = new_pages;
+    pages_mem->free_indices = new_free_indices;
+    pages_mem->capacity     = new_capacity;
 
     return true;
 }
 
 static bool mas_internal_resize_array_list()
 {
+    if (!g_mem)
+        return false;
 
+    mas_ecs_memory_array_list* arrays_mem = &g_mem->arrays;
+    if (arrays_mem->capacity == 0)
+        arrays_mem->capacity = 1;
+
+    uint32_t new_capacity           = arrays_mem->capacity         * 2;
+    uint32_t new_array_entries_size = sizeof(mas_ecs_memory_array) * new_capacity;
+    uint32_t new_free_indices_size  = sizeof(int32_t)              * new_capacity;
+    uint32_t mem_size = new_array_entries_size + new_free_indices_size;
+    void* mem = MAS_MALLOC(void, mem_size);
+    if (!mem)
+        return false;
+    memset(mem, 0, mem_size);
+
+    mas_ecs_memory_array *new_array_entries    = MAS_PTR_OFFSET(mas_ecs_memory_array, mem, 0);
+    int32_t              *new_free_indices = MAS_PTR_OFFSET(int32_t, mem, new_array_entries_size);
+
+    if (arrays_mem->list)
+    {
+        memcpy(new_array_entries, arrays_mem->list, arrays_mem->capacity * sizeof(mas_ecs_memory_array));
+        memcpy(new_free_indices, arrays_mem->free_indices, arrays_mem->capacity * sizeof(int32_t));
+        free(arrays_mem->list);
+        arrays_mem->list         = NULL;
+        arrays_mem->free_indices = NULL;
+    }
+
+    arrays_mem->list         = new_array_entries;
+    arrays_mem->free_indices = new_free_indices;
+    arrays_mem->capacity     = new_capacity;
+
+    return true;
 }
 
 static mas_ecs_memory_page* mas_internal_get_page(mas_ecs_memory_handle mem_handle)
@@ -251,6 +269,7 @@ void mas_ecs_memory_deinit()
     }
 }
 
+
 // FRAME SCOPE ALLOCATION API
 void* mas_ecs_memory_frame_malloc(size_t size)
 {
@@ -277,6 +296,7 @@ void  mas_ecs_memory_frame_reset()
         frame_mem->alloc_idx = 0;
     }
 }
+
 
 // PAGE ALLOCATION API
 mas_ecs_memory_page_id mas_ecs_memory_page_create()
@@ -447,7 +467,37 @@ void* mas_ecs_memory_array_add(mas_ecs_memory_array_id array_id)
     if (!array)
         return NULL;
 
-    // do the magic here
+    int32_t element_idx = -1;
+    if (array->count + 1 >= array->capacity)
+    {
+        if (array->capacity == 0)
+            array->capacity = 1;
+
+        uint32_t  new_capacity   = array->capacity * 2;
+        uint32_t  new_array_size = new_capacity * array->element_size;
+        void     *new_array      = MAS_MALLOC(void, new_array_size);
+        if (!new_array)
+            return NULL;
+        memset(new_array, 0, new_array_size);
+  
+        if (array->array)
+        {
+            memcpy(new_array, array->array, array->element_size * array->capacity);
+            free(array->array);
+            array->array = NULL;
+        }
+        
+        array->array    = new_array;
+        array->capacity = new_capacity;
+
+        element_idx = array->count++;
+    }
+
+    if (element_idx == -1)
+        return NULL;
+
+    void* element = MAS_PTR_OFFSET(void, array->array, array->element_size * element_idx);
+    return element;
 }
 
 void* mas_ecs_memory_array_get(mas_ecs_memory_array_id array_id, size_t idx)
