@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "mas_mmap.h"
-#include "mas_ecs_memory.h"
+#include "mas_memory.h"
 #include "mas_ecs_components.h"
 
 
@@ -205,11 +205,12 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
         return NULL;
 
     uint32_t             query_size = sizeof(mas_component_query) + (sizeof(mas_component_query_desc) * count);
-    mas_component_query *query      = MAS_ECS_MEMORY_FRAME_MALLOC(mas_component_query, query_size);
+    mas_component_query *query      = MAS_FRAME_MEMORY_MALLOC(mas_component_query, query_size);
     if(!query)
         return NULL;
-    query->comps   = MAS_PTR_OFFSET(mas_component_query_desc, query, sizeof(mas_component_query));
-    query->count = 0;
+    query->comps      = MAS_PTR_OFFSET(mas_component_query_desc, query, sizeof(mas_component_query));
+    query->count      = 0;
+    query->comps_hash = 0;
 
     size_t component_offset = 0;
     for(int32_t i = 0; i < count; ++i)
@@ -232,6 +233,8 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
 
         component_offset += comp->size;
     }
+
+    // TODO: SORT UNIQUE_IDS AND COMPUTE COMPS_HASH AND STORE IT IN THE QUERY
 
     return query;
 }

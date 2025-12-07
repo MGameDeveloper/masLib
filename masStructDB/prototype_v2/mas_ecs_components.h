@@ -20,6 +20,7 @@ struct mas_component_query_desc
 struct mas_component_query
 {
     mas_component_query_desc *comps;
+    uint64_t                  comps_hash;
     uint32_t                  count;
 };
 

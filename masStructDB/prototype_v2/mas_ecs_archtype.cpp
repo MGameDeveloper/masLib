@@ -112,21 +112,6 @@ mas_archtype* mas_archtype_find(const mas_component_query* comp_query)
 
 		if (archtype->comps_hash == comp_query->hash)
 			return archtype;
-#if 0
-		size_t comp_count = mas_memory_array_element_count(archtype->page_comp_layout);
-		if (comp_count == 0)
-			continue;
-
-		uint64_t comps_hash = 0;
-		for (size_t c = 0; c < comp_count; ++c)
-		{
-			mas_archtype_comp* comp = (mas_archtype_comp*)mas_memory_array_get_element(archtype->page_comp_layout, c);
-			if (!comp)
-			{
-				// calculate hash
-			}
-		}
-#endif
 	}
 
 	return NULL;

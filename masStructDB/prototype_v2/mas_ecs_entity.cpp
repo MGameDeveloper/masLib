@@ -130,6 +130,7 @@ mas_entity mas_entity_create()
 
 	// TODO: use archtype interface to insert the new entity in the default archtype that has all the component to be spawned in the scene
 	//       and get entity index from it for faster access to its components later
+	// THIS SHOULD SORT IDs INTERNALLY SO NO MATTER HOW MIX THEM THEY SHOULD GAVE THE SAME HASH VALUE TO BE USED LATER FOR ARCHTYPE QUERY AND CREATION
 	MAS_COMPONENT_QUERY_LIST(default_comps, 
 		MAS_COMP(mas_position), 
 		MAS_COMP(mas_rotation), 
