@@ -25,6 +25,8 @@ MAS_DEFINE_MEMORY_HANDLE(mas_memory_stack_id);
 bool mas_memory_init();
 void mas_memory_deinit();
 
+void mas_memory_zero(void* data, size_t size);
+
 // FRAME SCOPE ALLOCATION API
 void* mas_memory_frame_malloc(size_t size);
 void  mas_memory_frame_reset();

@@ -5,30 +5,19 @@
 
 struct mas_archtype_entity
 {
-	uint32_t archtype_unique_id;
-	uint32_t archtype_page_idx;
-	uint32_t page_entity_idx;
-};
-
-struct mas_archtype_chunk
-{
-	mas_memory_page_id page_id;
-	uint32_t               ent_count;
-};
-
-struct mas_archtype
-{
-	mas_memory_array_id page_array;
-	mas_memory_array_id page_comp_layout;
-	uint32_t            max_ent_count;
-	uint32_t            unique_id;
-	uint32_t            current_page_idx;
-};
-
-struct mas_archtype_registery
-{
-	mas_memory_array_id archtype_array;
-	uint32_t            unique_id_gen;
+	uint32_t archtype_idx;
+	uint32_t page_idx;
+	uint32_t entity_idx;
 };
 
 
+// forward declarations
+struct mas_component_query; 
+struct mas_archtype;
+
+bool                       mas_archtype_init();
+void                       mas_archtype_deinit();
+mas_archtype*              mas_archtype_find(const mas_component_query* comp_query);
+mas_archtype*              mas_archtype_create(const mas_component_query* comp_query);
+const mas_archtype_entity* mas_archtype_new_entity(mas_archtype* archtype);
+void                       mas_archtype_remove_entity(const mas_archtype_entity* entity);

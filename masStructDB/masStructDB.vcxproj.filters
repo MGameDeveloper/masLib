@@ -113,5 +113,8 @@
     <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

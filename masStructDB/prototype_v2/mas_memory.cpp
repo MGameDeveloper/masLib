@@ -351,6 +351,12 @@ void mas_memory_deinit()
     }
 }
 
+void mas_memory_zero(void* data, size_t size)
+{
+    if (!data || size == 0)
+        return;
+    memset(data, 0, size);
+}
 
 // FRAME SCOPE ALLOCATION API
 void* mas_memory_frame_malloc(size_t size)

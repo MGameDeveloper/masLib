@@ -155,6 +155,7 @@
     <ClCompile Include="prototype_v1\mas_mmap.cpp" />
     <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp" />
     <ClCompile Include="prototype_v2\mas_ecs.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp" />
     <ClCompile Include="prototype_v2\mas_ecs_components.cpp" />
     <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp" />
     <ClCompile Include="prototype_v2\mas_memory.cpp" />

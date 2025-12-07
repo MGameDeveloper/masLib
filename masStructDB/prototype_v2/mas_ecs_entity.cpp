@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-union mas_entity
+union mas_entity_handle
 {
 	uint64_t handle;
 	struct
@@ -24,9 +24,9 @@ union mas_entity
 
 struct mas_entity_mapper
 {
-	uint32_t archtype;
-	uint32_t archtype_page_idx;
-	uint32_t page_ent_idx;
+	uint32_t archtype_idx;
+	uint32_t page_idx;
+	uint32_t entity_idx;
 	uint32_t gen;
 };
 
@@ -35,7 +35,6 @@ struct mas_entities
 	mas_memory_array_id mappers;
 	mas_memory_stack_id free_indices;
 };
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -57,11 +56,23 @@ static bool mas_internal_are_entities_valid()
 	return true;
 }
 
+static void mas_internal_put_mapper_idx_back(int32_t mapper_idx)
+{
+	if (mapper_idx < 0)
+		return;
+
+	int32_t* ptr = (int32_t*)mas_memory_stack_push_element(g_ents.free_indices);
+	if (!ptr)
+		return;
+
+	*ptr = mapper_idx;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-bool mas_ecs_entity_init()
+bool mas_entity_init()
 {
 	if (!mas_memory_array_is_valid(g_ents.mappers))
 	{
@@ -83,19 +94,19 @@ bool mas_ecs_entity_init()
 	return true;
 }
 
-void mas_ecs_entity_deinit()
+void mas_entity_deinit()
 {
 	mas_memory_array_free(g_ents.mappers);
 	mas_memory_stack_free(g_ents.free_indices);
 }
 
-mas_ecs_entity mas_ecs_entity_create()
+mas_entity mas_entity_create()
 {
 	if (!mas_internal_are_entities_valid())
 		return { 0 };
 
-
-	int32_t            mapper_idx = -1; // to be pushed back if something went wrong;
+	// Get previouse freed index or add new a new one
+	int32_t            mapper_idx = -1;
 	mas_entity_mapper *ent_mapper = NULL;
 	if (!mas_memory_stack_is_empty(g_ents.free_indices))
 	{
@@ -117,7 +128,6 @@ mas_ecs_entity mas_ecs_entity_create()
 		return { 0 };
 	}
 
-#if 0
 	// TODO: use archtype interface to insert the new entity in the default archtype that has all the component to be spawned in the scene
 	//       and get entity index from it for faster access to its components later
 	MAS_COMPONENT_QUERY_LIST(default_comps, 
@@ -127,35 +137,53 @@ mas_ecs_entity mas_ecs_entity_create()
 		MAS_COMP(mas_matrix), 
 		MAS_COMP(mas_scene_node));
 	
-	mas_archtype* archtype = mas_ecs_archtype_find(default_comps);
+	mas_archtype *archtype = mas_archtype_find(default_comps);
 	if (!archtype)
+		archtype = mas_archtype_create(default_comps);
+
+	const mas_archtype_entity *archtype_entity = mas_archtype_new_entity(archtype);
+	if (!archtype_entity)
 	{
-		archtype = mas_ecs_archtype_create(default_comps);
-		if (!archtype)
-			return { 0 };
-	}
-
-	mas_archtype_entity *new_ent = mas_ecs_archtype_new_entity(archtype);
-	if (!new_ent)
+		mas_internal_put_mapper_idx_back(mapper_idx);
+		// log error & return invalid entity handle
 		return { 0 };
+	}
+	
+	ent_mapper->archtype_idx = archtype_entity->archtype_idx;
+	ent_mapper->page_idx     = archtype_entity->page_idx;
+	ent_mapper->entity_idx   = archtype_entity->entity_idx;
+	if (ent_mapper->gen == 0)
+		ent_mapper->gen = 1;
 
-	mas_entity_mapper* mapper = &g_mapper.list[ent_idx];
-	mapper->archtype          = new_ent->archtype_unique_id;
-	mapper->archtype_page_idx = new_ent->archtype_page_idx;
-	mapper->page_ent_idx      = new_ent->page_entity_idx;
-	if (mapper->gen == 0)
-		mapper->gen = 1;
-
-	mas_entity ent = { 0 };
-	ent.mapper_idx = ent_idx;
-	ent.gen        = mapper->gen;
-	return { ent.handle };
-#endif
-
-	return { 0 };
+	mas_entity_handle ent_handle = { 0 };
+	ent_handle.mapper_idx = mapper_idx;
+	ent_handle.gen        = ent_mapper->gen;
+	return { ent_handle.handle };
 }
 
-void mas_ecs_entity_destroy(mas_ecs_entity ent_id)
+void mas_entity_destroy(mas_entity ent_id)
 {
+	if (!mas_internal_are_entities_valid())
+		return;
 
+	mas_entity_handle ent_handle = { ent_id.id };
+	if (ent_handle.gen == 0 || (ent_handle.mapper_idx >= mas_memory_array_element_count(g_ents.mappers)))
+		return;
+
+	mas_entity_mapper* ent_mapper = (mas_entity_mapper*)mas_memory_array_get_element(g_ents.mappers, ent_handle.mapper_idx);
+	if (!ent_mapper || (ent_mapper->gen != ent_handle.gen))
+		return;
+
+
+	ent_mapper->gen++;
+	if (ent_mapper->gen == 0)
+		ent_mapper->gen = 1;
+	mas_internal_put_mapper_idx_back(ent_handle.mapper_idx);
+
+	mas_archtype_entity archtype_ent = { };
+	archtype_ent.archtype_idx = ent_mapper->archtype_idx;
+	archtype_ent.page_idx     = ent_mapper->page_idx;
+	archtype_ent.entity_idx   = ent_mapper->entity_idx;
+
+	mas_archtype_remove_entity(&archtype_ent);
 }
