@@ -32,8 +32,8 @@ struct mas_entity_mapper
 
 struct mas_entities
 {
-	mas_ecs_memory_array_id mappers;
-	mas_ecs_memory_stack_id free_indices;
+	mas_memory_array_id mappers;
+	mas_memory_stack_id free_indices;
 };
 
 
@@ -50,8 +50,8 @@ static mas_entities g_ents = { 0 };
 ///////////////////////////////////////////////////////////////////////////////////////
 static bool mas_internal_are_entities_valid()
 {
-	if (!mas_ecs_memory_array_is_valid(g_ents.mappers) ||
-		!(mas_ecs_memory_stack_is_valid(g_ents.free_indices)))
+	if (!mas_memory_array_is_valid(g_ents.mappers) ||
+		!(mas_memory_stack_is_valid(g_ents.free_indices)))
 		return false;
 
 	return true;
@@ -63,19 +63,19 @@ static bool mas_internal_are_entities_valid()
 ///////////////////////////////////////////////////////////////////////////////////////
 bool mas_ecs_entity_init()
 {
-	if (!mas_ecs_memory_array_is_valid(g_ents.mappers))
+	if (!mas_memory_array_is_valid(g_ents.mappers))
 	{
-		g_ents.mappers = mas_ecs_memory_array_create(sizeof(mas_entity_mapper));
-		if (!mas_ecs_memory_array_is_valid(g_ents.mappers))
+		g_ents.mappers = mas_memory_array_create(sizeof(mas_entity_mapper));
+		if (!mas_memory_array_is_valid(g_ents.mappers))
 			return false;
 	}
 
-	if (!mas_ecs_memory_stack_is_valid(g_ents.free_indices))
+	if (!mas_memory_stack_is_valid(g_ents.free_indices))
 	{
-		g_ents.free_indices = mas_ecs_memory_stack_create(sizeof(int32_t));
-		if (!mas_ecs_memory_stack_is_valid(g_ents.free_indices))
+		g_ents.free_indices = mas_memory_stack_create(sizeof(int32_t));
+		if (!mas_memory_stack_is_valid(g_ents.free_indices))
 		{
-			mas_ecs_memory_array_free(g_ents.mappers);
+			mas_memory_array_free(g_ents.mappers);
 			return false;
 		}
 	}
@@ -85,8 +85,8 @@ bool mas_ecs_entity_init()
 
 void mas_ecs_entity_deinit()
 {
-	mas_ecs_memory_array_free(g_ents.mappers);
-	mas_ecs_memory_stack_free(g_ents.free_indices);
+	mas_memory_array_free(g_ents.mappers);
+	mas_memory_stack_free(g_ents.free_indices);
 }
 
 mas_ecs_entity mas_ecs_entity_create()
@@ -94,35 +94,28 @@ mas_ecs_entity mas_ecs_entity_create()
 	if (!mas_internal_are_entities_valid())
 		return { 0 };
 
-	int32_t           *entity_mapper_idx_ptr = NULL;
-	mas_entity_mapper *entity_mapper         = (mas_entity_mapper*)mas_ecs_memory_array_new_element(g_ents.mappers);
-	if (!entity_mapper)
-	{
-		if (!mas_ecs_memory_stack_is_empty(g_ents.free_indices))
-		{
-			entity_mapper_idx_ptr = (int32_t*)mas_ecs_memory_stack_top_element(g_ents.free_indices);
-			if (entity_mapper_idx_ptr)
-			{
-				entity_mapper = (mas_entity_mapper*)mas_ecs_memory_array_get_element(g_ents.mappers, *entity_mapper_idx_ptr);
-				mas_ecs_memory_stack_pop_element(g_ents.free_indices);
-			}
-			else
-				return { 0 };
-		}
-		else
-		{
-			if (!mas_ecs_memory_array_resize(g_ents.mappers))
-				return { 0 };
 
-			entity_mapper = (mas_entity_mapper*)mas_ecs_memory_array_new_element(g_ents.mappers);
-			if (!entity_mapper)
-				return { 0 };
+	int32_t            mapper_idx = -1; // to be pushed back if something went wrong;
+	mas_entity_mapper *ent_mapper = NULL;
+	if (!mas_memory_stack_is_empty(g_ents.free_indices))
+	{
+		int32_t *mapper_idx_ptr = (int32_t*)mas_memory_stack_top_element(g_ents.free_indices);
+		if (mapper_idx_ptr)
+		{
+			mapper_idx = *mapper_idx_ptr;
+			ent_mapper = (mas_entity_mapper*)mas_memory_array_get_element(g_ents.mappers, mapper_idx);
+			if (ent_mapper)
+				mas_memory_stack_pop_element(g_ents.free_indices);
 		}
 	}
+	else
+		ent_mapper = (mas_entity_mapper*)mas_memory_array_new_element(g_ents.mappers);
 
-	// in case of failur
-	//mas_ecs_memory_stack_push_element(g_ents.free_indices, entity_mapper_idx_ptr, sizeof(int32_t));
-
+	if (!ent_mapper)
+	{
+		// log error
+		return { 0 };
+	}
 
 #if 0
 	// TODO: use archtype interface to insert the new entity in the default archtype that has all the component to be spawned in the scene
