@@ -11,6 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
+#define MAS_DEFAULT_PAGE_SIZE             (1024llu * 16)
 #define MAS_DEFAULT_FRAME_MEMORY_SIZE     (1024llu * 16llu)
 #define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + (offset))
 #define MAS_MALLOC(type, size)            (type*)malloc(size)
@@ -358,6 +359,18 @@ void mas_memory_zero(void* data, size_t size)
     memset(data, 0, size);
 }
 
+void mas_memory_copy(void* dst, const void* src, size_t size)
+{
+    if (!dst || !src || size == 0)
+        return;
+    memcpy(dst, src, size);
+}
+
+size_t mas_memory_default_page_size()
+{
+    return MAS_DEFAULT_PAGE_SIZE;
+}
+
 // FRAME SCOPE ALLOCATION API
 void* mas_memory_frame_malloc(size_t size)
 {
@@ -405,6 +418,10 @@ mas_memory_page_id mas_memory_page_create()
                 return { 0 };
             else
                 page_idx = pages_mem->count++;
+
+            mas_memory_page* local_page = &pages_mem->list[page_idx];
+            local_page->data = MAS_MALLOC(void, MAS_DEFAULT_PAGE_SIZE);
+            local_page->size = MAS_DEFAULT_PAGE_SIZE;
         }
         else
         {
@@ -765,7 +782,6 @@ void* mas_memory_stack_push_element(mas_memory_stack_id stack_id)
     if (!stack)
         return NULL;
 
-    int32_t element_idx = -1;
     if ((stack->count + 1) >= stack->capacity)
     {
         if (stack->capacity == 0)

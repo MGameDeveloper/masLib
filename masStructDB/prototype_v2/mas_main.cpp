@@ -1,15 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-#include <stdio.h>
-#include <stdint.h>
 #include "mas_ecs.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-void mas_test_components_query()
+void mas_system_func_test()
 {
     // TODO: components_query used to find an archtype or create archtype
     //          after adding components to entity
@@ -18,18 +16,7 @@ void mas_test_components_query()
         MAS_COMP(mas_rotation),
         MAS_COMP(mas_scale),
         MAS_COMP(mas_matrix));
-    // archtype* a = mas_ecs_archtype_query(transform_comps)
-    if(!transform_comps)
-    {
-        printf("ERROR: [ TRANSFORM_COMPS_NOT_FOUND ]\n");
-    }
-    else
-    {
-        printf("\nTRANSFORM_COMPS_IDS:\n");
-        for(int32_t i = 0; i < transform_comps->count; ++i)
-            printf("    - %s: %u\n", transform_comps_query_list[i], transform_comps->ids[i]);
-        printf("\n");
-    }
+
 }
 
 
@@ -41,7 +28,9 @@ int main(int argc, const char** argv)
     if(!mas_ecs_init())
         return -1;
     
-    mas_test_components_query();
+    mas_system_func_test();
+
+    mas_entity p = mas_entity_create();
 
     while(1)
     {

@@ -18,7 +18,7 @@ struct mas_entity
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-bool       mas_entity_init();
-void       mas_entity_deinit();
+bool mas_entity_init();
+void mas_entity_deinit();
 mas_entity mas_entity_create();
-void       mas_entity_destroy(mas_entity ent_id);
+void mas_entity_destroy(mas_entity ent_id);

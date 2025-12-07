@@ -26,6 +26,8 @@ bool mas_memory_init();
 void mas_memory_deinit();
 
 void mas_memory_zero(void* data, size_t size);
+void mas_memory_copy(void* dst, const void* src, size_t size);
+size_t mas_memory_default_page_size();
 
 // FRAME SCOPE ALLOCATION API
 void* mas_memory_frame_malloc(size_t size);

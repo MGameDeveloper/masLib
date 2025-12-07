@@ -22,6 +22,7 @@ struct mas_component_query
     mas_component_query_desc *comps;
     uint64_t                  comps_hash;
     uint32_t                  count;
+    uint32_t                  total_comps_size;
 };
 
 

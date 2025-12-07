@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "mas_mmap.h"
 #include "mas_memory.h"
 #include "mas_ecs_components.h"
@@ -151,6 +152,47 @@ static bool mas_internal_register_comp(const char* name, size_t size)
     return true;
 }
 
+static int mas_internal_compare_unique_id(const void* a, const void* b)
+{
+    uint32_t a_num = *(uint32_t*)a;
+    uint32_t b_num = *(uint32_t*)b;
+    return (a_num > b_num) ? b_num : a_num;
+}
+
+static inline void fnv1a_update_u32_le(uint64_t* state, uint32_t v) 
+{
+    // feed 4 bytes little-endian into FNV-1a
+    uint8_t b0 = (uint8_t)(v & 0xFF);
+    uint8_t b1 = (uint8_t)((v >> 8) & 0xFF);
+    uint8_t b2 = (uint8_t)((v >> 16) & 0xFF);
+    uint8_t b3 = (uint8_t)((v >> 24) & 0xFF);
+
+    const uint64_t FNV_PRIME_64 = 1099511628211ULL;
+
+    *state ^= (uint64_t)b0; *state *= FNV_PRIME_64;
+    *state ^= (uint64_t)b1; *state *= FNV_PRIME_64;
+    *state ^= (uint64_t)b2; *state *= FNV_PRIME_64;
+    *state ^= (uint64_t)b3; *state *= FNV_PRIME_64;
+}
+
+
+static bool mas_internal_hash_comps_id(uint64_t* out_hash, uint32_t* comps_id, uint32_t comp_count)
+{
+    uint32_t* copy = MAS_FRAME_MEMORY_MALLOC(uint32_t, sizeof(uint32_t) * comp_count);
+    if (!copy) 
+        return false;
+
+    memcpy(copy,    comps_id,   sizeof(uint32_t) * comp_count);
+    qsort(comps_id, comp_count, sizeof(uint32_t), &mas_internal_compare_unique_id);
+
+    const uint64_t FNV_OFFSET_BASIS_64 = 14695981039346656037ULL;
+    uint64_t h = FNV_OFFSET_BASIS_64;
+    for (size_t i = 0; i < comp_count; ++i)
+        fnv1a_update_u32_le(&h, copy[i]);
+
+    return true;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
@@ -212,7 +254,12 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
     query->count      = 0;
     query->comps_hash = 0;
 
+    uint32_t* comps_id = MAS_FRAME_MEMORY_MALLOC(uint32_t, sizeof(uint32_t) * count);
+    if (!comps_id)
+        return NULL;
+
     size_t component_offset = 0;
+    size_t total_comps_size = 0;
     for(int32_t i = 0; i < count; ++i)
     {
         mas_component* comp = mas_internal_find_comp(comp_name_list[i]);
@@ -231,10 +278,20 @@ mas_component_query* mas_ecs_components_query(const char** comp_name_list, uint3
 
         query->count++;
 
+        comps_id[i] = comp->unique_id;
+
         component_offset += comp->size;
+        total_comps_size += comp->size;
     }
 
+    query->total_comps_size = total_comps_size;
+
     // TODO: SORT UNIQUE_IDS AND COMPUTE COMPS_HASH AND STORE IT IN THE QUERY
+    if (!mas_internal_hash_comps_id(&query->comps_hash, comps_id, count))
+    {
+        // log error
+        return NULL;
+    }
 
     return query;
 }

@@ -15,34 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\masStructDB.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\masECSMemory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\masECS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\dbv2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\mas_mmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\mas_ecs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v1\mas_ecs_memory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="prototype_v2\mas_ecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_ecs_components.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v2\mas_mmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="prototype_v2\mas_ecs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_archtype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="prototype_v2\mas_ecs_components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\mas_ecs_core_components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\mas_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prototype_v2\mas_memory.h">
@@ -51,70 +62,5 @@
     <ClInclude Include="prototype_v2\mas_mmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="prototype_v2\mas_ecs_entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v2\mas_ecs_entity.cpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v2\mas_ecs_core_components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="prototype_v2\mas_ecs_archtype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\masStructDB.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\masStructDBMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\masECSMemory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\masECS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MainTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v1\mas_mmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v1\mas_ecs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v1\mas_ecs_memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v1\mas_ecs_main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_ecs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_ecs_components.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_mmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

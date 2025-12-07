@@ -18,6 +18,25 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="prototype_v2\mas_ecs.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_components.cpp" />
+    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp" />
+    <ClCompile Include="prototype_v2\mas_entity.cpp" />
+    <ClCompile Include="prototype_v2\mas_main.cpp" />
+    <ClCompile Include="prototype_v2\mas_memory.cpp" />
+    <ClCompile Include="prototype_v2\mas_mmap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="prototype_v2\mas_ecs.h" />
+    <ClInclude Include="prototype_v2\mas_ecs_archtype.h" />
+    <ClInclude Include="prototype_v2\mas_ecs_components.h" />
+    <ClInclude Include="prototype_v2\mas_ecs_core_components.h" />
+    <ClInclude Include="prototype_v2\mas_entity.h" />
+    <ClInclude Include="prototype_v2\mas_memory.h" />
+    <ClInclude Include="prototype_v2\mas_mmap.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -130,43 +149,6 @@
       </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="prototype_v1\mas_ecs.h" />
-    <ClInclude Include="prototype_v1\mas_ecs_memory.h" />
-    <ClInclude Include="prototype_v1\mas_mmap.h" />
-    <ClInclude Include="prototype_v1\mas_ecs_struct_registery.h" />
-    <ClInclude Include="prototype_v2\mas_ecs.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_archtype.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_components.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_core_components.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_entity.cpp" />
-    <ClInclude Include="prototype_v2\mas_memory.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_entity.h" />
-    <ClInclude Include="prototype_v2\mas_mmap.h" />
-    <ClInclude Include="Source\dbv2.h" />
-    <ClInclude Include="Source\masECS.h" />
-    <ClInclude Include="Source\masECSMemory.h" />
-    <ClInclude Include="Source\masStructDB.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="prototype_v1\mas_ecs_main.cpp" />
-    <ClCompile Include="prototype_v1\mas_ecs.cpp" />
-    <ClCompile Include="prototype_v1\mas_ecs_memory.cpp" />
-    <ClCompile Include="prototype_v1\mas_mmap.cpp" />
-    <ClCompile Include="prototype_v1\mas_ecs_struct_registery.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_components.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp" />
-    <ClCompile Include="prototype_v2\mas_memory.cpp" />
-    <ClCompile Include="prototype_v2\mas_main.cpp" />
-    <ClCompile Include="prototype_v2\mas_mmap.cpp" />
-    <ClCompile Include="Source\MainTest.cpp" />
-    <ClCompile Include="Source\masECS.cpp" />
-    <ClCompile Include="Source\masECSMemory.cpp" />
-    <ClCompile Include="Source\masStructDB.cpp" />
-    <ClCompile Include="Source\masStructDBMain.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
