@@ -500,8 +500,6 @@ mas_memory_array_id mas_memory_array_create(size_t element_size)
         return { 0 };
 
     mas_memory_array_list* arrays_mem = &g_mem->arrays;
-    if (!arrays_mem->list)
-        return { 0 };
 
     int32_t array_idx = -1;
     if (arrays_mem->count + 1 >= arrays_mem->capacity)
@@ -687,8 +685,6 @@ mas_memory_stack_id mas_memory_stack_create(size_t element_size)
         return { 0 };
 
     mas_memory_stack_list* stacks = &g_mem->stacks;
-    if (!stacks->list)
-        return { 0 };
 
     int32_t stack_idx = -1;
     if (stacks->count + 1 >= stacks->capacity)

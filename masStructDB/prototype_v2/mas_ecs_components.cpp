@@ -190,6 +190,8 @@ static bool mas_internal_hash_comps_id(uint64_t* out_hash, uint32_t* comps_id, u
     for (size_t i = 0; i < comp_count; ++i)
         fnv1a_update_u32_le(&h, copy[i]);
 
+    *out_hash = h;
+
     return true;
 }
 

@@ -28,9 +28,11 @@ int main(int argc, const char** argv)
     if(!mas_ecs_init())
         return -1;
     
-    mas_system_func_test();
+    //mas_system_func_test();
 
     mas_entity p = mas_entity_create();
+
+    mas_entity_destroy(p);
 
     while(1)
     {

@@ -120,7 +120,10 @@ mas_entity mas_entity_create()
 		}
 	}
 	else
+	{
+		mapper_idx = mas_memory_array_element_count(g_ents.mappers);
 		ent_mapper = (mas_entity_mapper*)mas_memory_array_new_element(g_ents.mappers);
+	}
 
 	if (!ent_mapper)
 	{
@@ -187,4 +190,12 @@ void mas_entity_destroy(mas_entity ent_id)
 	archtype_ent.entity_idx   = ent_mapper->entity_idx;
 
 	mas_archtype_remove_entity(&archtype_ent);
+}
+
+void mas_entity_add_components(mas_entity ent_id, const mas_component_query* comps)
+{
+	if (!mas_internal_are_entities_valid())
+		return;
+
+	// need solution for easy move of entities betweena archtypes
 }
