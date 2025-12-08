@@ -36,6 +36,9 @@
     <ClInclude Include="prototype_v2\mas_entity.h" />
     <ClInclude Include="prototype_v2\mas_memory.h" />
     <ClInclude Include="prototype_v2\mas_mmap.h" />
+    <ClInclude Include="prototype_v2\utils\mas_array.h" />
+    <ClInclude Include="prototype_v2\utils\mas_page.h" />
+    <ClInclude Include="prototype_v2\utils\mas_stack.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -62,5 +62,14 @@
     <ClInclude Include="prototype_v2\mas_mmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="prototype_v2\utils\mas_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\utils\mas_stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v2\utils\mas_page.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

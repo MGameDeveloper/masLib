@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mas_memory.h"
-
 
 struct mas_archtype_entity
 {

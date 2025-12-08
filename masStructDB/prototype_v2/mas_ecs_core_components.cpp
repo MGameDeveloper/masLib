@@ -19,7 +19,8 @@ void mas_ecs_core_components_register()
     MAS_COMPONENT_REGISTER(mas_vec4);
     MAS_COMPONENT_REGISTER(mas_quaternion);
     MAS_COMPONENT_REGISTER(mas_matrix);
-    MAS_COMPONENT_REGISTER(mas_scene_node);
+    MAS_COMPONENT_REGISTER(mas_parent);
+    MAS_COMPONENT_REGISTER(mas_children);
 
     // FOR DEBUG TO ENSURE REGISTERATION
     mas_ecs_comonents_print();

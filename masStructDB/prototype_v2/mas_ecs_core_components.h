@@ -4,6 +4,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 #include "mas_entity.h"
+#include "utils/mas_array.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -41,13 +42,15 @@ union mas_matrix
     float m16[16];
 };
 
-struct mas_scene_node
+struct mas_parent
 {
-    mas_entity parent;
-    mas_entity prev;
-    mas_entity next;
-    mas_entity child;
-    uint32_t   depth_level;
+    mas_entity entity;
+};
+
+struct mas_children // reference global entity pool where all entities allocated children from
+{
+    uint32_t index;
+    uint32_t count;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
