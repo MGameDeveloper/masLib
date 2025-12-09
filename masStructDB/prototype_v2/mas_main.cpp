@@ -30,9 +30,10 @@ int main(int argc, const char** argv)
     
     //mas_system_func_test();
 
-    mas_entity p = mas_entity_create();
+    mas_entity p0 = mas_entity_create();
+    mas_entity p1 = mas_entity_create();
 
-    mas_entity_destroy(p);
+    mas_entity_destroy(p0);
 
     while(1)
     {

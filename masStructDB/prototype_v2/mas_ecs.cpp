@@ -13,8 +13,6 @@ bool mas_ecs_init()
         return false;
     if(!mas_ecs_components_init())
         return false;
-    if (!mas_entity_init())
-        return false;
     if (!mas_archtype_init())
         return false;
     mas_ecs_core_components_register();
@@ -25,7 +23,6 @@ bool mas_ecs_init()
 void mas_ecs_deinit()
 {
     mas_ecs_components_deinit();
-    mas_entity_deinit();
     mas_archtype_deinit();
     mas_memory_deinit();
 }

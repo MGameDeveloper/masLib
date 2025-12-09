@@ -638,17 +638,18 @@ size_t mas_memory_array_capacity(mas_memory_array_id array_id)
     return array->capacity;
 }
 
-bool mas_memory_array_resize(mas_memory_array_id array_id)
+bool mas_memory_array_reserve(mas_memory_array_id array_id, size_t capacity)
 {
     mas_memory_handle  array_handle = { array_id.id };
     mas_memory_array  *array        = mas_internal_get_array(array_handle);
     if (!array)
         return false;
 
-    if (array->capacity == 0)
-        array->capacity = 1;
+    if (capacity == 0 || capacity == 1)
+        capacity = 2;
+    
 
-    uint32_t  new_capacity   = array->capacity * 2;
+    uint32_t  new_capacity   = capacity;
     uint32_t  new_array_size = new_capacity * array->element_size;
     void* new_array = MAS_MALLOC(void, new_array_size);
     if (!new_array)

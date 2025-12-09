@@ -48,7 +48,7 @@ void*               mas_memory_array_new_element(mas_memory_array_id);
 void*               mas_memory_array_get_element(mas_memory_array_id, size_t idx);
 size_t              mas_memory_array_element_count(mas_memory_array_id array_id);
 size_t              mas_memory_array_capacity(mas_memory_array_id array_id);
-//bool                mas_memory_array_resize(mas_memory_array_id array_id);
+bool                mas_memory_array_reserve(mas_memory_array_id array_id, size_t capacity);
 bool                mas_memory_array_is_valid(mas_memory_array_id array_id);
 
 // STACK ALLOCATION API

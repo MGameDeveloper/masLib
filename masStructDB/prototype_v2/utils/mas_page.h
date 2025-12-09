@@ -21,15 +21,18 @@ public:
 
 	~mas_page()
 	{
-		destroy();
+
 	}
 
 	bool create()
 	{
-		if (page == 0)
+		if (page.id == 0)
 			page = mas_memory_page_create();
-		return (page != 0);
+		return (page.id != 0);
 	}
 
-	void destroy() { mas_memory_page_free(page); }
+	T*     data()    { return (T*)mas_memory_page_data(page); }
+	size_t size()    { return mas_memory_page_size(page);     }
+	void   destroy() { mas_memory_page_free(page);            }
+	bool is_valid()  { return mas_memory_page_is_valid(page); }
 };
