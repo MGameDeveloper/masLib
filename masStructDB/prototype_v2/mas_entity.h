@@ -52,4 +52,5 @@ struct mas_entity
 ///////////////////////////////////////////////////////////////////////////////////////
 mas_entity mas_entity_create();
 void       mas_entity_destroy(mas_entity entity);
+void       mas_entity_add_component(mas_entity entity, const mas_component_query* comp_query); // TODO:
 

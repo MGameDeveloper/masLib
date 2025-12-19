@@ -228,3 +228,11 @@ void mas_entity_destroy(mas_entity entity)
 {
 	mas_archtype_remove_entity(entity);
 }
+
+void mas_entity_add_component(mas_entity entity, mas_component_query* comp_query)
+{
+	// this would get the archtype of current entity
+	mas_archtype* archtype = mas_archtype_get_by_entity(entity, comp_query); 
+	if (!archtype)
+		return;
+}

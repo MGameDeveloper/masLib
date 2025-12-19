@@ -39,6 +39,12 @@
     <ClCompile Include="prototype_v2\mas_mmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="prototype_v3\masComponentRegister.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prototype_v3\io\mas_mmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prototype_v2\mas_ecs.h">
@@ -69,6 +75,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prototype_v2\utils\mas_page.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v3\masComponentRegister.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v3\io\mas_mmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
