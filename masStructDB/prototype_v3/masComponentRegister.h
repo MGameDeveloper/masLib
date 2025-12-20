@@ -41,7 +41,7 @@ masComponentQuery* masComponentRegister_Query(masComponentList* CompList);
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPER MACROS
 /////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAS_COMPONENT_ADD(c) masComponents_Add(#c, sizeof(c))
+#define MAS_COMPONENT_REGISTER(c) masComponentRegister_Add(#c, sizeof(c))
 #define MAS_COMP(c) #c
 #define MAS_COMPONENT_LIST(name, ...)                \
     const char*      name##_List[] = { __VA_ARGS__ };\
@@ -58,7 +58,18 @@ typedef struct _test
 
 } masPosition, masRotation, masScale, masWorldMatrix, masLocalMatrix, masParent, masChildren;
 
-void w()
+void registeration()
+{
+	MAS_COMPONENT_REGISTER(masPosition);
+	MAS_COMPONENT_REGISTER(masRotation);
+	MAS_COMPONENT_REGISTER(masScale);
+	MAS_COMPONENT_REGISTER(masWorldMatrix);
+	MAS_COMPONENT_REGISTER(masLocalMatrix);
+	MAS_COMPONENT_REGISTER(masParent);
+	MAS_COMPONENT_REGISTER(masChildren);
+}
+
+size_t masEntity_Create()
 {
 	MAS_COMPONENT_LIST(TransformCompList,
 		MAS_COMP(masPosition),
@@ -86,4 +97,55 @@ void w()
 		}
 		printf("====================================\n");
 	}
+
+	size_t Entity = masArchtypeRegister_CreateEntity(TransformComps);
+	if (Entity == 0)
+		printf("[ ERROR ]: Creating Entity\n");
+	
+	return Entity;
+}
+
+size_t masArchtypeRegister_CreateEntity(const masComponentQuery* CompQuery)
+{
+	masArchtype *Archtype = masArchtype_FindByComponentQuery(CompQuery);
+	if (!Archtype)
+		Archtype = masArchtype_Create(CompQuery);
+
+	if (!Archtype)
+		return 0;
+
+	size_t Entity = masArchtype_CreateEntity(Archtype, CompQuery);
+	return Entity;
+}
+
+void* masEntity_AddComponent(size_t Entity, const char* CompName)
+{
+	if (masEntity_HasComponent(Entity, CompName))
+		return NULL;
+
+	masArchtype* Archtype = masEntity_GetArchtype(Entity);
+	if (!Archtype)
+		return NULL;
+
+	const masComponentQuery* CompQuery = masArchtype_GetComponentQuery(Archtype);
+	if (!CompQuery)
+		return NULL;
+
+	const masComponentQuery* TargetCompQuery = masComponentQuery_Add(CompQuery, CompName); // would add the new compname to the list re order them and calculate the final hash
+	if (!TargetCompQuery)
+		return NULL;
+
+	masArchtype* TargetArchtype = masArchtype_FindByComponentQuery(TargetCompQuery);
+	if (!TargetArchtype)
+		TargetArchtype = masArchtype_Create(TargetCompQuery);
+
+	if (!TargetArchtype)
+		return NULL;
+
+	if (!masArchtype_MoveEntity(Entity, Archtype, TargetArchtype))
+		return NULL;
+
+	void* Comp = masArchtype_GetComponent(Entity, TargetArchtype, CompName);
+
+	return Comp;
 }
