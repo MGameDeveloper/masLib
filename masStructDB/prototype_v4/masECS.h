@@ -1,32 +1,33 @@
 #pragma once
 
+#include "masArchtype.h"
 #include "masComponent.h"
 #include "masCoreComponents.h"
 
 void RegisterComponents()
 {
-	masComponent_Register(masVec3);
-	masComponent_Register(masPosition);
-	masComponent_Register(masRotation);
-	masComponent_Register(masScale);
-	masComponent_Register(masVelocity);
+	MAS_COMPONENT_REGISTER(masVec3);
+	MAS_COMPONENT_REGISTER(masPosition);
+	MAS_COMPONENT_REGISTER(masRotation);
+	MAS_COMPONENT_REGISTER(masScale);
+	MAS_COMPONENT_REGISTER(masVelocity);
 
-	masComponent_Register(masVec4);
-	masComponent_Register(masQuaternion);
+	MAS_COMPONENT_REGISTER(masVec4);
+	MAS_COMPONENT_REGISTER(masQuaternion);
 
-	masComponent_Register(masMatrix4x4);
-	masComponent_Register(masWorldMatrix);
-	masComponent_Register(masLocalMatrix);
+	MAS_COMPONENT_REGISTER(masMatrix4x4);
+	MAS_COMPONENT_REGISTER(masWorldMatrix);
+	MAS_COMPONENT_REGISTER(masLocalMatrix);
 
-	masComponent_Register(masParent);
-	masComponent_Register(masChildren);
+	MAS_COMPONENT_REGISTER(masParent);
+	MAS_COMPONENT_REGISTER(masChildren);
 }
 
 bool masECS_Init()
 {
 	if (!masComponent_Init())
 		return false;
-	if (!masEntity_Init())
+	if (!masArchtype_Init())
 		return false;
 
 	RegisterComponents();
@@ -36,6 +37,6 @@ bool masECS_Init()
 
 void masECS_DeInit()
 {
-	masEntity_DeInit();
+	masArchtype_DeInit();
 	masComponent_DeInit();
 }

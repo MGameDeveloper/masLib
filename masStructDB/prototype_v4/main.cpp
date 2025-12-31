@@ -10,24 +10,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-#include <string.h>
-#include <stdio.h>
-void parse_comps(const char* comps)
-{
-	char buf[256];
-	strcpy(buf, comps);
-
-	char* token = strtok(buf, ",");
-	while (token != NULL)
-	{
-		while (*token == ' ')
-			token++;
-
-		printf("TOKEN: %s\n", token);
-		token = strtok(buf, ",");
-	}
-}
-
 int main(int argc, const char** argv)
 {
 	if (!masECS_Init())

@@ -19,30 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="prototype_v2\mas_ecs.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_archtype.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_components.cpp" />
-    <ClCompile Include="prototype_v2\mas_ecs_core_components.cpp" />
-    <ClCompile Include="prototype_v2\mas_entity.cpp" />
-    <ClCompile Include="prototype_v2\mas_main.cpp" />
-    <ClCompile Include="prototype_v2\mas_memory.cpp" />
-    <ClCompile Include="prototype_v2\mas_mmap.cpp" />
-    <ClCompile Include="prototype_v3\io\mas_mmap.cpp" />
-    <ClCompile Include="prototype_v3\masComponentRegister.cpp" />
+    <ClCompile Include="prototype_v4\main.cpp" />
+    <ClCompile Include="prototype_v4\masArchtype.cpp" />
+    <ClCompile Include="prototype_v4\masComponent.cpp" />
+    <ClCompile Include="prototype_v4\masEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="prototype_v2\mas_ecs.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_archtype.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_components.h" />
-    <ClInclude Include="prototype_v2\mas_ecs_core_components.h" />
-    <ClInclude Include="prototype_v2\mas_entity.h" />
-    <ClInclude Include="prototype_v2\mas_memory.h" />
-    <ClInclude Include="prototype_v2\mas_mmap.h" />
-    <ClInclude Include="prototype_v2\utils\mas_array.h" />
-    <ClInclude Include="prototype_v2\utils\mas_page.h" />
-    <ClInclude Include="prototype_v2\utils\mas_stack.h" />
-    <ClInclude Include="prototype_v3\io\mas_mmap.h" />
-    <ClInclude Include="prototype_v3\masComponentRegister.h" />
+    <ClInclude Include="prototype_v4\masArchtype.h" />
+    <ClInclude Include="prototype_v4\masComponent.h" />
+    <ClInclude Include="prototype_v4\masCoreComponents.h" />
+    <ClInclude Include="prototype_v4\masECS.h" />
+    <ClInclude Include="prototype_v4\masEntity.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -23,7 +23,7 @@ struct masEntry
 	uint32_t Index;
 };
 
-struct masComponent
+struct masComponentDesc
 {
 	uint32_t  UniqueID;
 	uint32_t  Size;
@@ -32,11 +32,11 @@ struct masComponent
 
 struct masComponentMap
 {
-	masEntry     EntryList[MAS_ENTRY_MAX];
-	masComponent ComponentList[MAS_COMPONENT_MAX];
-	uint32_t     EntryCount;
-	uint32_t     ComponentCount;
-	uint32_t     UniqueIDGen;
+	masEntry         EntryList[MAS_ENTRY_MAX];
+	masComponentDesc ComponentDescList[MAS_COMPONENT_MAX];
+	uint32_t         EntryCount;
+	uint32_t         ComponentCount;
+	uint32_t         UniqueIDGen;
 };
 
 
@@ -64,22 +64,22 @@ static uint64_t masInternal_Hash(const char* Data, uint64_t Size)
 	return Hash;
 }
 
-static const masComponent* masInternal_FindComponent(const char* Name, uint64_t Hash)
+static const masComponentDesc* masInternal_FindComponent(const char* Name, uint64_t Hash)
 {
-	uint32_t      EntryIdx  = Hash % MAS_ENTRY_MAX;
-	masEntry     *Entry     = &CompMap->EntryList[EntryIdx];
-	masComponent *Component = &CompMap->ComponentList[Entry->Index];
+	uint32_t          EntryIdx  = Hash % MAS_ENTRY_MAX;
+	masEntry         *Entry     = &CompMap->EntryList[EntryIdx];
+	masComponentDesc *ComponentDesc = &CompMap->ComponentDescList[Entry->Index];
 	if (Entry->Hash != Hash)
 	{
-		if(Component->Size != 0)
-			printf("[ ERROR ]: Component Name Conflict [ %s with %s ]\n", Name, Component->Name);
+		if(ComponentDesc->Size != 0)
+			printf("[ ERROR ]: Component Name Conflict [ %s with %s ]\n", Name, ComponentDesc->Name);
 		return NULL;
 	}
 
-	return Component;
+	return ComponentDesc;
 }
 
-const masComponent* masInternal_AddComponent(const char* Name, uint32_t NameLen, uint32_t CompSize, uint32_t NameHash)
+const masComponentDesc* masInternal_AddComponent(const char* Name, uint32_t NameLen, uint32_t CompSize, uint32_t NameHash)
 {
 	if (CompMap->ComponentCount + 1 >= MAS_COMPONENT_MAX)
 	{
@@ -87,26 +87,26 @@ const masComponent* masInternal_AddComponent(const char* Name, uint32_t NameLen,
 		return NULL;
 	}
 
-	uint32_t      EntryIdx  = NameHash % MAS_ENTRY_MAX;
-	masEntry     *Entry     = &CompMap->EntryList[EntryIdx];
-	masComponent *Component = &CompMap->ComponentList[Entry->Index];
+	uint32_t          EntryIdx      = NameHash % MAS_ENTRY_MAX;
+	masEntry         *Entry         = &CompMap->EntryList[EntryIdx];
+	masComponentDesc *ComponentDesc = &CompMap->ComponentDescList[Entry->Index];
 	if (Entry->Hash != 0)
 	{
-		printf("[ ERROR ]: Component Name Conflict [ %s with %s ]\n", Name, Component->Name);
+		printf("[ ERROR ]: Component Name Conflict [ %s with %s ]\n", Name, ComponentDesc->Name);
 		return NULL;
 	}
 
 	Entry->Hash  = NameHash;
 	Entry->Index = CompMap->ComponentCount++;
 
-	Component       = &CompMap->ComponentList[Entry->Index];
-	Component->Size = CompSize;
-	Component->UniqueID = CompMap->UniqueIDGen++;
+	ComponentDesc = &CompMap->ComponentDescList[Entry->Index];
+	ComponentDesc->Size = CompSize;
+	ComponentDesc->UniqueID = CompMap->UniqueIDGen++;
 	if (NameLen >= 32)
 		NameLen = 32 - 1;
-	memcpy(Component->Name, Name, NameLen);
+	memcpy(ComponentDesc->Name, Name, NameLen);
 
-	return Component;
+	return ComponentDesc;
 }
 
 
@@ -151,36 +151,95 @@ void masComponent_RegisterByName(const char* Name, uint32_t Size)
 		return;
 	}
 
-	uint64_t            NameLen   = strlen(Name);
-	uint64_t            NameHash  = masInternal_Hash(Name, NameLen);
-	const masComponent *FoundComp = masInternal_FindComponent(Name, NameHash);
+	uint64_t                NameLen   = strlen(Name);
+	uint64_t                NameHash  = masInternal_Hash(Name, NameLen);
+	const masComponentDesc *FoundComp = masInternal_FindComponent(Name, NameHash);
 	if (FoundComp)
 	{
 		printf("Component[ %s ]: ALREADY_REGISTERED\n", Name);
 		return;
 	}
 
-	const masComponent* Component = masInternal_AddComponent(Name, NameLen, Size, NameHash);
-	if (!Component)
+	const masComponentDesc* ComponentDesc = masInternal_AddComponent(Name, NameLen, Size, NameHash);
+	if (!ComponentDesc)
 		printf("[ ERROR ]: Registering Component [ %s ]\n", Name);
 }
 
-const masComponent* masComponent_Find(const char* Name)
+masComponent masComponent_Find(const char* Name)
 {
 	if (!CompMap)
 	{
 		printf("[ ERROR ]: You must call masComponent_Init() before any call to masComponent_* functions\n");
-		return;
+		return {};
 	}
 
-	uint64_t NameLen  = strlen(Name);
-	uint64_t NameHash = masInternal_Hash(Name, NameLen);
-	const masComponent* Component = masComponent_Find(Name);
-	if (!Component)
+	uint64_t                NameLen       = strlen(Name);
+	uint64_t                NameHash      = masInternal_Hash(Name, NameLen);
+	uint32_t                EntryIdx      = NameHash % MAS_ENTRY_MAX;
+	const masEntry         *Entry         = &CompMap->EntryList[EntryIdx];
+	const masComponentDesc *ComponentDesc = &CompMap->ComponentDescList[Entry->Index];
+	if (Entry->Hash != NameHash)
 	{
-		printf("[ ERROR ]: Finding Component [ %s ]\n", Name);
-		return NULL;
+		printf("[ ERROR ]: Component[ %s ] is not found register before using it\n", Name);
+		return { };
 	}
+
+	masComponent Component = { };
+	Component.Hash     = Entry->Hash;
+	Component.Size     = ComponentDesc->Size;
+	Component.UniqueID = ComponentDesc->UniqueID;
 
 	return Component;
+}
+
+bool masComponent_IsValid(masComponent Component)
+{
+	if (Component.Size == 0)
+		return false;
+	return true;
+}
+
+const masComponentList* masComponent_Query(const char* Components)
+{
+	size_t ComponentNamesLength = strlen(Components);
+	if (ComponentNamesLength == 0)
+		return NULL;
+	ComponentNamesLength++; // FOR NULL TERMINATOR
+
+	char *buf = MAS_MALLOC(char, ComponentNamesLength);
+	strcpy(buf, Components);
+
+	uint32_t count = 0;
+	char* token = strtok(buf, ",");
+	if (token != NULL)
+		count = 1;
+
+	while (token != NULL)
+	{
+		while (*token == ' ') token++;
+
+		printf("TOKEN: %s\n", token);
+		token = strtok(NULL, ",");
+		if(token != NULL)
+			count++;
+	}
+
+	printf("COMPONENT_COUNT: %u\n", count);
+
+	size_t MemSize = sizeof(masComponentList) + (sizeof(masComponent) * count);
+	masComponentList* ComponentList = MAS_MALLOC(masComponentList, MemSize);
+	if (!ComponentList)
+		return NULL;
+	memset(ComponentList, 0, MemSize);
+
+	ComponentList->Names      = MAS_PTR_OFFSET(char, ComponentList,        sizeof(masComponentList));
+	ComponentList->Components = MAS_PTR_OFFSET(masComponent,  ComponentList->Names, ComponentNamesLength);
+	ComponentList->Count      = count;
+	strcpy(ComponentList->Names, Components);
+
+	// fill component list components
+
+
+	free(buf);
+	return ComponentList;
 }

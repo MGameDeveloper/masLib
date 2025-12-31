@@ -69,6 +69,7 @@ void registeration()
 	MAS_COMPONENT_REGISTER(masChildren);
 }
 
+#if 0
 size_t masEntity_Create()
 {
 	MAS_COMPONENT_LIST(TransformCompList,
@@ -82,7 +83,7 @@ size_t masEntity_Create()
 
 	masComponentQuery *TransformComps = masComponentRegister_Query(&TransformCompList);
 	if (!TransformComps)
-		return;
+		return 0;
 	else
 	{
 		printf("\n===================================\n");
@@ -104,7 +105,6 @@ size_t masEntity_Create()
 	
 	return Entity;
 }
-
 size_t masArchtypeRegister_CreateEntity(const masComponentQuery* CompQuery)
 {
 	masArchtype *Archtype = masArchtype_FindByComponentQuery(CompQuery);
@@ -150,5 +150,5 @@ void* masEntity_AddComponent(size_t Entity, const char* CompName)
 	return Comp;
 }
 
-
+#endif
 

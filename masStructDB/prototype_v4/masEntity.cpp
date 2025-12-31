@@ -7,10 +7,9 @@
 #include "masComponent.h"
 
 
-masEntity masEntity_Create()
+masEntity masEntity_Create(const char* Components)
 {
-	masComponentList(DefaultComponents, masPosition, masRotation, masScale, masWorldMatrix, masLocalMatrix, masParent);
-	masEntity Entity = masArchtype_CreateEntity(DefaultComponents);
+	masEntity Entity = masArchtype_CreateEntity(Components);
 	return Entity;
 }
 
@@ -24,7 +23,22 @@ void* masEntity_AddComponentByName(masEntity Entity, const char* CompName)
 	return masArchtype_AddEntityComponent(Entity, CompName);
 }
 
+void masEntity_RemoveComponentByName(masEntity Entity, const char* CompName)
+{
+	masArchtype_RemoveEntityComponent(Entity, CompName);
+}
+
 void* masEntity_GetComponentByName(masEntity Entity, const char* CompName)
 {
 	return masArchtype_GetEntityComponent(Entity, CompName);
+}
+
+void masEntity_AddChild(masEntity Parent, masEntity Child)
+{
+	masArchtype_AddEntityChild(Parent, Child);
+}
+
+void masEntity_RemoveChild(masEntity Child)
+{
+	masArchtype_RemoveEntityChild(Child);
 }

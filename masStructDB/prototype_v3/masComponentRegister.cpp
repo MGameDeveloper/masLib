@@ -4,7 +4,7 @@
 
 #include "masComponentRegister.h"
 #include "io/mas_mmap.h"
-
+#if 0
 union masTag
 {
 	size_t Value;
@@ -110,3 +110,4 @@ void masComponentRegister_Add(const char* name, uint64_t size)
 	GRegister->Count++;
 
 }
+#endif
