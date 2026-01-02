@@ -10,6 +10,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MAS_ENTRY_MAX    (1024 * 10)
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 union masEntityHandle
 {
 	uint64_t Entity;
@@ -36,18 +42,31 @@ struct masChunk
 
 struct masArchtype
 {
-	masChunk **Chunks;
-	uint32_t   ChunkCount;
-	uint32_t   MaxEntityCount;
-
-	char Components[256]; // list of components seperated by comma need to be parsed to get every component size
+	masChunk         **Chunks;
+	masComponentList  *Components;
+	uint32_t           ChunkCount;
+	uint32_t           MaxEntityCount;
 };
 
-struct masArchtypeList
+struct masEntry
+{
+	uint64_t Hash;
+	int32_t  Index;
+};
+
+struct masArchtypeMap
 {
 	masArchtype **Archtypes;
+	masEntry      EntryList[MAS_ENTRY_MAX];
+	uint32_t      EntryCount;
 	uint32_t      ArchtypeCount;
 };
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+static masArchtypeMap *GMap = NULL;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +93,16 @@ uint64_t masArchtype_CreateEntity(const char* Components)
 
 	const masComponentList *ComponentList = masComponent_Query(FinalComponents);
 	
+	masArchtype* Archtype = masArchtype_Find(ComponentList);
+	if (!Archtype)
+	{
+		Archtype = masArchtype_Create(ComponentList);
+		if (!Archtype)
+			return 0;
+	}
+
+	// get empry entity index from it
+
 	return 0;
 }
 
