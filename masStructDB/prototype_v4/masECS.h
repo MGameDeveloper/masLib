@@ -3,6 +3,8 @@
 #include "masArchtype.h"
 #include "masComponent.h"
 #include "masCoreComponents.h"
+#include "masFrameMemory.h"
+
 
 void RegisterComponents()
 {
@@ -25,6 +27,8 @@ void RegisterComponents()
 
 bool masECS_Init()
 {
+	if (!masFrameMemory_Init())
+		return false;
 	if (!masComponent_Init())
 		return false;
 	if (!masArchtype_Init())
@@ -39,4 +43,9 @@ void masECS_DeInit()
 {
 	masArchtype_DeInit();
 	masComponent_DeInit();
+}
+
+void masECS_Update()
+{
+	masFrameMemory_Reset();
 }

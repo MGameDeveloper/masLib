@@ -23,6 +23,7 @@
     <ClCompile Include="prototype_v4\masArchtype.cpp" />
     <ClCompile Include="prototype_v4\masComponent.cpp" />
     <ClCompile Include="prototype_v4\masEntity.cpp" />
+    <ClCompile Include="prototype_v4\masFrameMemory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prototype_v4\masArchtype.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="prototype_v4\masCoreComponents.h" />
     <ClInclude Include="prototype_v4\masECS.h" />
     <ClInclude Include="prototype_v4\masEntity.h" />
+    <ClInclude Include="prototype_v4\masFrameMemory.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

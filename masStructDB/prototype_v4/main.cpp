@@ -18,8 +18,12 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 
-
 	masEntity Ent = masEntity_Create();
+
+	while (true)
+	{
+		masECS_Update();
+	}
 
 	masECS_DeInit();
 }

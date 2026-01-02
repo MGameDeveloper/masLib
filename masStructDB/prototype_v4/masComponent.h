@@ -13,6 +13,7 @@ struct masComponentList
 {
     char         *Names;
     masComponent *Components;
+    uint64_t      Hash;
     uint32_t      Count;
     uint32_t      NameLen;
 };

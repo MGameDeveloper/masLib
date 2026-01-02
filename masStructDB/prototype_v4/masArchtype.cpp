@@ -66,7 +66,7 @@ void masArchtype_DeInit()
 uint64_t masArchtype_CreateEntity(const char* Components)
 {
 	MAS_DECLARE_COMPONENTS(DefaultComponents, masPosition, masRotation, masScale, masWorldMatrix, masLocalMatrix, masParent);
-	
+
 	char FinalComponents[256] = { };
 	strcpy(FinalComponents, DefaultComponents);
 	if (Components != NULL)
