@@ -74,7 +74,6 @@ uint64_t masArchtype_CreateEntity(const char* Components)
 
 	const masComponentList *ComponentList = masComponent_Query(FinalComponents);
 	
-	int i = 0;
 	return 0;
 }
 
