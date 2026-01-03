@@ -60,6 +60,7 @@ struct masArchtypeMap
 	masEntry      EntryList[MAS_ENTRY_MAX];
 	uint32_t      EntryCount;
 	uint32_t      ArchtypeCount;
+	uint32_t      MaxArchtypeCount;
 };
 
 
@@ -74,6 +75,20 @@ static masArchtypeMap *GMap = NULL;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool masArchtype_Init()
 {
+	if (GMap)
+		return true;
+
+	size_t  MemSize = sizeof(masArchtypeMap);
+	void   *Data    = malloc(MemSize);
+	if (!Data)
+		return false;
+	memset(Data, 0, MemSize);
+
+	GMap = (masArchtypeMap*)Data;
+
+	for (uint32_t i = 0; i < MAS_ENTRY_MAX; ++i)
+		GMap->EntryList[i].Index = -1;
+
 	return true;
 }
 
@@ -92,7 +107,7 @@ uint64_t masArchtype_CreateEntity(const char* Components)
 		strcpy(FinalComponents + strlen(DefaultComponents), Components);
 
 	const masComponentList *ComponentList = masComponent_Query(FinalComponents);
-	
+#if 0	
 	masArchtype* Archtype = masArchtype_Find(ComponentList);
 	if (!Archtype)
 	{
@@ -100,7 +115,7 @@ uint64_t masArchtype_CreateEntity(const char* Components)
 		if (!Archtype)
 			return 0;
 	}
-
+#endif
 	// get empry entity index from it
 
 	return 0;

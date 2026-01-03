@@ -30,6 +30,9 @@
     <ClCompile Include="prototype_v4\masFrameMemory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="prototype_v4\internal\masChunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prototype_v4\masComponent.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prototype_v4\masFrameMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prototype_v4\internal\masChunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
