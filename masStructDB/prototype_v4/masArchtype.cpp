@@ -5,6 +5,7 @@
 #include "masArchtype.h"
 #include "masComponent.h"
 #include "masCoreComponents.h"
+#include "internal/masChunk.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,10 +43,10 @@ struct masChunk
 
 struct masArchtype
 {
-	masChunk         **Chunks;
-	masComponentList  *Components;
-	uint32_t           ChunkCount;
-	uint32_t           MaxEntityCount;
+	masComponentList *Components;
+	masChunkListID    ChunkList;
+	uint32_t          ChunkCount;
+	uint32_t          MaxEntityCount;
 };
 
 struct masEntry
