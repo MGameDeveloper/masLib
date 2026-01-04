@@ -1,16 +1,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "masComponent.h"
 #include "masFrameMemory.h"
+#include "internal/masMemory.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + (offset))
-#define MAS_MALLOC(type, size)            (type*)malloc(size)
 #define MAS_ENTRY_MAX                     (1024 * 3 * 5)
 #define MAS_COMPONENT_MAX                 (1024 * 3)
 
@@ -142,7 +140,7 @@ void masComponent_DeInit()
 	printf("[ TRACE ]: Writing Components to file\n");
 	printf("[ ERROR ]: Failed to write components to file\n");
 	
-	free(CompMap);
+	MAS_FREE(CompMap);
 	CompMap = NULL;
 }
 
@@ -281,6 +279,7 @@ const masComponentList* masComponent_Query(const char* Components)
 
 
 	// FILL COPMONENT LIST WITH COMPONENT DATA
+	uint32_t ComponentsSize = 0;
 	for (int32_t i = 0; i < ComponentList->Count; ++i)
 	{
 		const char* CompName = ComponentNameList[i];
@@ -290,6 +289,8 @@ const masComponentList* masComponent_Query(const char* Components)
 		DstComp->Hash     = SrcComp.Hash;
 		DstComp->UniqueID = SrcComp.UniqueID;
 		DstComp->Size     = SrcComp.Size;
+
+		ComponentsSize += DstComp->Size;
 	}
 
 
@@ -306,7 +307,8 @@ const masComponentList* masComponent_Query(const char* Components)
 			return (*(uint32_t*)a - *(uint32_t*)b);
 		});
 
-	ComponentList->Hash = masInternal_Hash(UniqueIDList, sizeof(uint32_t) * ComponentList->Count);
+	ComponentList->Hash           = masInternal_Hash(UniqueIDList, sizeof(uint32_t) * ComponentList->Count);
+	ComponentList->ComponentsSize = ComponentsSize;
 
 	return ComponentList;
 }

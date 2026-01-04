@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="prototype_v4\internal\masChunk.cpp" />
+    <ClCompile Include="prototype_v4\internal\masMemory.cpp" />
     <ClCompile Include="prototype_v4\main.cpp" />
     <ClCompile Include="prototype_v4\masArchtype.cpp" />
     <ClCompile Include="prototype_v4\masComponent.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="prototype_v4\masFrameMemory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="prototype_v4\internal\masMemory.h" />
     <ClInclude Include="prototype_v4\masArchtype.h" />
     <ClInclude Include="prototype_v4\internal\masChunk.h" />
     <ClInclude Include="prototype_v4\masComponent.h" />

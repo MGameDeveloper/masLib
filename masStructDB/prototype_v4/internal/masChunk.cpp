@@ -1,12 +1,11 @@
-#include <stdlib.h>
 #include <string.h>
 #include "masChunk.h"
+#include "masMemory.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAS_MALLOC(type, size) (type*)malloc(size)
 #define MAS_PTR_OFFSET(type, ptr, offset) (type*)(((uint8_t*)ptr) + (offset))
 #define MAS_CHUNK_SIZE (1024 * 16)
 
@@ -75,7 +74,7 @@ bool masInternal_Resize(uint32_t Count, uint32_t CountMultiplier)
 		Map->FreeIndexCount = GMap->FreeIndexCount;
 		Map->ListCount      = GMap->ListCount;
 
-		free(GMap);
+		MAS_FREE(GMap);
 		GMap = Map;
 	}
 
@@ -141,15 +140,15 @@ void masChunkList_DeInit()
 
 		for (uint32_t ChunkIdx = 0; ChunkIdx < List->MaxCount; ++ChunkIdx)
 		{
-			free(List->Chunks[ChunkIdx]);
+			MAS_FREE(List->Chunks[ChunkIdx]);
 			List->Chunks[ChunkIdx] = NULL;
 		}
 
-		free(List->Chunks);
+		MAS_FREE(List->Chunks);
 		List->Chunks = NULL;
 	}
 
-	free(GMap);
+	MAS_FREE(GMap);
 	GMap = NULL;
 }
 
@@ -187,12 +186,12 @@ masChunkListID masChunkList_Create()
 	return { ListHandle.Handle };
 }
 
-void masChunkList_Free(masChunkListID ChunkID)
+void masChunkList_Free(masChunkListID ChunkListID)
 {
 	if (!GMap)
 		return;
 
-	masChunkListHandle ListHandle = { ChunkID.ID };
+	masChunkListHandle ListHandle = { ChunkListID.ID };
 	if (ListHandle.ListIdx >= GMap->MaxListCount || ListHandle.Handle == 0 || ListHandle.Version == 0)
 		return;
 
@@ -206,4 +205,15 @@ void masChunkList_Free(masChunkListID ChunkID)
 		List->Version = 1;
 
 	GMap->FreeIndices[GMap->FreeIndexCount++] = ListHandle.ListIdx;
+}
+
+size_t masChunkList_ChunkSize()
+{
+	return MAS_CHUNK_SIZE;
+}
+
+bool masChunkList_IsValid(masChunkListID ChunkListID)
+{
+	masChunkListHandle ChunkHandle = { ChunkListID.ID };
+	return (ChunkHandle.Version != 0);
 }

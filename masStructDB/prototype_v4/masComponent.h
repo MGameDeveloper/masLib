@@ -16,6 +16,7 @@ struct masComponentList
     uint64_t      Hash;
     uint32_t      Count;
     uint32_t      NameLen;
+    uint32_t      ComponentsSize;
 };
 
 bool         masComponent_Init();

@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "internal/masMemory.h"
 #include "masFrameMemory.h"
 
 
@@ -43,7 +43,7 @@ bool masFrameMemory_Init()
 	if (GFrameMem.Data != NULL)
 		return true;
 
-	void* Data = malloc(MAS_FRAME_MEMORY_SIZE);
+	void* Data = MAS_MALLOC(void, MAS_FRAME_MEMORY_SIZE);
 	if (!Data)
 		return false;
 	memset(Data, 0, MAS_FRAME_MEMORY_SIZE);
@@ -56,7 +56,7 @@ bool masFrameMemory_Init()
 
 void  masFrameMemory_DeInit()
 {
-	free(GFrameMem.Data);
+	MAS_FREE(GFrameMem.Data);
 	memset(&GFrameMem, 0, sizeof(masFrameMemory));
 }
 
